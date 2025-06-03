@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Tương Tác: Poka-Yoke Trong Phát Triển Phần Mềm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #F8F7F4; /* Warm neutral background */
+            color: #3D405B; /* Deep indigo for primary text */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 300px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 350px;
+            }
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #81B29A; /* Muted teal for active/accent */
+            color: #FFFFFF;
+            font-weight: 600;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        }
+        .poka-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        .poka-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .tag-prevention { background-color: #A9D8B8; color: #1E4620; } /* Lighter green for prevention */
+        .tag-warning { background-color: #FCE2A4; color: #7A5300; }   /* Soft yellow for warning */
+        .tag-control { background-color: #F4B8B8; color: #6C1D1D; }    /* Muted red for control */
+
+        /* Modal styles */
+        .modal-overlay {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .modal-content {
+            transition: transform 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm sticky top-0 z-40">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-xl font-bold text-[#3D405B]">Poka-Yoke</span>
+                    <span class="text-xl font-light text-[#81B29A] ml-2">/ Nâng tầm chất lượng</span>
+                </div>
+                <nav class="hidden md:flex space-x-6">
+                    <a href="#principles" class="text-gray-600 hover:text-[#81B29A] transition">Nguyên Tắc</a>
+                    <a href="#examples" class="text-gray-600 hover:text-[#81B29A] transition">Ví Dụ Thực Tế</a>
+                    <a href="#process" class="text-gray-600 hover:text-[#81B29A] transition">Quy Trình Áp Dụng</a>
+                    <a href="#insights" class="text-gray-600 hover:text-[#81B29A] transition">Phân Tích</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <section class="text-center mb-16">
+            <h1 class="text-3xl md:text-5xl font-bold text-[#3D405B] mb-4">Áp Dụng Poka-Yoke Trong Phát Triển Phần Mềm</h1>
+            <p class="text-lg md:text-xl text-gray-600 max-w-3xl mx-auto">Một dashboard tương tác giúp bạn khám phá triết lý "Phòng Ngừa Sai Lỗi" của Nhật Bản, nâng cao chất lượng sản phẩm và văn hóa đội nhóm từ gốc rễ.</p>
+        </section>
+
+        <section id="principles" class="mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#3D405B]">Ba Chức Năng Cốt Lõi Của Poka-Yoke</h2>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md text-center poka-card">
+                    <div class="text-4xl mb-4">🛡️</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#3D405B]">Ngăn chặn (Prevention)</h3>
+                    <p class="text-gray-600">Thiết kế quy trình hoặc công cụ để lỗi không thể xảy ra ngay từ đầu. Đây là hình thức lý tưởng nhất.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center poka-card">
+                    <div class="text-4xl mb-4">🔔</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#3D405B]">Cảnh báo (Warning)</h3>
+                    <p class="text-gray-600">Phát tín hiệu ngay khi lỗi vừa xảy ra để người dùng nhận biết và khắc phục kịp thời.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md text-center poka-card">
+                    <div class="text-4xl mb-4">🛑</div>
+                    <h3 class="text-xl font-semibold mb-2 text-[#3D405B]">Kiểm soát (Control)</h3>
+                    <p class="text-gray-600">Tự động dừng quy trình khi phát hiện lỗi, không cho phép lỗi lan rộng sang công đoạn tiếp theo.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="examples" class="mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-2 text-[#3D405B]">Poka-Yoke Dành Cho Bạn</h2>
+            <p class="text-center text-gray-600 mb-8">Chọn vai trò của bạn để xem các ví dụ thực tế và cách áp dụng chi tiết.</p>
+            <div id="role-filter" class="flex flex-wrap justify-center gap-2 md:gap-4 mb-8">
+                <button data-role="all" class="nav-button active px-4 py-2 rounded-full bg-gray-200 text-gray-700">Tất cả</button>
+                <button data-role="developer" class="nav-button px-4 py-2 rounded-full bg-gray-200 text-gray-700">Developer</button>
+                <button data-role="qc" class="nav-button px-4 py-2 rounded-full bg-gray-200 text-gray-700">QC/Tester</button>
+                <button data-role="manager" class="nav-button px-4 py-2 rounded-full bg-gray-200 text-gray-700">Manager</button>
+                <button data-role="leader" class="nav-button px-4 py-2 rounded-full bg-gray-200 text-gray-700">Leader</button>
+                <button data-role="communicator" class="nav-button px-4 py-2 rounded-full bg-gray-200 text-gray-700">IT Comtor/BA</button>
+            </div>
+
+            <div id="poka-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                </div>
+        </section>
+        
+        <section id="process" class="mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#3D405B]">Hành Trình Áp Dụng Poka-Yoke (Kaizen)</h2>
+            <div class="flex flex-col md:flex-row justify-center items-stretch md:space-x-2">
+                <div class="flex-1 flex flex-col items-center text-center p-3">
+                    <div class="bg-[#81B29A] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-2">1</div>
+                    <h4 class="font-semibold">Xác định Lỗi</h4>
+                    <p class="text-sm text-gray-600">Tìm các lỗi thường gặp, rủi ro cao trong quy trình làm việc hiện tại.</p>
+                </div>
+                <div class="text-gray-300 text-2xl hidden md:flex items-center">→</div>
+                <div class="flex-1 flex flex-col items-center text-center p-3">
+                    <div class="bg-[#E07A5F] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-2">2</div>
+                    <h4 class="font-semibold">Phân tích Gốc rễ</h4>
+                    <p class="text-sm text-gray-600">Sử dụng các kỹ thuật như 5 Whys hoặc Fishbone Diagram để tìm ra nguyên nhân sâu xa.</p>
+                </div>
+                 <div class="text-gray-300 text-2xl hidden md:flex items-center">→</div>
+                <div class="flex-1 flex flex-col items-center text-center p-3">
+                    <div class="bg-[#F4D35E] text-black w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-2">3</div>
+                     <h4 class="font-semibold">Brainstorm Giải pháp</h4>
+                     <p class="text-sm text-gray-600">Đề xuất các cơ chế Poka-Yoke: tự động hóa, checklist, thay đổi thiết kế, cảnh báo...</p>
+                </div>
+                 <div class="text-gray-300 text-2xl hidden md:flex items-center">→</div>
+                <div class="flex-1 flex flex-col items-center text-center p-3">
+                    <div class="bg-[#3D405B] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-2">4</div>
+                     <h4 class="font-semibold">Triển khai & Ưu tiên</h4>
+                     <p class="text-sm text-gray-600">Bắt đầu với những giải pháp dễ thực hiện, mang lại hiệu quả cao ("low-hanging fruit").</p>
+                </div>
+                 <div class="text-gray-300 text-2xl hidden md:flex items-center">→</div>
+                <div class="flex-1 flex flex-col items-center text-center p-3">
+                    <div class="bg-[#B2B2B2] text-white w-12 h-12 rounded-full flex items-center justify-center font-bold text-xl mb-2">5</div>
+                     <h4 class="font-semibold">Đo lường & Cải tiến</h4>
+                     <p class="text-sm text-gray-600">Theo dõi hiệu quả của giải pháp Poka-Yoke và tiếp tục điều chỉnh, cải tiến liên tục.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="insights" class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-16">
+            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#3D405B]">Góc Nhìn Dữ Liệu</h2>
+            <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Chi Phí Sửa Lỗi Tăng Theo Thời Gian</h3>
+                    <p class="text-center text-gray-600 mb-4 text-sm">Phát hiện lỗi càng muộn, chi phí sửa chữa càng tăng theo cấp số nhân. Poka-Yoke giúp chúng ta phát hiện lỗi sớm để giảm thiểu chi phí này.</p>
+                    <div class="chart-container">
+                        <canvas id="costOfBugsChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold text-center mb-4">Phân Bổ Kỹ Thuật Poka-Yoke Theo Vai Trò</h3>
+                     <p class="text-center text-gray-600 mb-4 text-sm">Biểu đồ này cho thấy sự phân bổ các ví dụ Poka-Yoke được liệt kê trong dashboard này cho từng vai trò. Mọi người đều có vai trò quan trọng trong việc xây dựng chất lượng.</p>
+                    <div class="chart-container">
+                        <canvas id="rolesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <section class="text-center">
+             <h2 class="text-2xl md:text-3xl font-bold text-center mb-4 text-[#3D405B]">Xây Dựng Văn Hóa Chất Lượng</h2>
+             <p class="text-lg text-gray-600 max-w-3xl mx-auto mb-8">Poka-Yoke không chỉ là công cụ, mà là một tư duy. Hãy cùng nhau xây dựng một môi trường "Không Đổ Lỗi", nơi mỗi sai sót là một cơ hội để học hỏi và cải tiến quy trình.</p>
+             <a href="#examples" class="bg-[#E07A5F] text-white font-bold py-3 px-6 rounded-lg hover:bg-opacity-90 transition shadow-lg">Bắt đầu khám phá ngay!</a>
+        </section>
+
+    </main>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p>&copy; 2024 Poka-Yoke Interactive Dashboard. Được tạo ra với tinh thần Kaizen.</p>
+        </div>
+    </footer>
+
+    <div id="detailModal" class="modal-overlay fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50 p-4 opacity-0">
+        <div class="modal-content relative mx-auto p-6 border w-full max-w-xl shadow-xl rounded-lg bg-white transform scale-95">
+            <div class="flex justify-between items-center pb-3">
+                <h3 class="text-xl leading-6 font-bold text-[#3D405B]" id="modalTitle">Chi tiết Poka-Yoke</h3>
+                <button id="closeModalButtonCross" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+            </div>
+            <div class="mt-2">
+                <div id="modalContent" class="text-sm text-gray-700 space-y-3 max-h-[60vh] overflow-y-auto pr-2">
+                    </div>
+            </div>
+            <div class="items-center pt-4 mt-4 border-t border-gray-200">
+                <button id="closeModalButton" class="w-full px-4 py-2 bg-[#E07A5F] text-white text-base font-medium rounded-md shadow-sm hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-[#E07A5F]">
+                    Đóng
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const pokaData = [
+                { 
+                    role: 'developer', type: 'prevention', title: 'Sử dụng IDE thông minh', 
+                    desc: 'Tự động hoàn thành code, kiểm tra cú pháp tức thì để ngăn lỗi cơ bản.',
+                    details: [
+                        "Cài đặt và cấu hình các extension/plugin hỗ trợ cho ngôn ngữ lập trình của bạn (ví dụ: ESLint, Prettier cho JavaScript; Pylint cho Python).",
+                        "Bật tính năng 'real-time error checking' hoặc 'live linting' trong cài đặt IDE.",
+                        "Thường xuyên cập nhật IDE và các extension để có những tính năng và bản vá lỗi mới nhất.",
+                        "Tận dụng tính năng 'code snippets' hoặc 'live templates' để chèn nhanh các đoạn code thường dùng, giảm thiểu lỗi gõ tay."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'prevention', title: 'Áp dụng Coding Standards', 
+                    desc: 'Sử dụng Linters/Formatters tự động để đảm bảo code nhất quán, giảm lỗi logic.',
+                    details: [
+                        "Thống nhất bộ quy tắc coding (coding convention) cho toàn đội.",
+                        "Cấu hình Linter (ví dụ: ESLint cho JS, Checkstyle cho Java) để tự động kiểm tra code theo quy tắc đã định.",
+                        "Sử dụng Formatter (ví dụ: Prettier) để tự động định dạng code, đảm bảo tính nhất quán về hình thức.",
+                        "Tích hợp Linter và Formatter vào pre-commit hook để code được kiểm tra và định dạng trước khi commit."
+                    ]
+                },
+                 { 
+                    role: 'developer', type: 'prevention', title: 'Sử dụng Strict Mode (JavaScript)', 
+                    desc: "Kích hoạt strict mode để bắt các lỗi phổ biến và các hành vi 'không an toàn' trong JavaScript.",
+                    details: [
+                        "Thêm `'use strict';` ở đầu file JavaScript hoặc ở đầu hàm.",
+                        "Hiểu rõ các thay đổi mà strict mode mang lại (ví dụ: không cho phép gán giá trị cho biến chưa khai báo, `this` trong hàm không trỏ về global object).",
+                        "Kiểm tra console của trình duyệt để phát hiện các lỗi được strict mode báo cáo.",
+                        "Strict mode giúp viết code an toàn hơn và dễ debug hơn."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'prevention', title: 'Thiết kế API/Function chặt chẽ', 
+                    desc: 'Sử dụng kiểu dữ liệu mạnh (strong typing), tham số bắt buộc rõ ràng để ngăn việc gọi hàm sai cách.',
+                    details: [
+                        "Sử dụng TypeScript hoặc các công cụ kiểm tra kiểu tĩnh cho JavaScript (Flow).",
+                        "Trong các ngôn ngữ có kiểu tĩnh (Java, C#), định nghĩa rõ ràng kiểu dữ liệu cho tham số và giá trị trả về.",
+                        "Đánh dấu các tham số là bắt buộc (non-nullable) nếu cần thiết.",
+                        "Cung cấp tài liệu API rõ ràng (ví dụ: Swagger/OpenAPI) để người dùng hiểu cách sử dụng đúng."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'warning', title: 'Viết Unit & Integration Test', 
+                    desc: 'Test runner sẽ cảnh báo ngay khi có test case thất bại, chỉ rõ vị trí lỗi.',
+                    details: [
+                        "Viết Unit Test cho từng hàm, module nhỏ để đảm bảo chúng hoạt động đúng như mong đợi.",
+                        "Viết Integration Test để kiểm tra sự tương tác giữa các module.",
+                        "Đặt mục tiêu độ bao phủ code (code coverage) cao cho các test.",
+                        "Chạy test tự động trong CI/CD pipeline để phát hiện lỗi sớm."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'warning', title: 'Phân tích code tĩnh (SAST)', 
+                    desc: 'Công cụ như SonarQube cảnh báo về "code smell", lỗ hổng bảo mật tiềm ẩn.',
+                    details: [
+                        "Tích hợp công cụ SAST vào quy trình phát triển (ví dụ: chạy tự động trong CI pipeline).",
+                        "Review các cảnh báo từ SAST và ưu tiên khắc phục các vấn đề nghiêm trọng.",
+                        "Tùy chỉnh bộ quy tắc của SAST cho phù hợp với dự án và tiêu chuẩn của đội."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'control', title: 'Sử dụng Quality Gates (CI/CD)', 
+                    desc: 'Không cho phép build/deploy nếu code không đạt ngưỡng chất lượng.',
+                    details: [
+                        "Định nghĩa các tiêu chí chất lượng (Quality Gates) trong CI/CD pipeline (ví dụ: % test coverage, không có lỗi nghiêm trọng từ SAST, tất cả unit test phải pass).",
+                        "Cấu hình pipeline tự động dừng nếu không đạt Quality Gates.",
+                        "Thông báo cho team khi build bị lỗi do không đạt Quality Gates để khắc phục kịp thời."
+                    ]
+                },
+                { 
+                    role: 'developer', type: 'control', title: 'Sử dụng Feature Flags', 
+                    desc: 'Cho phép bật/tắt tính năng mới một cách an toàn, có thể tắt ngay nếu phát sinh lỗi.',
+                    details: [
+                        "Sử dụng thư viện hoặc dịch vụ quản lý feature flag.",
+                        "Bao bọc code của tính năng mới bằng feature flag.",
+                        "Triển khai tính năng mới ở trạng thái 'tắt' (off) theo mặc định.",
+                        "Bật dần tính năng cho một nhóm nhỏ người dùng (canary release) hoặc cho môi trường staging trước khi bật cho tất cả người dùng.",
+                        "Có kế hoạch rollback nhanh chóng bằng cách tắt feature flag nếu có sự cố."
+                    ]
+                },
+                { 
+                    role: 'qc', type: 'prevention', title: 'Tham gia review sớm', 
+                    desc: 'Phát hiện mập mờ, thiếu sót trong tài liệu yêu cầu và thiết kế ngay từ đầu.',
+                    details: [
+                        "Tham gia vào các buổi review tài liệu yêu cầu (SRS) và tài liệu thiết kế (Design Document).",
+                        "Đặt câu hỏi để làm rõ các điểm chưa hiểu, các trường hợp ngoại lệ.",
+                        "Đóng góp ý kiến từ góc độ kiểm thử để đảm bảo tính khả thi và khả năng kiểm thử của yêu cầu/thiết kế.",
+                        "Việc này giúp ngăn ngừa lỗi từ giai đoạn sớm nhất, giảm chi phí sửa lỗi sau này."
+                    ]
+                },
+                 { 
+                    role: 'qc', type: 'prevention', title: 'Sử dụng Test Checklist chi tiết', 
+                    desc: 'Đảm bảo không bỏ sót các kịch bản kiểm thử quan trọng, dựa trên yêu cầu và lỗi thường gặp.',
+                    details: [
+                        "Tạo checklist dựa trên tài liệu yêu cầu, user stories, và các lỗi thường gặp trong các dự án tương tự.",
+                        "Cập nhật checklist thường xuyên khi có thay đổi yêu cầu hoặc phát hiện ra các kịch bản mới.",
+                        "Sử dụng checklist như một hướng dẫn khi thực hiện kiểm thử thủ công hoặc khi thiết kế test case tự động.",
+                        "Chia sẻ checklist với team để mọi người cùng nắm được phạm vi kiểm thử."
+                    ]
+                },
+                { 
+                    role: 'qc', type: 'prevention', title: 'Thiết kế Test Case có hệ thống', 
+                    desc: 'Chủ động tìm lỗi bằng cách kiểm tra các giá trị biên, trường hợp ngoại lệ.',
+                    details: [
+                        "Áp dụng các kỹ thuật thiết kế test case như Phân vùng tương đương (Equivalence Partitioning), Phân tích giá trị biên (Boundary Value Analysis), Bảng quyết định (Decision Tables).",
+                        "Thiết kế test case cho cả luồng chính (happy path) và các luồng phụ, luồng lỗi (negative paths).",
+                        "Đảm bảo test case có các bước thực hiện rõ ràng, kết quả mong đợi cụ thể và điều kiện tiên quyết (nếu có).",
+                        "Review test case với BA/Developer để đảm bảo tính đầy đủ và chính xác."
+                    ]
+                },
+                { 
+                    role: 'qc', type: 'prevention', title: 'Tự động hóa Test Case lặp đi lặp lại', 
+                    desc: 'Sử dụng công cụ tự động hóa (Selenium, Cypress) để chạy các test case hồi quy, giảm lỗi do con người.',
+                    details: [
+                        "Xác định các test case ổn định, có tần suất thực thi cao và phù hợp để tự động hóa (thường là các test hồi quy).",
+                        "Chọn công cụ tự động hóa phù hợp với công nghệ của dự án và kỹ năng của team.",
+                        "Viết script test rõ ràng, dễ bảo trì, có thể tái sử dụng và tích hợp vào CI/CD pipeline.",
+                        "Thường xuyên review và cập nhật script test khi có thay đổi trong ứng dụng để đảm bảo tính hiệu quả."
+                    ]
+                },
+                { 
+                    role: 'qc', type: 'warning', title: 'Sử dụng Bug Tracking Tools hiệu quả', 
+                    desc: 'Quy trình báo cáo lỗi rõ ràng, có các trường thông tin bắt buộc, thông báo tự động.',
+                     details: [
+                        "Thống nhất template báo cáo lỗi với các trường thông tin cần thiết (Tiêu đề, Các bước tái hiện, Kết quả mong đợi, Kết quả thực tế, Môi trường, Mức độ nghiêm trọng, Ảnh chụp/Video).",
+                        "Phân loại lỗi (Bug Triage) và gán mức độ ưu tiên (Priority) một cách hợp lý.",
+                        "Theo dõi trạng thái của bug thường xuyên và đảm bảo bug được xử lý.",
+                        "Sử dụng tính năng thông báo tự động của tool để các bên liên quan được cập nhật."
+                    ]
+                },
+                { 
+                    role: 'qc', type: 'control', title: 'Áp dụng "Definition of Done" (DoD)', 
+                    desc: 'Không chuyển task sang giai đoạn tiếp theo nếu chưa pass hết test case liên quan và không còn bug nghiêm trọng.',
+                    details: [
+                        "Cùng team định nghĩa rõ ràng các tiêu chí trong DoD cho một User Story hoặc Task (ví dụ: code đã được review, unit test pass, integration test pass, test case của QC pass, tài liệu được cập nhật).",
+                        "Đảm bảo mọi thành viên hiểu và tuân thủ DoD.",
+                        "Không đánh dấu một task là 'Done' nếu chưa đáp ứng tất cả các tiêu chí trong DoD.",
+                        "Review và cập nhật DoD định kỳ cho phù hợp với tình hình dự án."
+                    ]
+                },
+                { 
+                    role: 'manager', type: 'prevention', title: 'Quy trình làm việc rõ ràng (Workflow)', 
+                    desc: 'Sử dụng Kanban/Scrum board để trực quan hóa luồng công việc, tránh bỏ sót việc.',
+                    details: [
+                        "Định nghĩa rõ ràng các giai đoạn trong quy trình phát triển (ví dụ: To Do, In Progress, In Review, Testing, Done).",
+                        "Thiết lập giới hạn công việc đang thực hiện (WIP limits) cho mỗi giai đoạn để tránh quá tải và tắc nghẽn.",
+                        "Sử dụng công cụ quản lý dự án (Jira, Trello, Asana) để trực quan hóa workflow và theo dõi tiến độ công việc.",
+                        "Thường xuyên rà soát và cải tiến workflow dựa trên phản hồi của team."
+                    ]
+                },
+                { 
+                    role: 'manager', type: 'prevention', title: 'Sử dụng template chuẩn cho tài liệu', 
+                    desc: 'Đảm bảo các tài liệu quan trọng (kế hoạch, báo cáo...) luôn đầy đủ, nhất quán.',
+                    details: [
+                        "Xây dựng các template cho các loại tài liệu thường dùng trong dự án (ví dụ: Kế hoạch dự án, Báo cáo tiến độ, Tài liệu yêu cầu, Biên bản họp).",
+                        "Đảm bảo template có các mục cần thiết, cấu trúc rõ ràng và dễ hiểu.",
+                        "Hướng dẫn team sử dụng template và lưu trữ tài liệu ở một nơi tập trung, dễ truy cập.",
+                        "Review định kỳ để đảm bảo template vẫn còn phù hợp và được sử dụng đúng cách."
+                    ]
+                },
+                { 
+                    role: 'manager', type: 'prevention', title: 'Định kỳ tổ chức Buổi Retrospective', 
+                    desc: 'Tạo không gian để team nhìn lại quá trình làm việc, xác định điểm tốt, điểm cần cải thiện và các lỗi đã xảy ra để rút kinh nghiệm.',
+                    details: [
+                        "Lên lịch retrospective đều đặn (ví dụ: cuối mỗi Sprint trong Scrum, hoặc định kỳ hàng tháng).",
+                        "Sử dụng các format khác nhau (Start-Stop-Continue, Mad-Sad-Glad, 4Ls) để buổi họp không nhàm chán và thu hút sự tham gia.",
+                        "Tạo môi trường an toàn, khuyến khích mọi người chia sẻ thẳng thắn, tập trung vào quy trình và vấn đề, không đổ lỗi cá nhân.",
+                        "Ghi lại các 'action items' cụ thể để cải tiến và phân công người chịu trách nhiệm theo dõi việc thực hiện chúng."
+                    ]
+                },
+                { 
+                    role: 'manager', type: 'warning', title: 'Dashboard theo dõi dự án (KPIs)', 
+                    desc: 'Hiển thị các chỉ số quan trọng, cảnh báo màu sắc khi có rủi ro về tiến độ hoặc chất lượng.',
+                    details: [
+                        "Xác định các chỉ số hiệu suất chính (KPIs) quan trọng cho dự án (ví dụ: % hoàn thành, burndown/burnup chart, số lượng bug tồn đọng, thời gian xử lý bug, tỷ lệ test case pass).",
+                        "Sử dụng công cụ quản lý dự án hoặc các tool dashboard để trực quan hóa các KPIs này.",
+                        "Thiết lập ngưỡng cảnh báo (ví dụ: màu đỏ nếu tiến độ trễ quá X%, màu vàng nếu số bug nghiêm trọng vượt quá Y).",
+                        "Review dashboard thường xuyên (ví dụ: hàng ngày hoặc hàng tuần) để nắm bắt tình hình và đưa ra quyết định kịp thời."
+                    ]
+                },
+                { 
+                    role: 'manager', type: 'control', title: 'Quy trình Go/No-Go Decision cho Release', 
+                    desc: 'Không release sản phẩm nếu chưa đạt các tiêu chí chất lượng đã định trước.',
+                    details: [
+                        "Xác định rõ ràng các tiêu chí chất lượng (Quality Criteria) cho việc release sản phẩm (ví dụ: % test case pass, không còn bug nghiêm trọng/blocker, UAT được khách hàng chấp thuận, tài liệu đầy đủ).",
+                        "Tổ chức buổi họp Go/No-Go với các bên liên quan (stakeholders) trước mỗi đợt release.",
+                        "Trình bày tình trạng dự án, các chỉ số chất lượng và các rủi ro còn lại (nếu có).",
+                        "Quyết định Go (tiến hành release) hoặc No-Go (hoãn release để khắc phục) dựa trên các tiêu chí đã thống nhất."
+                    ]
+                },
+                { 
+                    role: 'leader', type: 'prevention', title: 'Khuyến khích Pair Programming', 
+                    desc: 'Hai cặp mắt cùng nhìn vào code sẽ giúp phát hiện lỗi và chia sẻ kiến thức tốt hơn.',
+                    details: [
+                        "Giải thích lợi ích của Pair Programming cho team (chất lượng code cao hơn, chia sẻ kiến thức, giảm bus factor).",
+                        "Tạo điều kiện về không gian và công cụ để team có thể thực hiện Pair Programming hiệu quả.",
+                        "Khuyến khích áp dụng cho các task phức tạp, module quan trọng hoặc khi onboarding thành viên mới.",
+                        "Không bắt buộc, nhưng tạo văn hóa để mọi người thấy thoải mái khi đề xuất hoặc tham gia."
+                    ]
+                },
+                 { 
+                    role: 'leader', type: 'prevention', title: 'Xây dựng văn hóa chia sẻ kiến thức', 
+                    desc: 'Tạo không khí tin tưởng để mọi người dám nói lên vấn đề, không giấu lỗi, chia sẻ giải pháp.',
+                    details: [
+                        "Tổ chức các buổi chia sẻ kiến thức nội bộ (internal tech talks, brown bag sessions).",
+                        "Khuyến khích việc viết tài liệu, tạo wiki cho dự án.",
+                        "Sử dụng các công cụ chat/collaboration để team dễ dàng trao đổi và đặt câu hỏi.",
+                        "Tạo không gian an toàn để mọi người dám thừa nhận khi không biết và sẵn sàng học hỏi từ người khác."
+                    ]
+                },
+                { 
+                    role: 'leader', type: 'prevention', title: 'Thúc đẩy Văn hóa "Fail Fast, Learn Faster"', 
+                    desc: 'Khuyến khích team thử nghiệm, chấp nhận rủi ro nhỏ để học hỏi nhanh chóng, thay vì sợ sai và không dám đổi mới.',
+                    details: [
+                        "Tạo môi trường an toàn tâm lý, nơi thất bại nhỏ được coi là một phần của quá trình học hỏi và đổi mới, không phải là điều để trừng phạt.",
+                        "Khuyến khích chia nhỏ các thử nghiệm lớn thành các bước nhỏ, có thể kiểm soát được để giảm thiểu tác động nếu có lỗi.",
+                        "Tổ chức các buổi chia sẻ bài học kinh nghiệm (lessons learned) từ cả thành công và thất bại một cách cởi mở.",
+                        "Lãnh đạo cần làm gương bằng cách thừa nhận sai lầm của chính mình và cách mình đã học hỏi từ đó."
+                    ]
+                },
+                { 
+                    role: 'leader', type: 'warning', title: 'Tổ chức họp 1-1 thường xuyên', 
+                    desc: 'Nắm bắt khó khăn, vướng mắc của thành viên để hỗ trợ kịp thời, ngăn rủi ro.',
+                    details: [
+                        "Lên lịch họp 1-1 định kỳ với từng thành viên (ví dụ: 2 tuần/lần hoặc 1 tháng/lần).",
+                        "Chuẩn bị trước các chủ đề cần thảo luận (ví dụ: tiến độ công việc, khó khăn gặp phải, định hướng phát triển cá nhân, phản hồi về team/dự án).",
+                        "Lắng nghe chủ động và tạo không gian để thành viên chia sẻ thoải mái.",
+                        "Cùng nhau tìm giải pháp cho các vấn đề và đặt ra các mục tiêu cụ thể."
+                    ]
+                },
+                { 
+                    role: 'leader', type: 'control', title: 'Thiết lập quy trình Code Review nghiêm túc', 
+                    desc: 'Code phải được ít nhất một người khác review và approve trước khi merge vào nhánh chính.',
+                    details: [
+                        "Xây dựng checklist cho code review (ví dụ: code có dễ hiểu không, có tuân thủ coding standard không, có unit test không, có xử lý lỗi không, có vấn đề về performance/security không?).",
+                        "Yêu cầu ít nhất một (hoặc hai) reviewer cho mỗi Pull Request/Merge Request.",
+                        "Reviewer cần đưa ra phản hồi mang tính xây dựng, tập trung vào chất lượng code, không công kích cá nhân.",
+                        "Developer cần tiếp thu phản hồi và thực hiện các thay đổi cần thiết trước khi code được merge."
+                    ]
+                },
+                { 
+                    role: 'communicator', type: 'prevention', title: 'Sử dụng Glossary (Bảng thuật ngữ)', 
+                    desc: 'Tránh hiểu lầm về thuật ngữ nghiệp vụ giữa khách hàng và team phát triển.',
+                    details: [
+                        "Tạo một tài liệu Glossary chung cho dự án, liệt kê các thuật ngữ chuyên ngành, từ viết tắt, và các khái niệm nghiệp vụ quan trọng.",
+                        "Định nghĩa rõ ràng cho mỗi thuật ngữ, nếu có thể hãy kèm theo ví dụ minh họa.",
+                        "Chia sẻ Glossary với tất cả các bên liên quan (khách hàng, team phát triển, QC, Manager).",
+                        "Cập nhật Glossary thường xuyên khi có thuật ngữ mới hoặc thay đổi trong định nghĩa."
+                    ]
+                },
+                { 
+                    role: 'communicator', type: 'prevention', title: 'Xác nhận yêu cầu bằng văn bản & hình ảnh', 
+                    desc: 'Sử dụng mockups, prototypes để đảm bảo hiểu đúng ý khách hàng trước khi phát triển.',
+                    details: [
+                        "Sau các buổi họp, tóm tắt lại các yêu cầu đã thống nhất bằng văn bản và gửi email xác nhận cho khách hàng.",
+                        "Sử dụng wireframes, mockups hoặc prototypes để minh họa các yêu cầu phức tạp hoặc liên quan đến giao diện người dùng.",
+                        "Yêu cầu khách hàng xác nhận (approve) các tài liệu này trước khi chuyển cho đội phát triển.",
+                        "Lưu trữ tất cả các tài liệu và xác nhận một cách có hệ thống để dễ dàng tra cứu khi cần."
+                    ]
+                },
+                { 
+                    role: 'communicator', type: 'prevention', title: 'Sử dụng Kỹ thuật "Prototyping"', 
+                    desc: 'Tạo các bản mẫu (mockup, wireframe, prototype tương tác) để khách hàng hình dung rõ hơn về sản phẩm, giúp phát hiện hiểu lầm sớm.',
+                    details: [
+                        "Chọn công cụ prototyping phù hợp với nhu cầu và kỹ năng (ví dụ: Figma, Adobe XD, Balsamiq, hoặc thậm chí là vẽ tay trên giấy).",
+                        "Tập trung vào luồng người dùng (user flow) và các tương tác chính trong giai đoạn đầu, không cần quá chi tiết về mặt thẩm mỹ.",
+                        "Trình bày prototype cho khách hàng và các stakeholders để thu thập phản hồi thường xuyên và sớm nhất có thể.",
+                        "Lặp lại quá trình cập nhật prototype dựa trên phản hồi cho đến khi đạt được sự đồng thuận về yêu cầu và thiết kế cơ bản."
+                    ]
+                },
+                { 
+                    role: 'communicator', type: 'warning', title: 'Luôn có Biên bản họp (MoM)', 
+                    desc: 'Ghi lại quyết định, đầu việc, người chịu trách nhiệm và gửi xác nhận cho các bên.',
+                    details: [
+                        "Chỉ định một người chịu trách nhiệm ghi biên bản cho mỗi buổi họp quan trọng.",
+                        "Biên bản cần ghi rõ: Ngày giờ, người tham dự, các nội dung chính đã thảo luận, các quyết định đã đưa ra, các đầu việc (action items) cần thực hiện, người chịu trách nhiệm cho mỗi đầu việc và deadline (nếu có).",
+                        "Gửi biên bản họp cho tất cả những người tham dự (và các bên liên quan khác nếu cần) trong thời gian sớm nhất sau cuộc họp (thường trong vòng 24 giờ).",
+                        "Yêu cầu mọi người xem lại và xác nhận nội dung biên bản để đảm bảo tính chính xác và đồng thuận."
+                    ]
+                },
+                { 
+                    role: 'communicator', type: 'control', title: 'Không phát triển khi yêu cầu mập mờ', 
+                    desc: 'Tính năng chỉ được bắt đầu khi tài liệu yêu cầu đã được phê duyệt và làm rõ hoàn toàn.',
+                    details: [
+                        "Thiết lập một quy trình rõ ràng rằng đội phát triển chỉ bắt đầu làm việc với các yêu cầu đã được BA/Comtor xác nhận là 'Ready for Development'.",
+                        "Một yêu cầu 'Ready' nghĩa là đã được khách hàng phê duyệt, các câu hỏi đã được giải đáp, các phụ thuộc đã được xác định.",
+                        "Nếu có bất kỳ điểm nào chưa rõ ràng, BA/Comtor phải làm việc lại với khách hàng để làm rõ trước khi chuyển cho đội phát triển.",
+                        "Việc này giúp tránh lãng phí thời gian và công sức vào việc phát triển sai yêu cầu."
+                    ]
+                }
+            ];
+
+            const grid = document.getElementById('poka-grid');
+            const filterContainer = document.getElementById('role-filter');
+            
+            const modal = document.getElementById('detailModal');
+            const modalTitleEl = document.getElementById('modalTitle');
+            const modalContentEl = document.getElementById('modalContent');
+            const closeModalButton = document.getElementById('closeModalButton');
+            const closeModalButtonCross = document.getElementById('closeModalButtonCross');
+
+            let currentFilteredData = [];
+
+
+            function getTypeClass(type) {
+                if (type === 'prevention') return 'tag-prevention';
+                if (type === 'warning') return 'tag-warning';
+                if (type === 'control') return 'tag-control';
+                return 'bg-gray-200 text-gray-800';
+            }
+            
+            function getTypeIcon(type) {
+                if (type === 'prevention') return '🛡️';
+                if (type === 'warning') return '🔔';
+                if (type === 'control') return '🛑';
+                return '➡️';
+            }
+
+            function renderCards(filter = 'all') {
+                grid.innerHTML = '';
+                currentFilteredData = filter === 'all' ? pokaData : pokaData.filter(item => item.role === filter);
+                
+                currentFilteredData.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'bg-white p-5 rounded-lg shadow-md poka-card flex flex-col';
+                    card.innerHTML = `
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start mb-2">
+                                <h4 class="text-lg font-semibold text-[#3D405B] pr-2">${item.title}</h4>
+                                <span class="text-2xl">${getTypeIcon(item.type)}</span>
+                            </div>
+                            <p class="text-gray-600 text-sm mb-3">${item.desc}</p>
+                        </div>
+                        <div class="mt-auto pt-3 border-t border-gray-100">
+                             <span class="text-xs font-medium px-2.5 py-1 rounded-full ${getTypeClass(item.type)} mb-3 inline-block">${item.type.charAt(0).toUpperCase() + item.type.slice(1)}</span>
+                            <button data-index="${index}" data-title="${item.title}" class="view-details-button w-full text-sm bg-[#81B29A] text-white py-2 px-3 rounded-md hover:bg-opacity-90 transition">
+                                Xem chi tiết
+                            </button>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            filterContainer.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON' && e.target.dataset.role) {
+                    const filter = e.target.dataset.role;
+                    
+                    const currentActive = filterContainer.querySelector('.active');
+                    if(currentActive) currentActive.classList.remove('active');
+                    e.target.classList.add('active');
+
+                    renderCards(filter);
+                }
+            });
+            
+            function openModal(title, detailsArray) {
+                modalTitleEl.textContent = title;
+                modalContentEl.innerHTML = ''; 
+                if (detailsArray && detailsArray.length > 0) {
+                    const ul = document.createElement('ul');
+                    ul.className = 'list-disc list-inside space-y-2 text-gray-700';
+                    detailsArray.forEach(step => {
+                        const li = document.createElement('li');
+                        li.textContent = step;
+                        ul.appendChild(li);
+                    });
+                    modalContentEl.appendChild(ul);
+                } else {
+                    modalContentEl.textContent = 'Không có thông tin chi tiết cho mục này.';
+                }
+                modal.classList.remove('hidden', 'opacity-0');
+                modal.querySelector('.modal-content').classList.remove('scale-95');
+                modal.classList.add('opacity-100');
+                modal.querySelector('.modal-content').classList.add('scale-100');
+
+            }
+
+            function closeModal() {
+                modal.classList.add('opacity-0');
+                modal.querySelector('.modal-content').classList.add('scale-95');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.querySelector('.modal-content').classList.remove('scale-100');
+                }, 300); // Match transition duration
+            }
+
+            closeModalButton.addEventListener('click', closeModal);
+            closeModalButtonCross.addEventListener('click', closeModal);
+
+            modal.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+
+            grid.addEventListener('click', function(e) {
+                const button = e.target.closest('.view-details-button');
+                if (button) {
+                    const index = parseInt(button.dataset.index, 10);
+                    const title = button.dataset.title; 
+                    
+                    if (currentFilteredData[index] && currentFilteredData[index].details) {
+                         const details = currentFilteredData[index].details;
+                         openModal(title, details);
+                    } else {
+                        console.error("Không tìm thấy chi tiết cho chỉ số:", index, "trong", currentFilteredData);
+                        openModal(title, ["Không tìm thấy thông tin chi tiết."]);
+                    }
+                }
+            });
+
+
+            // Initial render
+            renderCards();
+            
+            const costOfBugsCtx = document.getElementById('costOfBugsChart').getContext('2d');
+            new Chart(costOfBugsCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Yêu Cầu', 'Thiết Kế', 'Coding', 'Testing', 'Release'],
+                    datasets: [{
+                        label: 'Chi phí sửa lỗi tương đối',
+                        data: [1, 5, 10, 50, 200],
+                        backgroundColor: ['#A9D8B8', '#FCE2A4', '#F4B8B8', '#E07A5F', '#3D405B'],
+                        borderColor: 'rgba(255, 255, 255, 0)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Chi phí tương đối (x lần)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Chi phí ước tính: ${context.raw}x`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const rolesDataCount = pokaData.reduce((acc, item) => {
+                acc[item.role] = (acc[item.role] || 0) + 1;
+                return acc;
+            }, {});
+            
+            const rolesLabels = {
+                'developer': 'Developer',
+                'qc': 'QC/Tester',
+                'manager': 'Manager',
+                'leader': 'Leader',
+                'communicator': 'IT Comtor/BA'
+            };
+
+            const rolesChartCtx = document.getElementById('rolesChart').getContext('2d');
+            new Chart(rolesChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(rolesDataCount).map(key => rolesLabels[key] || key),
+                    datasets: [{
+                        label: 'Số kỹ thuật Poka-Yoke',
+                        data: Object.values(rolesDataCount),
+                        backgroundColor: ['#3D405B', '#81B29A', '#E07A5F', '#F4D35E', '#B2B2B2', '#F2CC8F'],
+                        hoverOffset: 8,
+                        borderColor: '#F8F7F4',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                     plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 15,
+                                font: { size: 11 }
+                            }
+                        },
+                         tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    label += context.raw + ' ví dụ';
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
