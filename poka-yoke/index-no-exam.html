@@ -9,10 +9,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Japanese Harmony -->
-    <!-- Application Structure Plan: Cấu trúc ứng dụng được duy trì dưới dạng dashboard tương tác. Điểm mới: Thêm mục trắc nghiệm kiến thức Poka-Yoke với hiển thị kết quả. Luồng chính: 1. Header. 2. Nguyên tắc Poka-Yoke. 3. Ví dụ theo vai trò (có modal chi tiết). 4. Quy trình áp dụng. 5. Mục trắc nghiệm mới. 6. Biểu đồ. 7. Kết luận. Mục trắc nghiệm giúp củng cố kiến thức đã học. -->
-    <!-- Visualization & Content Choices: Report Info -> Goal -> Viz/Presentation Method -> Interaction -> Justification -> Library/Method. 1. Ví dụ theo vai trò -> So sánh & Thông tin chi tiết -> Thẻ (Card) + Modal -> HTML/Tailwind/JS. 2. Chi phí sửa lỗi -> Nhấn mạnh -> Biểu đồ cột -> Chart.js. 3. Phân bổ kỹ thuật -> Hiểu tổng quan -> Biểu đồ Donut -> Chart.js. 4. Quy trình áp dụng -> Hướng dẫn -> Sơ đồ bước -> HTML/Tailwind. 5. Trắc nghiệm -> Đánh giá kiến thức -> Câu hỏi trắc nghiệm, hiển thị kết quả -> HTML/Tailwind/JS. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Be Vietnam Pro', sans-serif;
@@ -54,29 +50,12 @@
         .tag-warning { background-color: #FCE2A4; color: #7A5300; }   /* Soft yellow for warning */
         .tag-control { background-color: #F4B8B8; color: #6C1D1D; }    /* Muted red for control */
 
+        /* Modal styles */
         .modal-overlay {
             transition: opacity 0.3s ease-in-out;
         }
         .modal-content {
             transition: transform 0.3s ease-in-out;
-        }
-        .quiz-option {
-            transition: background-color 0.2s ease;
-        }
-        .quiz-option.selected {
-            background-color: #81B29A;
-            color: white;
-        }
-        .quiz-option:hover {
-            background-color: #E0E7EB;
-        }
-        .answer-correct {
-            color: #1E4620; /* Dark green for correct answer text */
-            font-weight: bold;
-        }
-        .answer-incorrect {
-            color: #9A3412; /* Dark red for incorrect answer text */
-            text-decoration: line-through;
         }
     </style>
 </head>
@@ -93,7 +72,6 @@
                     <a href="#principles" class="text-gray-600 hover:text-[#81B29A] transition">Nguyên Tắc</a>
                     <a href="#examples" class="text-gray-600 hover:text-[#81B29A] transition">Ví Dụ Thực Tế</a>
                     <a href="#process" class="text-gray-600 hover:text-[#81B29A] transition">Quy Trình Áp Dụng</a>
-                    <a href="#quiz" class="text-gray-600 hover:text-[#81B29A] transition">Trắc Nghiệm</a>
                     <a href="#insights" class="text-gray-600 hover:text-[#81B29A] transition">Phân Tích</a>
                 </nav>
             </div>
@@ -141,8 +119,7 @@
             </div>
 
             <div id="poka-grid" class="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Cards will be injected here by JS -->
-            </div>
+                </div>
         </section>
         
         <section id="process" class="mb-16">
@@ -180,30 +157,6 @@
             </div>
         </section>
 
-        <!-- Quiz Section -->
-        <section id="quiz" class="mb-16 bg-white rounded-lg shadow-md p-6 md:p-8">
-            <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#3D405B]">Bài Trắc Nghiệm Poka-Yoke</h2>
-            <div id="quiz-area" class="max-w-2xl mx-auto">
-                <div id="quiz-question-container" class="mb-6">
-                    <p id="quiz-question-number" class="text-sm text-gray-500 mb-1"></p>
-                    <p id="quiz-question-text" class="text-lg font-semibold text-gray-700"></p>
-                </div>
-                <div id="quiz-options-container" class="space-y-3 mb-6">
-                    <!-- Options will be injected here -->
-                </div>
-                <button id="quiz-next-button" class="w-full bg-[#81B29A] text-white font-semibold py-3 px-4 rounded-lg hover:bg-opacity-90 transition shadow-md disabled:opacity-50" disabled>Chọn một đáp án</button>
-            </div>
-            <div id="quiz-results-area" class="max-w-2xl mx-auto hidden">
-                <h3 class="text-xl font-bold text-center mb-4 text-[#3D405B]">Kết Quả Trắc Nghiệm</h3>
-                <p id="quiz-score-text" class="text-2xl font-bold text-center mb-6"></p>
-                <div id="quiz-answers-review" class="space-y-4">
-                    <!-- Review of answers will be injected here -->
-                </div>
-                <button id="quiz-restart-button" class="mt-8 w-full bg-[#E07A5F] text-white font-semibold py-3 px-4 rounded-lg hover:bg-opacity-90 transition shadow-md">Làm lại bài trắc nghiệm</button>
-            </div>
-        </section>
-
-
         <section id="insights" class="bg-white rounded-lg shadow-md p-6 md:p-8 mb-16">
             <h2 class="text-2xl md:text-3xl font-bold text-center mb-8 text-[#3D405B]">Góc Nhìn Dữ Liệu</h2>
             <div class="grid lg:grid-cols-2 gap-8 md:gap-12">
@@ -238,7 +191,6 @@
         </div>
     </footer>
 
-    <!-- Modal Structure -->
     <div id="detailModal" class="modal-overlay fixed inset-0 bg-gray-800 bg-opacity-75 overflow-y-auto h-full w-full flex items-center justify-center hidden z-50 p-4 opacity-0">
         <div class="modal-content relative mx-auto p-6 border w-full max-w-xl shadow-xl rounded-lg bg-white transform scale-95">
             <div class="flex justify-between items-center pb-3">
@@ -247,8 +199,7 @@
             </div>
             <div class="mt-2">
                 <div id="modalContent" class="text-sm text-gray-700 space-y-3 max-h-[60vh] overflow-y-auto pr-2">
-                    <!-- Detailed steps will be injected here -->
-                </div>
+                    </div>
             </div>
             <div class="items-center pt-4 mt-4 border-t border-gray-200">
                 <button id="closeModalButton" class="w-full px-4 py-2 bg-[#E07A5F] text-white text-base font-medium rounded-md shadow-sm hover:bg-opacity-90 focus:outline-none focus:ring-2 focus:ring-[#E07A5F]">
@@ -553,99 +504,6 @@
                 }
             ];
 
-            const quizData = [
-                {
-                    question: "Poka-Yoke (ポカヨケ) là một thuật ngữ tiếng Nhật có nghĩa là gì?",
-                    options: ["Cải tiến liên tục", "Phòng ngừa sai lỗi", "Quản lý chất lượng tổng thể", "Đúng giờ"],
-                    correctAnswer: 1,
-                    explanation: "Poka-Yoke (Poka: lỗi vô ý, Yokeru: tránh/ngăn ngừa) tập trung vào việc ngăn chặn các lỗi sai do con người gây ra."
-                },
-                {
-                    question: "Ai được coi là cha đẻ của khái niệm Poka-Yoke?",
-                    options: ["Taiichi Ohno", "Kaoru Ishikawa", "Shigeo Shingo", "W. Edwards Deming"],
-                    correctAnswer: 2,
-                    explanation: "Shigeo Shingo, một kỹ sư công nghiệp của Toyota, đã phát triển Poka-Yoke như một phần của Hệ thống Sản xuất Toyota."
-                },
-                {
-                    question: "Đâu KHÔNG phải là một trong ba chức năng/mức độ chính của Poka-Yoke?",
-                    options: ["Ngăn chặn (Prevention)", "Cảnh báo (Warning)", "Kiểm soát (Control)", "Trừng phạt (Punishment)"],
-                    correctAnswer: 3,
-                    explanation: "Poka-Yoke tập trung vào việc ngăn ngừa, cảnh báo và kiểm soát lỗi, chứ không phải trừng phạt khi lỗi xảy ra."
-                },
-                {
-                    question: "Hình thức Poka-Yoke nào được coi là lý tưởng nhất?",
-                    options: ["Cảnh báo lỗi khi nó xảy ra", "Kiểm soát lỗi sau khi nó xảy ra", "Ngăn chặn lỗi không thể xảy ra ngay từ đầu", "Ghi nhận lỗi để rút kinh nghiệm"],
-                    correctAnswer: 2,
-                    explanation: "Ngăn chặn (Prevention) là hình thức Poka-Yoke hiệu quả nhất vì nó loại bỏ khả năng xảy ra lỗi."
-                },
-                {
-                    question: "Ví dụ nào sau đây KHÔNG phải là một ứng dụng Poka-Yoke trong phát triển phần mềm cho Developer?",
-                    options: ["Sử dụng IDE có tính năng tự động hoàn thành code", "Viết Unit Test cho các hàm", "Yêu cầu Manager duyệt tất cả các dòng code", "Sử dụng Linter để kiểm tra coding standard"],
-                    correctAnswer: 2,
-                    explanation: "Việc Manager duyệt từng dòng code không phải là một cơ chế Poka-Yoke tự động hoặc tích hợp sẵn để ngăn lỗi, mà thiên về quy trình quản lý."
-                },
-                {
-                    question: "Việc sử dụng pre-commit hook để tự động chạy Linter và Unit Test trước khi commit code là một ví dụ của Poka-Yoke loại nào?",
-                    options: ["Ngăn chặn (Prevention)", "Cảnh báo (Warning)", "Kiểm soát (Control)", "Cả Ngăn chặn và Kiểm soát"],
-                    correctAnswer: 3,
-                    explanation: "Pre-commit hook giúp ngăn chặn code lỗi được commit (Prevention) và có thể kiểm soát việc commit nếu test thất bại (Control)."
-                },
-                {
-                    question: "Đối với QC/Tester, việc tham gia review tài liệu yêu cầu sớm giúp gì?",
-                    options: ["Viết test case nhanh hơn", "Phát hiện sự mập mờ, thiếu sót trong yêu cầu ngay từ đầu", "Giảm số lượng bug phải log", "Tăng thời gian rảnh cho QC"],
-                    correctAnswer: 1,
-                    explanation: "Review sớm giúp QC phát hiện các vấn đề tiềm ẩn trong yêu cầu, ngăn chúng trở thành bug trong code, từ đó giảm thiểu lỗi."
-                },
-                {
-                    question: "Kỹ thuật '5 Whys' thường được sử dụng trong bước nào của quy trình áp dụng Poka-Yoke?",
-                    options: ["Xác định lỗi", "Phân tích nguyên nhân gốc rễ", "Brainstorm giải pháp", "Đo lường hiệu quả"],
-                    correctAnswer: 1,
-                    explanation: "'5 Whys' là một kỹ thuật hiệu quả để đào sâu và tìm ra nguyên nhân cốt lõi của một vấn đề hoặc lỗi."
-                },
-                {
-                    question: "Triết lý 'Không Đổ Lỗi' (No Blame Culture) trong Poka-Yoke có nghĩa là gì?",
-                    options: ["Không ai phải chịu trách nhiệm khi có lỗi", "Tập trung vào cải tiến quy trình thay vì chỉ trích cá nhân", "Lỗi là do công cụ, không phải do người", "Bỏ qua các lỗi nhỏ"],
-                    correctAnswer: 1,
-                    explanation: "Văn hóa không đổ lỗi khuyến khích việc nhìn nhận lỗi như một cơ hội để cải thiện hệ thống và quy trình, thay vì tìm người để khiển trách."
-                },
-                {
-                    question: "Việc một form đăng ký không cho phép submit nếu trường email không đúng định dạng là ví dụ của Poka-Yoke loại nào?",
-                    options: ["Ngăn chặn (Prevention)", "Cảnh báo (Warning)", "Kiểm soát (Control)", "Không phải Poka-Yoke"],
-                    correctAnswer: 0,
-                    explanation: "Form này ngăn chặn việc nhập dữ liệu sai định dạng ngay từ đầu, là một hình thức Prevention."
-                },
-                {
-                    question: "Kaizen (改善) có liên quan như thế nào đến Poka-Yoke?",
-                    options: ["Kaizen là tên gọi khác của Poka-Yoke", "Poka-Yoke là một phần của triết lý cải tiến liên tục Kaizen", "Kaizen chỉ áp dụng cho sản xuất, Poka-Yoke cho dịch vụ", "Chúng không liên quan đến nhau"],
-                    correctAnswer: 1,
-                    explanation: "Poka-Yoke là một công cụ và tư duy quan trọng trong việc thực hiện Kaizen (cải tiến liên tục) bằng cách loại bỏ lãng phí do lỗi."
-                },
-                {
-                    question: "Lợi ích chính của việc áp dụng Poka-Yoke là gì?",
-                    options: ["Tăng tốc độ code của Developer", "Giảm số lượng Manager cần thiết", "Nâng cao chất lượng sản phẩm và giảm chi phí sửa lỗi", "Làm cho công việc của QC trở nên dễ dàng hơn"],
-                    correctAnswer: 2,
-                    explanation: "Poka-Yoke giúp tạo ra sản phẩm ít lỗi hơn, từ đó giảm chi phí và thời gian dành cho việc sửa lỗi, đồng thời tăng sự hài lòng của khách hàng."
-                },
-                 {
-                    question: "Trong vai trò IT Comtor/BA, việc sử dụng 'Glossary' (bảng thuật ngữ) chung cho dự án giúp ngăn ngừa loại lỗi nào phổ biến nhất?",
-                    options: ["Lỗi cú pháp code", "Lỗi logic nghiệp vụ phức tạp", "Hiểu lầm về thuật ngữ giữa các bên liên quan", "Lỗi hiệu năng hệ thống"],
-                    correctAnswer: 2,
-                    explanation: "Glossary giúp đảm bảo mọi người (khách hàng, BA, dev, QC) hiểu thống nhất về các thuật ngữ, tránh hiểu sai yêu cầu dẫn đến lỗi."
-                },
-                {
-                    question: "Khi một Manager thiết lập 'Quality Gates' trong CI/CD pipeline, đây là hành động Poka-Yoke thuộc loại nào?",
-                    options: ["Ngăn chặn (Prevention)", "Cảnh báo (Warning)", "Kiểm soát (Control)", "Chỉ là quy trình quản lý"],
-                    correctAnswer: 2,
-                    explanation: "Quality Gates kiểm soát việc build hoặc deploy, tự động dừng quy trình nếu không đạt tiêu chuẩn chất lượng, đây là một hình thức Control."
-                },
-                {
-                    question: "Mục tiêu cuối cùng của việc áp dụng Poka-Yoke là gì?",
-                    options: ["Loại bỏ hoàn toàn vai trò của QC", "Đạt được 'Zero Defects' (Không Lỗi)", "Tăng số lượng tính năng được release", "Giảm thời gian họp của team"],
-                    correctAnswer: 1,
-                    explanation: "Mặc dù 'Zero Defects' là một mục tiêu rất tham vọng, Poka-Yoke hướng tới việc loại bỏ lỗi càng nhiều càng tốt, lý tưởng là đạt đến trạng thái không có lỗi."
-                }
-            ];
-
             const grid = document.getElementById('poka-grid');
             const filterContainer = document.getElementById('role-filter');
             
@@ -656,21 +514,6 @@
             const closeModalButtonCross = document.getElementById('closeModalButtonCross');
 
             let currentFilteredData = [];
-
-            const quizArea = document.getElementById('quiz-area');
-            const quizQuestionContainer = document.getElementById('quiz-question-container');
-            const quizQuestionNumberEl = document.getElementById('quiz-question-number');
-            const quizQuestionTextEl = document.getElementById('quiz-question-text');
-            const quizOptionsContainerEl = document.getElementById('quiz-options-container');
-            const quizNextButtonEl = document.getElementById('quiz-next-button');
-            const quizResultsAreaEl = document.getElementById('quiz-results-area');
-            const quizScoreTextEl = document.getElementById('quiz-score-text');
-            const quizAnswersReviewEl = document.getElementById('quiz-answers-review');
-            const quizRestartButtonEl = document.getElementById('quiz-restart-button');
-
-            let currentQuizQuestionIndex = 0;
-            let userQuizAnswers = [];
-            let selectedOptionIndex = -1;
 
 
             function getTypeClass(type) {
@@ -744,6 +587,7 @@
                 modal.querySelector('.modal-content').classList.remove('scale-95');
                 modal.classList.add('opacity-100');
                 modal.querySelector('.modal-content').classList.add('scale-100');
+
             }
 
             function closeModal() {
@@ -752,11 +596,12 @@
                 setTimeout(() => {
                     modal.classList.add('hidden');
                     modal.querySelector('.modal-content').classList.remove('scale-100');
-                }, 300);
+                }, 300); // Match transition duration
             }
 
             closeModalButton.addEventListener('click', closeModal);
             closeModalButtonCross.addEventListener('click', closeModal);
+
             modal.addEventListener('click', function(event) {
                 if (event.target === modal) {
                     closeModal();
@@ -779,118 +624,9 @@
                 }
             });
 
-            function loadQuizQuestion() {
-                selectedOptionIndex = -1; // Reset selected option
-                quizNextButtonEl.disabled = true;
-                quizNextButtonEl.textContent = 'Chọn một đáp án';
-
-                if (currentQuizQuestionIndex < quizData.length) {
-                    const questionData = quizData[currentQuizQuestionIndex];
-                    quizQuestionNumberEl.textContent = `Câu ${currentQuizQuestionIndex + 1} / ${quizData.length}`;
-                    quizQuestionTextEl.textContent = questionData.question;
-                    quizOptionsContainerEl.innerHTML = '';
-
-                    questionData.options.forEach((option, index) => {
-                        const optionButton = document.createElement('button');
-                        optionButton.className = 'quiz-option w-full text-left p-3 border rounded-lg hover:bg-gray-100';
-                        optionButton.textContent = option;
-                        optionButton.dataset.index = index;
-                        optionButton.addEventListener('click', () => selectQuizOption(optionButton, index));
-                        quizOptionsContainerEl.appendChild(optionButton);
-                    });
-
-                    if (currentQuizQuestionIndex === quizData.length - 1) {
-                        quizNextButtonEl.textContent = 'Nộp bài và Xem Kết Quả';
-                    } else {
-                        quizNextButtonEl.textContent = 'Câu tiếp theo';
-                    }
-                     quizNextButtonEl.disabled = true; // Keep disabled until an option is selected
-                } else {
-                    showQuizResults();
-                }
-            }
-
-            function selectQuizOption(selectedButton, index) {
-                const options = quizOptionsContainerEl.querySelectorAll('.quiz-option');
-                options.forEach(btn => btn.classList.remove('selected'));
-                selectedButton.classList.add('selected');
-                selectedOptionIndex = index;
-                quizNextButtonEl.disabled = false;
-                 if (currentQuizQuestionIndex === quizData.length - 1) {
-                    quizNextButtonEl.textContent = 'Nộp bài và Xem Kết Quả';
-                } else {
-                    quizNextButtonEl.textContent = 'Câu tiếp theo';
-                }
-            }
-
-            quizNextButtonEl.addEventListener('click', () => {
-                if (selectedOptionIndex === -1) return; 
-
-                userQuizAnswers[currentQuizQuestionIndex] = selectedOptionIndex;
-                currentQuizQuestionIndex++;
-                if (currentQuizQuestionIndex < quizData.length) {
-                    loadQuizQuestion();
-                } else {
-                    showQuizResults();
-                }
-            });
-
-            function showQuizResults() {
-                quizArea.classList.add('hidden');
-                quizResultsAreaEl.classList.remove('hidden');
-
-                let score = 0;
-                quizData.forEach((q, index) => {
-                    if (userQuizAnswers[index] === q.correctAnswer) {
-                        score++;
-                    }
-                });
-
-                quizScoreTextEl.textContent = `Bạn đã trả lời đúng ${score} / ${quizData.length} câu!`;
-                quizAnswersReviewEl.innerHTML = '';
-
-                quizData.forEach((q, index) => {
-                    const reviewDiv = document.createElement('div');
-                    reviewDiv.className = 'p-4 border rounded-lg bg-gray-50';
-                    
-                    let questionHtml = `<p class="font-semibold mb-1">Câu ${index + 1}: ${q.question}</p><ul class="list-disc list-inside ml-4 text-sm">`;
-                    q.options.forEach((opt, optIndex) => {
-                        let liClass = '';
-                        let suffix = '';
-                        if (optIndex === q.correctAnswer) {
-                            liClass = 'answer-correct';
-                            suffix = ' (Đáp án đúng)';
-                        }
-                        if (optIndex === userQuizAnswers[index] && userQuizAnswers[index] !== q.correctAnswer) {
-                            liClass = 'answer-incorrect';
-                            suffix = ' (Bạn chọn)';
-                        } else if (optIndex === userQuizAnswers[index] && userQuizAnswers[index] === q.correctAnswer) {
-                             suffix += ' (Bạn chọn đúng)';
-                        }
-                        questionHtml += `<li class="${liClass}">${opt}${suffix}</li>`;
-                    });
-                    questionHtml += `</ul>`;
-                    if (q.explanation) {
-                        questionHtml += `<p class="mt-2 text-xs text-gray-600 bg-gray-100 p-2 rounded"><em>Giải thích:</em> ${q.explanation}</p>`;
-                    }
-                    reviewDiv.innerHTML = questionHtml;
-                    quizAnswersReviewEl.appendChild(reviewDiv);
-                });
-            }
-            
-            quizRestartButtonEl.addEventListener('click', () => {
-                currentQuizQuestionIndex = 0;
-                userQuizAnswers = [];
-                selectedOptionIndex = -1;
-                quizResultsAreaEl.classList.add('hidden');
-                quizArea.classList.remove('hidden');
-                loadQuizQuestion();
-            });
-
 
             // Initial render
             renderCards();
-            loadQuizQuestion(); // Load the first quiz question
             
             const costOfBugsCtx = document.getElementById('costOfBugsChart').getContext('2d');
             new Chart(costOfBugsCtx, {
