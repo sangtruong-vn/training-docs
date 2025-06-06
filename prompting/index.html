@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cẩm Nang Tương Tác: AI Prompt Engineering</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: "Calm Harmony" -->
+    <!-- Application Structure Plan: The application is structured as a role-based interactive dashboard. Instead of a linear document, a main navigation bar allows users to select their specific role (e.g., Developer, PM). Clicking a role instantly filters the content to show only relevant prompt examples. This task-oriented design was chosen for maximum efficiency, enabling users to find and copy what they need without scrolling through irrelevant information. The initial view presents the foundational "Core Principles" to ensure all users start with the essential knowledge. A new "Playground" section was added for hands-on practice. This structure transforms the static guide into a dynamic, user-centric tool. Added bilingual support (VI/JA) with a UI toggle. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: C.O.R.E. Principles (Context, Objective, Role, Expectation). Goal: Inform/Educate. Viz/Method: A 4-column card layout using HTML/Tailwind for visual separation. The problematic chart was removed to enhance stability and focus on the core textual content.
+        - Report Info: General & Role-Specific Prompts. Goal: Organize/Provide Templates. Viz/Method: Interactive content sections with pre-formatted code blocks (HTML/CSS) and a "Copy" button. Interaction: Main navigation filters content visibility via JavaScript. Copy buttons use JS to copy prompt text to the clipboard. Language switch updates all UI text. Justification: This provides a direct, actionable utility for users.
+        - Report Info: Advanced Techniques. Goal: Inform. Viz/Method: Presented as distinct cards for clarity. Justification: Easy-to-digest format for supplementary information.
+        - Report Info: Playground. Goal: Practice/Apply. Viz/Method: A two-column layout with textareas for input and a preformatted block for real-time output. Interaction: User input in textareas dynamically builds a complete, formatted prompt. A copy button allows for immediate use. Justification: Bridges the gap between theory and practice.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        html[lang="ja"] body {
+            font-family: 'Noto Sans JP', sans-serif;
+        }
+        .nav-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .nav-btn.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #475569; /* slate-600 */
+            color: white;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .copy-btn:hover {
+            background-color: #334155; /* slate-700 */
+        }
+        .prompt-card {
+            background-color: #0f172a; /* slate-900 */
+            color: #e2e8f0; /* slate-200 */
+            border-radius: 0.5rem;
+            padding: 1.5rem 1rem;
+            position: relative;
+        }
+        .prompt-card pre {
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        .lang-switcher button {
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .lang-switcher button.active {
+            background-color: #0d9488;
+            color: white;
+        }
+        #playground-inputs textarea {
+            background-color: #1e293b; /* slate-800 */
+            color: #cbd5e1; /* slate-300 */
+            border: 1px solid #334155; /* slate-700 */
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+    <div class="relative container mx-auto p-4 md:p-8 max-w-7xl">
+        <div class="absolute top-4 right-4 lang-switcher bg-slate-200 rounded-lg p-1 flex gap-1">
+            <button data-lang="vi" class="active">VIE</button>
+            <button data-lang="ja">日本語</button>
+        </div>
+
+        <header class="text-center mb-10 pt-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-teal-700" data-key="main_title">Cẩm Nang Tương Tác</h1>
+            <p class="text-xl text-slate-600 mt-2" data-key="main_subtitle">AI Prompt Engineering cho Đội Ngũ Phát Triển Phần Mềm</p>
+        </header>
+
+        <nav class="mb-10">
+            <div id="nav-container" class="flex flex-wrap justify-center gap-2 md:gap-3">
+                <button data-target="principles" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_principles">
+                    Nền Tảng
+                </button>
+                 <button data-target="playground" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_playground">
+                    Playground
+                </button>
+                <button data-target="developer" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_developer">
+                    Developer
+                </button>
+                <button data-target="qc" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_qc">
+                    QC
+                </button>
+                <button data-target="communicator" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_communicator">
+                    Communicator
+                </button>
+                <button data-target="lead" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_lead">
+                    Lead/TL
+                </button>
+                <button data-target="pm" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_pm">
+                    PM
+                </button>
+                <button data-target="manager" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_manager">
+                    Manager/Director
+                </button>
+                <button data-target="other" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_other">
+                    Sales/HR
+                </button>
+                <button data-target="advanced" class="nav-btn px-4 py-2 rounded-full bg-white shadow-sm hover:bg-teal-100 border border-slate-200" data-key="nav_advanced">
+                    Nâng Cao
+                </button>
+            </div>
+        </nav>
+
+        <main id="content-container">
+            <!-- Section: Nền Tảng -->
+            <div id="principles" class="content-section space-y-12">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="principles_title">Nền Tảng Cốt Lõi</h2>
+                    <p class="text-slate-600" data-key="principles_desc">
+                        Đây là những nguyên tắc và cấu trúc nền tảng mà bất kỳ ai cũng cần nắm vững để tạo ra những prompt hiệu quả. Hãy bắt đầu từ đây để xây dựng một tư duy đúng đắn về prompt engineering.
+                    </p>
+                </div>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <span class="text-4xl">🌍</span>
+                        <h3 class="text-xl font-bold mt-2 mb-1 text-teal-700" data-key="core_context_title">Context</h3>
+                        <p class="text-slate-600 text-sm" data-key="core_context_desc">Cung cấp bối cảnh, thông tin nền tảng để AI hiểu rõ tình huống của bạn.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <span class="text-4xl">🎯</span>
+                        <h3 class="text-xl font-bold mt-2 mb-1 text-teal-700" data-key="core_objective_title">Objective</h3>
+                        <p class="text-slate-600 text-sm" data-key="core_objective_desc">Nêu rõ mục tiêu, nhiệm vụ bạn muốn AI thực hiện một cách cụ thể.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <span class="text-4xl">🎭</span>
+                        <h3 class="text-xl font-bold mt-2 mb-1 text-teal-700" data-key="core_role_title">Role</h3>
+                        <p class="text-slate-600 text-sm" data-key="core_role_desc">Chỉ định vai trò chuyên gia cho AI để định hướng phong cách và kiến thức.</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <span class="text-4xl">📋</span>
+                        <h3 class="text-xl font-bold mt-2 mb-1 text-teal-700" data-key="core_expectation_title">Expectation</h3>
+                        <p class="text-slate-600 text-sm" data-key="core_expectation_desc">Mô tả chi tiết kết quả mong muốn về định dạng, giọng văn, và ràng buộc.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 pt-8">
+                    <div class="w-full md:max-w-4xl mx-auto">
+                        <h3 class="text-2xl font-bold mb-4 text-center" data-key="principles_structure_title">Cấu Trúc Prompt Tổng Quát</h3>
+                        <p class="text-slate-600 mb-4 text-center" data-key="principles_structure_desc">
+                            Sử dụng cấu trúc này như một khuôn mẫu cho hầu hết các yêu cầu của bạn. Việc điền đầy đủ thông tin vào các mục sẽ giúp AI hiểu rõ và đưa ra kết quả chính xác nhất.
+                        </p>
+                        <div class="prompt-card">
+                            <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                            <pre><code data-key="prompt_general"># VAI TRÒ (Role)
+Bạn là một [ghi vai trò chuyên gia].
+
+# NGỮ CẢNH (Context)
+Tôi đang làm việc trên dự án [tên dự án], sử dụng công nghệ [...]. Cụ thể, tôi đang ở phần [mô tả chức năng].
+[Mô tả thêm vấn đề hoặc tình huống].
+
+# MỤC TIÊU (Objective)
+Nhiệm vụ của bạn là [mô tả nhiệm vụ].
+
+# KỲ VỌNG (Expectation)
+- Định dạng đầu ra: [JSON, Markdown...].
+- Giọng văn: [Chuyên nghiệp, đơn giản...].
+- Ràng buộc: [Không dùng thư viện X...].</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Section: Playground -->
+            <div id="playground" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="playground_title">Playground</h2>
+                    <p class="text-slate-600" data-key="playground_desc">
+                        Thực hành tạo prompt của riêng bạn! Điền vào các ô bên dưới và xem prompt hoàn chỉnh được tạo ra ngay lập tức.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div id="playground-inputs" class="space-y-4">
+                        <div>
+                            <label for="role-input" class="block font-medium text-slate-700 mb-1" data-key="playground_role_label">🎭 Vai trò (Role)</label>
+                            <textarea id="role-input" rows="2" class="w-full p-2 rounded-md" placeholder="Bạn là một..."></textarea>
+                        </div>
+                         <div>
+                            <label for="context-input" class="block font-medium text-slate-700 mb-1" data-key="playground_context_label">🌍 Ngữ cảnh (Context)</label>
+                            <textarea id="context-input" rows="4" class="w-full p-2 rounded-md" placeholder="Tôi đang làm việc trên dự án..."></textarea>
+                        </div>
+                         <div>
+                            <label for="objective-input" class="block font-medium text-slate-700 mb-1" data-key="playground_objective_label">🎯 Mục tiêu (Objective)</label>
+                            <textarea id="objective-input" rows="3" class="w-full p-2 rounded-md" placeholder="Nhiệm vụ của bạn là..."></textarea>
+                        </div>
+                         <div>
+                            <label for="expectation-input" class="block font-medium text-slate-700 mb-1" data-key="playground_expectation_label">📋 Kỳ vọng (Expectation)</label>
+                            <textarea id="expectation-input" rows="5" class="w-full p-2 rounded-md" placeholder="- Định dạng đầu ra...\n- Giọng văn...\n- Ràng buộc..."></textarea>
+                        </div>
+                    </div>
+                    <div class="h-full">
+                         <h4 class="font-bold text-lg mb-2 text-slate-800" data-key="playground_result_title">Prompt được tạo ra</h4>
+                         <div class="prompt-card h-full min-h-[300px]">
+                            <button id="playground-copy-btn" class="copy-btn" data-key="copy_btn">Sao chép</button>
+                            <pre><code id="playground-output"></code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Developer -->
+            <div id="developer" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="developer_title">Prompts cho Developer</h2>
+                    <p class="text-slate-600" data-key="developer_desc">
+                        Các mẫu prompt này được thiết kế để hỗ trợ lập trình viên trong các công việc hàng ngày như viết code, gỡ lỗi, tối ưu hóa và học công nghệ mới.
+                    </p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="developer_p1_title">Tác vụ: Viết code & Unit Test</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_dev_1"># VAI TRÒ
+Bạn là một Lập trình viên Python chuyên nghiệp, chuyên về Django Rest Framework.
+
+# NGỮ CẢNH
+Tôi đang xây dựng một API endpoint để đăng ký người dùng mới. Model `User` có các trường: `email` (unique), `password` (hashed), `full_name`.
+
+# MỤC TIÊU
+Hãy viết một API View (sử dụng `APIView` của DRF) cho chức năng đăng ký người dùng. View này cần validate dữ liệu đầu vào, kiểm tra email đã tồn tại chưa, hash mật khẩu và tạo người dùng mới. Sau đó, viết các unit test cần thiết cho view này bằng `pytest`.
+
+# KỲ VỌNG
+- Cung cấp mã nguồn cho `views.py` và `tests.py`.
+- Trong code, hãy thêm comment giải thích các phần logic phức tạp.
+- Unit test cần bao gồm các trường hợp: thành công, email đã tồn tại, thiếu trường dữ liệu.
+- Sử dụng status code của HTTP một cách chính xác.</code></pre>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="developer_p2_title">Tác vụ: Debug lỗi</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_dev_2"># VAI TRÒ
+Bạn là một chuyên gia gỡ lỗi JavaScript với kinh nghiệm về React và state management.
+
+# NGỮ CẢNH
+Tôi có một component React sau. Khi tôi nhấn nút "Add to Cart", state `cartItems` không được cập nhật ngay lập tức trên UI, mặc dù console.log cho thấy nó đã thay đổi.
+[Dán đoạn code component bị lỗi vào đây]
+
+# MỤC TIÊU
+Phân tích đoạn code và xác định nguyên nhân gây ra lỗi. Đề xuất cách sửa lỗi và giải thích tại sao cách sửa đó lại hiệu quả.
+
+# KỲ VỌNG
+- Chỉ ra chính xác dòng code gây lỗi.
+- Cung cấp đoạn code đã được sửa lại hoàn chỉnh.
+- Giải thích rõ về tính bất đồng bộ của `setState` trong React và cách xử lý đúng.</code></pre>
+                </div>
+            </div>
+            
+            <!-- Other sections are structured similarly with data-key attributes -->
+            <!-- Section: QC -->
+            <div id="qc" class="content-section hidden space-y-8">
+                 <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="qc_title">Prompts cho QC / Tester</h2>
+                    <p class="text-slate-600" data-key="qc_desc">Sử dụng các mẫu prompt này để nhanh chóng tạo ra các bộ test case toàn diện, kịch bản kiểm thử và tự động hóa các tác vụ lặp đi lặp lại trong quy trình đảm bảo chất lượng.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="qc_p1_title">Tác vụ: Tạo Test Case</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_qc_1"># VAI TRÒ
+Bạn là một Chuyên gia Đảm bảo Chất lượng (QA) có kinh nghiệm trong việc kiểm thử ứng dụng web thương mại điện tử.
+
+# NGỮ CẢNH
+Chúng tôi có một chức năng "Áp dụng mã giảm giá" trong trang giỏ hàng. Các quy tắc của mã giảm giá như sau:
+- Mã "SALE50": Giảm 50% cho đơn hàng trên 1,000,000 VNĐ.
+- Mã "FREESHIP": Miễn phí vận chuyển cho đơn hàng nội thành.
+- Mỗi đơn hàng chỉ áp dụng được 1 mã.
+- Mã không áp dụng cho sản phẩm đã giảm giá.
+
+# MỤC TIÊU
+Tạo một bộ test case chi tiết để kiểm tra chức năng này.
+
+# KỲ VỌNG
+- Định dạng đầu ra là một bảng Markdown với các cột: "Test Case ID", "Mô tả", "Các bước thực hiện", "Kết quả mong muốn".
+- Bao gồm các trường hợp: positive (thành công), negative (thất bại), và edge cases (trường hợp biên, ví dụ: đơn hàng đúng 1,000,000 VNĐ).
+- Phân loại test case theo chức năng và giao diện (UI/UX).</code></pre>
+                </div>
+            </div>
+
+            <!-- Section: Communicator -->
+            <div id="communicator" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="communicator_title">Prompts cho Communicator / BrSE</h2>
+                    <p class="text-slate-600" data-key="communicator_desc">Những mẫu prompt này giúp các kỹ sư cầu nối dịch thuật tài liệu, làm rõ yêu cầu và chuẩn bị các câu hỏi quan trọng để đảm bảo sự thông suốt giữa khách hàng và đội ngũ phát triển.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="communicator_p1_title">Tác vụ: Dịch từ tiếng Nhật & Làm rõ yêu cầu</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_comm_1"># VAI TRÒ
+Bạn là một Kỹ sư Cầu nối (BrSE) có khả năng giao tiếp xuất sắc giữa khách hàng Nhật và đội ngũ phát triển Việt Nam.
+
+# NGỮ CẢNH
+Khách hàng đã gửi một email yêu cầu bằng tiếng Nhật. Đội ngũ phát triển Việt Nam cần hiểu rõ yêu cầu kỹ thuật.
+Email gốc: [Dán email tiếng Nhật vào đây]
+
+# MỤC TIÊU
+1. Dịch email sang tiếng Việt một cách chính xác.
+2. Tóm tắt các yêu cầu chính dưới dạng gạch đầu dòng.
+3. Xác định những điểm còn mơ hồ hoặc thiếu thông tin trong yêu cầu của khách hàng và đề xuất các câu hỏi cần làm rõ với họ.
+
+# KỲ VỌNG
+- Phần dịch thuật giữ nguyên sắc thái chuyên nghiệp.
+- Phần tóm tắt đi thẳng vào các yêu cầu chức năng.
+- Phần câu hỏi cần cụ thể, giúp đội ngũ dev có đủ thông tin để bắt đầu công việc. Ví dụ: "Khách hàng muốn 'xử lý nhanh hơn', vậy 'nhanh hơn' cụ thể là dưới bao nhiêu giây?"</code></pre>
+                </div>
+                 <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="communicator_p2_title">Tác vụ: Dịch sang tiếng Nhật & Chuẩn hoá</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_comm_2"># VAI TRÒ
+Bạn là một Kỹ sư Cầu nối (BrSE) có kinh nghiệm, hiểu rõ các sắc thái giao tiếp trong môi trường làm việc Nhật Bản.
+
+# NGỮ CẢNH
+Đội ngũ phát triển ở Việt Nam có một câu hỏi kỹ thuật cần gửi cho khách hàng Nhật Bản. Câu hỏi được viết bằng tiếng Việt.
+
+# MỤC TIÊU
+Dịch câu hỏi sau sang tiếng Nhật. Đảm bảo bản dịch không chỉ đúng về mặt kỹ thuật mà còn sử dụng kính ngữ (Keigo) và văn phong phù hợp để thể hiện sự tôn trọng.
+
+# KỲ VỌNG
+- Cung cấp bản dịch tiếng Nhật và phiên âm Romaji.
+- Giải thích ngắn gọn tại sao lại chọn mức độ kính ngữ đó.
+- Câu hỏi gốc (tiếng Việt): [Dán câu hỏi tiếng Việt vào đây]</code></pre>
+                </div>
+            </div>
+
+            <!-- Section: Lead/TL -->
+            <div id="lead" class="content-section hidden space-y-8">
+                 <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="lead_title">Prompts cho Team Leader / Tech Lead</h2>
+                    <p class="text-slate-600" data-key="lead_desc">Các mẫu prompt này hỗ trợ Leader trong việc đưa ra quyết định kỹ thuật, thiết kế kiến trúc hệ thống, lên kế hoạch và phân chia công việc cho các thành viên trong nhóm.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="lead_p1_title">Tác vụ: Lên kế hoạch kỹ thuật</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_lead_1"># VAI TRÒ
+Bạn là một Tech Lead với 10 năm kinh nghiệm thiết kế hệ thống microservices.
+
+# NGỮ CẢNH
+Chúng tôi cần xây dựng một chức năng mới: "Thông báo đẩy (Push Notification)" cho ứng dụng di động. Hệ thống hiện tại bao gồm các service: User, Order, Product.
+
+# MỤC TIÊU
+Đề xuất một giải pháp kỹ thuật để triển khai chức năng này.
+
+# KỲ VỌNG
+- Vẽ một sơ đồ kiến trúc đơn giản (dạng text-based hoặc mermaid.js) để mô tả luồng hoạt động.
+- Đề xuất nên tạo một service mới (Notification Service) hay tích hợp vào service có sẵn. Phân tích ưu nhược điểm của mỗi phương án.
+- Liệt kê các công nghệ có thể sử dụng (ví dụ: Firebase Cloud Messaging, RabbitMQ, Kafka).
+- Chia nhỏ công việc thành các task cụ thể cho các lập trình viên.</code></pre>
+                </div>
+            </div>
+
+            <!-- Section: PM -->
+            <div id="pm" class="content-section hidden space-y-8">
+                 <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="pm_title">Prompts cho Project Manager</h2>
+                    <p class="text-slate-600" data-key="pm_desc">Dành cho các Quản lý dự án, các mẫu prompt này giúp tự động hóa việc viết user story, lập kế hoạch sprint, soạn thảo email thông báo và báo cáo tiến độ dự án.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="pm_p1_title">Tác vụ: Viết User Story và Kế hoạch</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_pm_1"># VAI TRÒ
+Bạn là một Quản lý Dự án (PM) chuyên nghiệp, tuân thủ phương pháp Agile/Scrum.
+
+# NGỮ CẢNH
+Chúng ta đang bắt đầu Sprint mới cho một dự án E-learning. Mục tiêu của Sprint này là xây dựng chức năng "Bình luận dưới mỗi bài học".
+
+# MỤC TIÊU
+1. Viết các User Story cho chức năng này, bao gồm cả vai trò admin.
+2. Tạo một danh sách các công việc (tasks) cần thực hiện từ các user story đó, phân chia cho backend, frontend, và QC.
+3. Soạn một email thông báo bắt đầu Sprint gửi cho toàn bộ team.
+
+# KỲ VỌNG
+- User story phải theo định dạng: "Là một [người dùng], tôi muốn [hành động] để [đạt được lợi ích]".
+- Danh sách công việc cần rõ ràng, có thể ước tính được thời gian.
+- Email thông báo cần nêu rõ mục tiêu Sprint, thời gian và các thành viên tham gia.</code></pre>
+                </div>
+            </div>
+
+            <!-- Section: Manager/Director -->
+            <div id="manager" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="manager_title">Prompts cho Manager / Director</h2>
+                    <p class="text-slate-600" data-key="manager_desc">Các mẫu prompt cấp cao này hỗ trợ các nhà quản lý trong việc phân tích dữ liệu, tóm tắt báo cáo, xây dựng chiến lược và chuẩn bị các bài trình bày cho ban lãnh đạo.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="manager_p1_title">Tác vụ: Phân tích và Tóm tắt Báo cáo</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_manager_1"># VAI TRÒ
+Bạn là một Giám đốc Công nghệ (CTO) có tư duy chiến lược.
+
+# NGỮ CẢNH
+Dưới đây là báo cáo tiến độ của 3 dự án trong tháng vừa qua. Báo cáo bao gồm các chỉ số: % hoàn thành, số lượng bug, chi phí, và phản hồi của khách hàng.
+[Dán dữ liệu báo cáo vào đây]
+
+# MỤC TIÊU
+Phân tích dữ liệu và tóm tắt thành một báo cáo ngắn gọn cho Ban Giám đốc (BOD).
+
+# KỲ VỌNG
+- Báo cáo tóm tắt không quá 1 trang A4.
+- Nêu bật những thành tựu chính.
+- Chỉ ra những rủi ro hoặc điểm nóng cần chú ý.
+- Đề xuất 2-3 hành động chiến lược cho tháng tiếp theo.
+- Sử dụng giọng văn chuyên nghiệp, tập trung vào kết quả và định hướng.</code></pre>
+                </div>
+            </div>
+
+             <!-- Section: Sales/HR -->
+            <div id="other" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="other_title">Prompts cho Sales & HR</h2>
+                    <p class="text-slate-600" data-key="other_desc">Các bộ phận hỗ trợ cũng có thể tận dụng AI. Các mẫu này giúp đội ngũ Sales soạn email, đội ngũ HR viết mô tả công việc và thực hiện các tác vụ chuyên môn khác.</p>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="other_p1_title">Sales - Soạn thảo Email</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_other_1"># VAI TRÒ
+Bạn là một chuyên viên kinh doanh phần mềm nhiều kinh nghiệm.
+
+# NGỮ CẢNH
+Công ty chúng tôi cung cấp dịch vụ phát triển ứng dụng di động tùy chỉnh. Tôi muốn tiếp cận công ty ABC, một công ty trong lĩnh vực bán lẻ thời trang chưa có app.
+
+# MỤC TIÊU
+Soạn một email chào hàng ngắn gọn, chuyên nghiệp gửi cho Giám đốc Marketing của công ty ABC.
+
+# KỲ VỌNG
+- Tiêu đề email hấp dẫn.
+- Nội dung email tập trung vào lợi ích mà một ứng dụng di động có thể mang lại.
+- Có lời kêu gọi hành động (Call to Action) rõ ràng.
+- Giọng văn lịch sự, không quá suồng sã.</code></pre>
+                </div>
+                <div class="prompt-card">
+                    <h4 class="font-bold text-lg mb-2 text-teal-400" data-key="other_p2_title">HR - Viết Mô tả công việc</h4>
+                    <button class="copy-btn" data-key="copy_btn">Sao chép</button>
+                    <pre><code data-key="prompt_other_2"># VAI TRÒ
+Bạn là một Chuyên viên Tuyển dụng (Talent Acquisition) chuyên về lĩnh vực IT.
+
+# NGỮ CẢNH
+Chúng tôi cần tuyển dụng 1 vị trí "Senior Frontend Developer (ReactJS)".
+
+# MỤC TIÊU
+Viết một bản Mô tả Công việc (JD) hoàn chỉnh và hấp dẫn để đăng lên LinkedIn và các trang tuyển dụng khác.
+
+# KỲ VỌNG
+- JD có các phần rõ ràng: Mô tả công ty, Mô tả công việc, Yêu cầu, Quyền lợi.
+- Sử dụng ngôn ngữ thu hút, tập trung vào văn hóa công ty và các dự án thú vị.
+- Yêu cầu kỹ thuật cần cụ thể.</code></pre>
+                </div>
+            </div>
+
+            <!-- Section: Advanced -->
+            <div id="advanced" class="content-section hidden space-y-8">
+                <div class="text-center max-w-3xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-800 mb-4" data-key="advanced_title">Kỹ Thuật Nâng Cao</h2>
+                    <p class="text-slate-600" data-key="advanced_desc">
+                        Khi đã thành thạo các nguyên tắc cơ bản, hãy khám phá các kỹ thuật nâng cao này để giải quyết những bài toán phức tạp hơn và nhận được kết quả tinh vi hơn từ AI.
+                    </p>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p1_title">Few-Shot Prompting</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p1_desc">Cung cấp cho AI một hoặc vài ví dụ mẫu về kết quả bạn muốn để AI "học" theo định dạng và phong cách đó.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p1_example">Ví dụ: "Chuyển: 'Fix bug này đi' sang giọng chuyên nghiệp. Ví dụ: 'Vui lòng xử lý lỗi này'."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p2_title">Chain-of-Thought</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p2_desc">Yêu cầu AI suy nghĩ từng bước ("think step-by-step") trước khi đưa ra câu trả lời. Hữu ích cho bài toán logic.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p2_example">Ví dụ: "Tính dung lượng cho 1 triệu user, mỗi người 5 ảnh 2MB. Hãy suy nghĩ từng bước."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p3_title">Self-Critique</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p3_desc">Yêu cầu AI tự đánh giá và cải thiện câu trả lời của chính nó, giúp kết quả đầu ra hoàn thiện hơn.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p3_example">Ví dụ: "Viết email, sau đó đóng vai khách hàng nhận xét và viết lại tốt hơn."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p4_title">Prompt Chaining</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p4_desc">Chia một nhiệm vụ phức tạp thành nhiều prompt nhỏ. Kết quả của prompt trước là đầu vào cho prompt sau.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p4_example">Ví dụ: "P1: Tóm tắt văn bản. P2: Dựa trên tóm tắt, viết một tweet."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p5_title">Controlling Creativity</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p5_desc">Dùng tham số (vd: `temperature`) hoặc chỉ dẫn để điều khiển mức độ sáng tạo của AI, từ chính xác đến đột phá.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p5_example">Ví dụ: "Hãy viết 5 tiêu đề quảng cáo cho sản phẩm X, ưu tiên ý tưởng độc đáo và bất ngờ nhất."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p6_title">Kỹ thuật "ReAct"</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p6_desc">Kết hợp yêu cầu AI "Suy luận" (Reason) và "Hành động" (Act - vd: tìm kiếm) để có câu trả lời chính xác hơn.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p6_example">Ví dụ: "Hỏi: Đạo diễn Oppenheimer? Suy luận: Cần tìm... Hành động: Tìm kiếm... Kết quả: C. Nolan."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p7_title">Tạo Persona Chi Tiết</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p7_desc">Xây dựng một "nhân vật" chi tiết cho AI (kinh nghiệm, phong cách) để nhận được phản hồi sâu sắc, độc đáo.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p7_example">Ví dụ: "Bạn là một nhà phê bình ẩm thực khó tính. Hãy đánh giá món phở này..."</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow flex flex-col">
+                        <h3 class="text-xl font-bold mb-2 text-teal-700" data-key="advanced_p8_title">Function Calling</h3>
+                        <p class="text-slate-600 flex-grow" data-key="advanced_p8_desc">Viết prompt để AI có thể gọi API hoặc dùng công cụ ngoài, cho phép nó tương tác với hệ thống khác.</p>
+                        <p class="text-sm text-slate-500 mt-4 italic" data-key="advanced_p8_example">Ví dụ: "Thời tiết ở TP.HCM? Hãy dùng `get_weather(city: 'Ho Chi Minh City')`."</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA ---
+            const translations = {
+                vi: {
+                    main_title: "Cẩm Nang Tương Tác",
+                    main_subtitle: "AI Prompt Engineering cho Đội Ngũ Phát Triển Phần Mềm",
+                    nav_principles: "Nền Tảng",
+                    nav_playground: "Playground",
+                    nav_developer: "Developer",
+                    nav_qc: "QC",
+                    nav_communicator: "Communicator",
+                    nav_lead: "Lead/TL",
+                    nav_pm: "PM",
+                    nav_manager: "Manager/Director",
+                    nav_other: "Sales/HR",
+                    nav_advanced: "Nâng Cao",
+                    principles_title: "Nền Tảng Cốt Lõi",
+                    principles_desc: "Đây là những nguyên tắc và cấu trúc nền tảng mà bất kỳ ai cũng cần nắm vững để tạo ra những prompt hiệu quả. Hãy bắt đầu từ đây để xây dựng một tư duy đúng đắn về prompt engineering.",
+                    core_context_title: "Context",
+                    core_context_desc: "Cung cấp bối cảnh, thông tin nền tảng để AI hiểu rõ tình huống của bạn.",
+                    core_objective_title: "Objective",
+                    core_objective_desc: "Nêu rõ mục tiêu, nhiệm vụ bạn muốn AI thực hiện một cách cụ thể.",
+                    core_role_title: "Role",
+                    core_role_desc: "Chỉ định vai trò chuyên gia cho AI để định hướng phong cách và kiến thức.",
+                    core_expectation_title: "Expectation",
+                    core_expectation_desc: "Mô tả chi tiết kết quả mong muốn về định dạng, giọng văn, và ràng buộc.",
+                    principles_structure_title: "Cấu Trúc Prompt Tổng Quát",
+                    principles_structure_desc: "Sử dụng cấu trúc này như một khuôn mẫu cho hầu hết các yêu cầu của bạn. Việc điền đầy đủ thông tin vào các mục sẽ giúp AI hiểu rõ và đưa ra kết quả chính xác nhất.",
+                    copy_btn: "Sao chép",
+                    copy_success: "Đã sao chép!",
+                    playground_title: "Playground",
+                    playground_desc: "Thực hành tạo prompt của riêng bạn! Điền vào các ô bên dưới và xem prompt hoàn chỉnh được tạo ra ngay lập tức.",
+                    playground_role_label: "🎭 Vai trò (Role)",
+                    playground_context_label: "🌍 Ngữ cảnh (Context)",
+                    playground_objective_label: "🎯 Mục tiêu (Objective)",
+                    playground_expectation_label: "📋 Kỳ vọng (Expectation)",
+                    playground_result_title: "Prompt được tạo ra",
+                    developer_title: "Prompts cho Developer",
+                    developer_desc: "Các mẫu prompt này được thiết kế để hỗ trợ lập trình viên trong các công việc hàng ngày như viết code, gỡ lỗi, tối ưu hóa và học công nghệ mới.",
+                    developer_p1_title: "Tác vụ: Viết code & Unit Test",
+                    developer_p2_title: "Tác vụ: Debug lỗi",
+                    qc_title: "Prompts cho QC / Tester",
+                    qc_desc: "Sử dụng các mẫu prompt này để nhanh chóng tạo ra các bộ test case toàn diện, kịch bản kiểm thử và tự động hóa các tác vụ lặp đi lặp lại trong quy trình đảm bảo chất lượng.",
+                    qc_p1_title: "Tác vụ: Tạo Test Case",
+                    communicator_title: "Prompts cho Communicator / BrSE",
+                    communicator_desc: "Những mẫu prompt này giúp các kỹ sư cầu nối dịch thuật tài liệu, làm rõ yêu cầu và chuẩn bị các câu hỏi quan trọng để đảm bảo sự thông suốt giữa khách hàng và đội ngũ phát triển.",
+                    communicator_p1_title: "Tác vụ: Dịch từ tiếng Nhật & Làm rõ yêu cầu",
+                    communicator_p2_title: "Tác vụ: Dịch sang tiếng Nhật & Chuẩn hoá",
+                    lead_title: "Prompts cho Team Leader / Tech Lead",
+                    lead_desc: "Các mẫu prompt này hỗ trợ Leader trong việc đưa ra quyết định kỹ thuật, thiết kế kiến trúc hệ thống, lên kế hoạch và phân chia công việc cho các thành viên trong nhóm.",
+                    lead_p1_title: "Tác vụ: Lên kế hoạch kỹ thuật",
+                    pm_title: "Prompts cho Project Manager",
+                    pm_desc: "Dành cho các Quản lý dự án, các mẫu prompt này giúp tự động hóa việc viết user story, lập kế hoạch sprint, soạn thảo email thông báo và báo cáo tiến độ dự án.",
+                    pm_p1_title: "Tác vụ: Viết User Story và Kế hoạch",
+                    manager_title: "Prompts cho Manager / Director",
+                    manager_desc: "Các mẫu prompt cấp cao này hỗ trợ các nhà quản lý trong việc phân tích dữ liệu, tóm tắt báo cáo, xây dựng chiến lược và chuẩn bị các bài trình bày cho ban lãnh đạo.",
+                    manager_p1_title: "Tác vụ: Phân tích và Tóm tắt Báo cáo",
+                    other_title: "Prompts cho Sales & HR",
+                    other_desc: "Các bộ phận hỗ trợ cũng có thể tận dụng AI. Các mẫu này giúp đội ngũ Sales soạn email, đội ngũ HR viết mô tả công việc và thực hiện các tác vụ chuyên môn khác.",
+                    other_p1_title: "Sales - Soạn thảo Email",
+                    other_p2_title: "HR - Viết Mô tả công việc",
+                    advanced_title: "Kỹ Thuật Nâng Cao",
+                    advanced_desc: "Khi đã thành thạo các nguyên tắc cơ bản, hãy khám phá các kỹ thuật nâng cao này để giải quyết những bài toán phức tạp hơn và nhận được kết quả tinh vi hơn từ AI.",
+                    advanced_p1_title: "Few-Shot Prompting",
+                    advanced_p1_desc: "Cung cấp cho AI một hoặc vài ví dụ mẫu về kết quả bạn muốn để AI \"học\" theo định dạng và phong cách đó.",
+                    advanced_p1_example: "Ví dụ: \"Chuyển: 'Fix bug này đi' sang giọng chuyên nghiệp. Ví dụ: 'Vui lòng xử lý lỗi này'.\"",
+                    advanced_p2_title: "Chain-of-Thought",
+                    advanced_p2_desc: "Yêu cầu AI suy nghĩ từng bước (\"think step-by-step\") trước khi đưa ra câu trả lời. Hữu ích cho bài toán logic.",
+                    advanced_p2_example: "Ví dụ: \"Tính dung lượng cho 1 triệu user, mỗi người 5 ảnh 2MB. Hãy suy nghĩ từng bước.\"",
+                    advanced_p3_title: "Self-Critique",
+                    advanced_p3_desc: "Yêu cầu AI tự đánh giá và cải thiện câu trả lời của chính nó, giúp kết quả đầu ra hoàn thiện hơn.",
+                    advanced_p3_example: "Ví dụ: \"Viết email, sau đó đóng vai khách hàng nhận xét và viết lại tốt hơn.\"",
+                    advanced_p4_title: "Prompt Chaining",
+                    advanced_p4_desc: "Chia một nhiệm vụ phức tạp thành nhiều prompt nhỏ. Kết quả của prompt trước là đầu vào cho prompt sau.",
+                    advanced_p4_example: "Ví dụ: \"P1: Tóm tắt văn bản. P2: Dựa trên tóm tắt, viết một tweet.\"",
+                    advanced_p5_title: "Controlling Creativity",
+                    advanced_p5_desc: "Dùng tham số (vd: `temperature`) hoặc chỉ dẫn để điều khiển mức độ sáng tạo của AI, từ chính xác đến đột phá.",
+                    advanced_p5_example: "Ví dụ: \"Hãy viết 5 tiêu đề quảng cáo cho sản phẩm X, ưu tiên ý tưởng độc đáo và bất ngờ nhất.\"",
+                    advanced_p6_title: "Kỹ thuật \"ReAct\"",
+                    advanced_p6_desc: "Kết hợp yêu cầu AI \"Suy luận\" (Reason) và \"Hành động\" (Act - vd: tìm kiếm) để có câu trả lời chính xác hơn.",
+                    advanced_p6_example: "Ví dụ: \"Hỏi: Đạo diễn Oppenheimer? Suy luận: Cần tìm... Hành động: Tìm kiếm... Kết quả: C. Nolan.\"",
+                    advanced_p7_title: "Tạo Persona Chi Tiết",
+                    advanced_p7_desc: "Xây dựng một \"nhân vật\" chi tiết cho AI (kinh nghiệm, phong cách) để nhận được phản hồi sâu sắc, độc đáo.",
+                    advanced_p7_example: "Ví dụ: \"Bạn là một nhà phê bình ẩm thực khó tính. Hãy đánh giá món phở này...\"",
+                    advanced_p8_title: "Function Calling",
+                    advanced_p8_desc: "Viết prompt để AI có thể gọi API hoặc dùng công cụ ngoài, cho phép nó tương tác với hệ thống khác.",
+                    advanced_p8_example: "Ví dụ: \"Thời tiết ở TP.HCM? Hãy dùng `get_weather(city: 'Ho Chi Minh City')`.\"",
+                    prompt_general: `# VAI TRÒ (Role)\nBạn là một [ghi vai trò chuyên gia].\n\n# NGỮ CẢNH (Context)\nTôi đang làm việc trên dự án [tên dự án], sử dụng công nghệ [...]. Cụ thể, tôi đang ở phần [mô tả chức năng].\n[Mô tả thêm vấn đề hoặc tình huống].\n\n# MỤC TIÊU (Objective)\nNhiệm vụ của bạn là [mô tả nhiệm vụ].\n\n# KỲ VỌNG (Expectation)\n- Định dạng đầu ra: [JSON, Markdown...].\n- Giọng văn: [Chuyên nghiệp, đơn giản...].\n- Ràng buộc: [Không dùng thư viện X...].`,
+                    prompt_dev_1: `# VAI TRÒ\nBạn là một Lập trình viên Python chuyên nghiệp, chuyên về Django Rest Framework.\n\n# NGỮ CẢNH\nTôi đang xây dựng một API endpoint để đăng ký người dùng mới. Model \`User\` có các trường: \`email\` (unique), \`password\` (hashed), \`full_name\`.\n\n# MỤC TIÊU\nHãy viết một API View (sử dụng \`APIView\` của DRF) cho chức năng đăng ký người dùng. View này cần validate dữ liệu đầu vào, kiểm tra email đã tồn tại chưa, hash mật khẩu và tạo người dùng mới. Sau đó, viết các unit test cần thiết cho view này bằng \`pytest\`.\n\n# KỲ VỌNG\n- Cung cấp mã nguồn cho \`views.py\` và \`tests.py\`.\n- Trong code, hãy thêm comment giải thích các phần logic phức tạp.\n- Unit test cần bao gồm các trường hợp: thành công, email đã tồn tại, thiếu trường dữ liệu.\n- Sử dụng status code của HTTP một cách chính xác.`,
+                    prompt_dev_2: `# VAI TRÒ\nBạn là một chuyên gia gỡ lỗi JavaScript với kinh nghiệm về React và state management.\n\n# NGỮ CẢNH\nTôi có một component React sau. Khi tôi nhấn nút "Add to Cart", state \`cartItems\` không được cập nhật ngay lập tức trên UI, mặc dù console.log cho thấy nó đã thay đổi.\n[Dán đoạn code component bị lỗi vào đây]\n\n# MỤC TIÊU\nPhân tích đoạn code và xác định nguyên nhân gây ra lỗi. Đề xuất cách sửa lỗi và giải thích tại sao cách sửa đó lại hiệu quả.\n\n# KỲ VỌNG\n- Chỉ ra chính xác dòng code gây lỗi.\n- Cung cấp đoạn code đã được sửa lại hoàn chỉnh.\n- Giải thích rõ về tính bất đồng bộ của \`setState\` trong React và cách xử lý đúng.`,
+                    prompt_qc_1: `# VAI TRÒ\nBạn là một Chuyên gia Đảm bảo Chất lượng (QA) có kinh nghiệm trong việc kiểm thử ứng dụng web thương mại điện tử.\n\n# NGỮ CẢNH\nChúng tôi có một chức năng "Áp dụng mã giảm giá" trong trang giỏ hàng. Các quy tắc của mã giảm giá như sau:\n- Mã "SALE50": Giảm 50% cho đơn hàng trên 1,000,000 VNĐ.\n- Mã "FREESHIP": Miễn phí vận chuyển cho đơn hàng nội thành.\n- Mỗi đơn hàng chỉ áp dụng được 1 mã.\n- Mã không áp dụng cho sản phẩm đã giảm giá.\n\n# MỤC TIÊU\nTạo một bộ test case chi tiết để kiểm tra chức năng này.\n\n# KỲ VỌNG\n- Định dạng đầu ra là một bảng Markdown với các cột: "Test Case ID", "Mô tả", "Các bước thực hiện", "Kết quả mong muốn".\n- Bao gồm các trường hợp: positive (thành công), negative (thất bại), và edge cases (trường hợp biên, ví dụ: đơn hàng đúng 1,000,000 VNĐ).\n- Phân loại test case theo chức năng và giao diện (UI/UX).`,
+                    prompt_comm_1: `# VAI TRÒ\nBạn là một Kỹ sư Cầu nối (BrSE) có khả năng giao tiếp xuất sắc giữa khách hàng Nhật và đội ngũ phát triển Việt Nam.\n\n# NGỮ CẢNH\nKhách hàng đã gửi một email yêu cầu bằng tiếng Nhật. Đội ngũ phát triển Việt Nam cần hiểu rõ yêu cầu kỹ thuật.\nEmail gốc: [Dán email tiếng Nhật vào đây]\n\n# MỤC TIÊU\n1. Dịch email sang tiếng Việt một cách chính xác.\n2. Tóm tắt các yêu cầu chính dưới dạng gạch đầu dòng.\n3. Xác định những điểm còn mơ hồ hoặc thiếu thông tin trong yêu cầu của khách hàng và đề xuất các câu hỏi cần làm rõ với họ.\n\n# KỲ VỌNG\n- Phần dịch thuật giữ nguyên sắc thái chuyên nghiệp.\n- Phần tóm tắt đi thẳng vào các yêu cầu chức năng.\n- Phần câu hỏi cần cụ thể, giúp đội ngũ dev có đủ thông tin để bắt đầu công việc. Ví dụ: "Khách hàng muốn 'xử lý nhanh hơn', vậy 'nhanh hơn' cụ thể là dưới bao nhiêu giây?"`,
+                    prompt_comm_2: `# VAI TRÒ\nBạn là một Kỹ sư Cầu nối (BrSE) có kinh nghiệm, hiểu rõ các sắc thái giao tiếp trong môi trường làm việc Nhật Bản.\n\n# NGỮ CẢNH\nĐội ngũ phát triển ở Việt Nam có một câu hỏi kỹ thuật cần gửi cho khách hàng Nhật Bản. Câu hỏi được viết bằng tiếng Việt.\n\n# MỤC TIÊU\nDịch câu hỏi sau sang tiếng Nhật. Đảm bảo bản dịch không chỉ đúng về mặt kỹ thuật mà còn sử dụng kính ngữ (Keigo) và văn phong phù hợp để thể hiện sự tôn trọng.\n\n# KỲ VỌNG\n- Cung cấp bản dịch tiếng Nhật và phiên âm Romaji.\n- Giải thích ngắn gọn tại sao lại chọn mức độ kính ngữ đó.\n- Câu hỏi gốc (tiếng Việt): [Dán câu hỏi tiếng Việt vào đây]`,
+                    prompt_lead_1: `# VAI TRÒ\nBạn là một Tech Lead với 10 năm kinh nghiệm thiết kế hệ thống microservices.\n\n# NGỮ CẢNH\nChúng tôi cần xây dựng một chức năng mới: "Thông báo đẩy (Push Notification)" cho ứng dụng di động. Hệ thống hiện tại bao gồm các service: User, Order, Product.\n\n# MỤC TIÊU\nĐề xuất một giải pháp kỹ thuật để triển khai chức năng này.\n\n# KỲ VỌNG\n- Vẽ một sơ đồ kiến trúc đơn giản (dạng text-based hoặc mermaid.js) để mô tả luồng hoạt động.\n- Đề xuất nên tạo một service mới (Notification Service) hay tích hợp vào service có sẵn. Phân tích ưu nhược điểm của mỗi phương án.\n- Liệt kê các công nghệ có thể sử dụng (ví dụ: Firebase Cloud Messaging, RabbitMQ, Kafka).\n- Chia nhỏ công việc thành các task cụ thể cho các lập trình viên.`,
+                    prompt_pm_1: `# VAI TRÒ\nBạn là một Quản lý Dự án (PM) chuyên nghiệp, tuân thủ phương pháp Agile/Scrum.\n\n# NGỮ CẢNH\nChúng ta đang bắt đầu Sprint mới cho một dự án E-learning. Mục tiêu của Sprint này là xây dựng chức năng "Bình luận dưới mỗi bài học".\n\n# MỤC TIÊU\n1. Viết các User Story cho chức năng này, bao gồm cả vai trò admin.\n2. Tạo một danh sách các công việc (tasks) cần thực hiện từ các user story đó, phân chia cho backend, frontend, và QC.\n3. Soạn một email thông báo bắt đầu Sprint gửi cho toàn bộ team.\n\n# KỲ VỌNG\n- User story phải theo định dạng: "Là một [người dùng], tôi muốn [hành động] để [đạt được lợi ích]".\n- Danh sách công việc cần rõ ràng, có thể ước tính được thời gian.\n- Email thông báo cần nêu rõ mục tiêu Sprint, thời gian và các thành viên tham gia.`,
+                    prompt_manager_1: `# VAI TRÒ\nBạn là một Giám đốc Công nghệ (CTO) có tư duy chiến lược.\n\n# NGỮ CẢNH\nDưới đây là báo cáo tiến độ của 3 dự án trong tháng vừa qua. Báo cáo bao gồm các chỉ số: % hoàn thành, số lượng bug, chi phí, và phản hồi của khách hàng.\n[Dán dữ liệu báo cáo vào đây]\n\n# MỤC TIÊU\nPhân tích dữ liệu và tóm tắt thành một báo cáo ngắn gọn cho Ban Giám đốc (BOD).\n\n# KỲ VỌNG\n- Báo cáo tóm tắt không quá 1 trang A4.\n- Nêu bật những thành tựu chính.\n- Chỉ ra những rủi ro hoặc điểm nóng cần chú ý.\n- Đề xuất 2-3 hành động chiến lược cho tháng tiếp theo.\n- Sử dụng giọng văn chuyên nghiệp, tập trung vào kết quả và định hướng.`,
+                    prompt_other_1: `# VAI TRÒ\nBạn là một chuyên viên kinh doanh phần mềm nhiều kinh nghiệm.\n\n# NGỮ CẢNH\nCông ty chúng tôi cung cấp dịch vụ phát triển ứng dụng di động tùy chỉnh. Tôi muốn tiếp cận công ty ABC, một công ty trong lĩnh vực bán lẻ thời trang chưa có app.\n\n# MỤC TIÊU\nSoạn một email chào hàng ngắn gọn, chuyên nghiệp gửi cho Giám đốc Marketing của công ty ABC.\n\n# KỲ VỌNG\n- Tiêu đề email hấp dẫn.\n- Nội dung email tập trung vào lợi ích mà một ứng dụng di động có thể mang lại.\n- Có lời kêu gọi hành động (Call to Action) rõ ràng.\n- Giọng văn lịch sự, không quá suồng sã.`,
+                    prompt_other_2: `# VAI TRÒ\nBạn là một Chuyên viên Tuyển dụng (Talent Acquisition) chuyên về lĩnh vực IT.\n\n# NGỮ CẢNH\nChúng tôi cần tuyển dụng 1 vị trí "Senior Frontend Developer (ReactJS)".\n\n# MỤC TIÊU\nViết một bản Mô tả Công việc (JD) hoàn chỉnh và hấp dẫn để đăng lên LinkedIn và các trang tuyển dụng khác.\n\n# KỲ VỌNG\n- JD có các phần rõ ràng: Mô tả công ty, Mô tả công việc, Yêu cầu, Quyền lợi.\n- Sử dụng ngôn ngữ thu hút, tập trung vào văn hóa công ty và các dự án thú vị.\n- Yêu cầu kỹ thuật cần cụ thể.`
+                },
+                ja: {
+                    main_title: "インタラクティブ・ハンドブック",
+                    main_subtitle: "ソフトウェア開発チームのためのAIプロンプトエンジニアリング",
+                    nav_principles: "基本",
+                    nav_playground: "プレイグラウンド",
+                    nav_developer: "開発者",
+                    nav_qc: "品質管理",
+                    nav_communicator: "コミュニケーター",
+                    nav_lead: "リード/TL",
+                    nav_pm: "PM",
+                    nav_manager: "マネージャー/ディレクター",
+                    nav_other: "営業/人事",
+                    nav_advanced: "高度なテクニック",
+                    principles_title: "中心的な原則",
+                    principles_desc: "これらは、効果的なプロンプトを作成するために誰もが習得すべき基本的な原則と構造です。プロンプトエンジニアリングに関する正しい考え方を身につけるために、ここから始めましょう。",
+                    core_context_title: "Context (文脈)",
+                    core_context_desc: "AIがあなたの状況を明確に理解できるように、背景情報を提供します。",
+                    core_objective_title: "Objective (目的)",
+                    core_objective_desc: "AIに実行させたいタスクや目標を具体的に述べます。",
+                    core_role_title: "Role (役割)",
+                    core_role_desc: "AIに専門家の役割を指定して、スタイルと知識の方向性を定めます。",
+                    core_expectation_title: "Expectation (期待)",
+                    core_expectation_desc: "フォーマット、トーン、制約など、期待する結果を詳細に記述します。",
+                    principles_structure_title: "一般的なプロンプトの構造",
+                    principles_structure_desc: "ほとんどの要求に対して、この構造をテンプレートとして使用してください。各項目に十分な情報を記入することで、AIが正確に理解し、最良の結果を出すのに役立ちます。",
+                    copy_btn: "コピー",
+                    copy_success: "コピーしました！",
+                    playground_title: "プレイグラウンド",
+                    playground_desc: "自分だけのプロンプトを作成する練習をしましょう！以下のボックスに入力して、完成したプロンプトが即座に生成されるのを確認してください。",
+                    playground_role_label: "🎭 役割 (Role)",
+                    playground_context_label: "🌍 文脈 (Context)",
+                    playground_objective_label: "🎯 目的 (Objective)",
+                    playground_expectation_label: "📋 期待 (Expectation)",
+                    playground_result_title: "生成されたプロンプト",
+                    developer_title: "開発者向けのプロンプト",
+                    developer_desc: "これらのプロンプトテンプレートは、コーディング、デバッグ、最適化、新技術の学習など、開発者の日常業務を支援するために設計されています。",
+                    developer_p1_title: "タスク：コードと単体テストの作成",
+                    developer_p2_title: "タスク：バグのデバッグ",
+                    qc_title: "品質管理/テスター向けのプロンプト",
+                    qc_desc: "これらのプロンプトテンプレートを使用して、包括的なテストケース、テストシナリオを迅速に作成し、品質保証プロセスにおける反復的なタスクを自動化します。",
+                    qc_p1_title: "タスク：テストケースの作成",
+                    communicator_title: "コミュニケーター/BrSE向けのプロンプト",
+                    communicator_desc: "これらのプロンプトテンプレートは、ブリッジSEがドキュメントを翻訳し、要件を明確にし、顧客と開発チーム間の円滑なコミュニケーションを確保するための重要な質問を準備するのに役立ちます。",
+                    communicator_p1_title: "タスク：日本語からの翻訳と要件の明確化",
+                    communicator_p2_title: "タスク：日本語への翻訳と標準化",
+                    lead_title: "チームリーダー/テックリード向けのプロンプト",
+                    lead_desc: "これらのプロンプトテンプレートは、リーダーが技術的な意思決定、システムアーキテクチャの設計、計画の立案、およびチームメンバーへのタスク割り当てを支援します。",
+                    lead_p1_title: "タスク：技術計画の策定",
+                    pm_title: "プロジェクトマネージャー向けのプロンプト",
+                    pm_desc: "プロジェクトマネージャー向けに、これらのプロンプトはユーザーストーリーの作成、スプリント計画、通知メールの作成、プロジェクト進捗報告の自動化を支援します。",
+                    pm_p1_title: "タスク：ユーザーストーリーと計画の作成",
+                    manager_title: "マネージャー/ディレクター向けのプロンプト",
+                    manager_desc: "これらの高度なプロンプトテンプレートは、管理者がデータ分析、レポートの要約、戦略の構築、経営陣向けのプレゼンテーション準備を支援します。",
+                    manager_p1_title: "タスク：レポートの分析と要約",
+                    other_title: "営業/人事向けのプロンプト",
+                    other_desc: "サポート部門もAIを活用できます。これらのテンプレートは、営業チームのメール作成、人事チームの職務記述書の作成、その他の専門的なタスクの実行を支援します。",
+                    other_p1_title: "営業 - メール作成",
+                    other_p2_title: "人事 - 職務記述書の作成",
+                    advanced_title: "高度なテクニック",
+                    advanced_desc: "基本原則を習得したら、これらの高度なテクニックを探求して、より複雑な問題を解決し、AIからより洗練された結果を得ましょう。",
+                    advanced_p1_title: "Few-Shot Prompting",
+                    advanced_p1_desc: "AIに期待する結果の例を1つかいくつか提供し、そのフォーマットとスタイルを「学習」させます。",
+                    advanced_p1_example: "例：「このバグを直して」を丁寧な表現に変換。例：「この不具合の修正をお願いします。」",
+                    advanced_p2_title: "Chain-of-Thought",
+                    advanced_p2_desc: "最終的な回答を出す前に、AIに段階的に考える（「think step-by-step」）よう要求します。論理的な問題に有用です。",
+                    advanced_p2_example: "例：「ユーザー100万人、各5枚の写真、1枚平均2MBのストレージ容量を計算してください。段階的に考えてください。」",
+                    advanced_p3_title: "Self-Critique",
+                    advanced_p3_desc: "AIに自身の回答を自己評価・改善させ、より完成度の高い出力を目指します。",
+                    advanced_p3_example: "例：「顧客へのメールを作成し、その後、顧客の立場でそのメールを評価し、より良い書き方を提案してください。」",
+                    advanced_p4_title: "Prompt Chaining",
+                    advanced_p4_desc: "複雑なタスクを複数の小さなプロンプトに分割します。前のプロンプトの結果が次のプロンプトの入力となります。",
+                    advanced_p4_example: "例：「P1：テキストを要約する。P2：要約に基づいてツイートを作成する。」",
+                    advanced_p5_title: "Controlling Creativity",
+                    advanced_p5_desc: "パラメータ（例：`temperature`）や指示を使い、AIの創造性のレベルを正確なものから革新的なものまで制御します。",
+                    advanced_p5_example: "例：「製品Xの広告見出しを5つ作成してください。ユニークで驚きのあるアイデアを優先してください。」",
+                    advanced_p6_title: "ReAct Technique",
+                    advanced_p6_desc: "AIに「推論」（Reason）と「行動」（Act、例：検索）を組み合わせるよう要求し、より正確な回答を得ます。",
+                    advanced_p6_example: "例：「質問：オッペンハイマーの監督は？推論：検索が必要...行動：検索...結果：C・ノーラン。」",
+                    advanced_p7_title: "Detailed Persona",
+                    advanced_p7_desc: "AIに詳細な「ペルソナ」（経験、スタイル）を構築し、深くユニークなフィードバックを得ます。",
+                    advanced_p7_example: "例：「あなたは気難しい料理評論家です。このフォーを評価してください...」",
+                    advanced_p8_title: "Function Calling",
+                    advanced_p8_desc: "AIがAPIを呼び出したり外部ツールを使用したりできるようにプロンプトを書き、他のシステムと対話させます。",
+                    advanced_p8_example: "例：「ホーチミン市の天気は？`get_weather(city: 'Ho Chi Minh City')`を使ってください。」",
+                    prompt_general: `# 役割 (Role)\nあなたは[専門家の役割を記述]です。\n\n# 文脈 (Context)\n私は[プロジェクト名]プロジェクトに取り組んでおり、[技術]を使用しています。具体的には、[機能やモジュールを記述]の部分です。\n[問題や状況についてさらに説明]。\n\n# 目的 (Objective)\nあなたのタスクは[タスクを記述]です。\n\n# 期待 (Expectation)\n- 出力形式: [JSON, Markdown...]\n- トーン: [プロフェッショナル, シンプル...]\n- 制約: [Xライブラリを使用しない...].`,
+                    prompt_dev_1: `# 役割\nあなたはDjango Rest Frameworkを専門とするプロのPython開発者です。\n\n# 文脈\n新しいユーザーを登録するためのAPIエンドポイントを構築しています。\`User\`モデルには、\`email\` (unique)、\`password\` (hashed)、\`full_name\`フィールドがあります。\n\n# 目的\nユーザー登録機能のためにAPIビュー（DRFの\`APIView\`を使用）を作成してください。このビューは、入力データを検証し、メールアドレスが既に存在するかどうかを確認し、パスワードをハッシュ化して新しいユーザーを作成する必要があります。その後、このビューに必要な単体テストを\`pytest\`で作成してください。\n\n# 期待\n- \`views.py\`と\`tests.py\`のソースコードを提供してください。\n- コードには、複雑なロジック部分にコメントで説明を加えてください。\n- 単体テストには、成功、メールアドレス重複、データフィールド不足のケースを含めてください。\n- HTTPステータスコードを正確に使用してください。`,
+                    prompt_dev_2: `# 役割\nあなたはReactと状態管理の経験を持つJavaScriptのデバッグ専門家です。\n\n# 文脈\n以下のReactコンポーネントがあります。「カートに追加」ボタンをクリックすると、console.logでは変更が確認できるにもかかわらず、UI上の\`cartItems\`ステートが即座に更新されません。\n[問題のあるコンポーネントのコードをここに貼り付け]\n\n# 目的\nコードを分析し、エラーの原因を特定してください。エラーの修正方法を提案し、その修正がなぜ有効なのかを説明してください。\n\n# 期待\n- エラーの原因となっているコード行を正確に指摘してください。\n- 修正済みの完全なコードを提供してください。\n- Reactにおける\`setState\`の非同期性とその正しい処理方法について明確に説明してください。`,
+                    prompt_qc_1: `# 役割\nあなたはEコマースウェブアプリケーションのテスト経験が豊富な品質保証(QA)の専門家です。\n\n# 文脈\nショッピングカートページに「割引コードを適用」機能があります。割引コードのルールは以下の通りです：\n- コード「SALE50」：1,000,000 VNĐ以上の注文で50%割引。\n- コード「FREESHIP」：都市部への配送で送料無料。\n- 各注文には1つのコードのみ適用可能。\n- 割引済みの商品にはコードは適用されません。\n\n# 目的\nこの機能をテストするための詳細なテストケースを作成してください。\n\n# 期待\n- 出力形式は、「テストケースID」、「説明」、「実行手順」、「期待される結果」の列を持つMarkdownテーブルとします。\n- ポジティブ（成功）、ネガティブ（失敗）、エッジケース（例：ちょうど1,000,000 VNĐの注文）を含めてください。\n- テストケースを機能別およびUI/UX別に分類してください。`,
+                    prompt_comm_1: `# 役割\nあなたは日本の顧客とベトナムの開発チームとの間で優れたコミュニケーション能力を持つブリッジSE（BrSE）です。\n\n# 文脈\n日本の顧客から日本語で要件のメールが送られてきました。ベトナムの開発チームは技術的な要件を明確に理解する必要があります。\n元のメール：[ここに日本語のメールを貼り付け]\n\n# 目的\n1. メールをベトナム語に正確に翻訳してください。\n2. 主な要件を箇条書きで要約してください。\n3. 顧客の要件で曖昧または情報が不足している点を特定し、彼らに確認するための質問を提案してください。\n\n# 期待\n- 翻訳部分はプロフェッショナルなトーンを保ってください。\n- 要約部分は機能要件に焦点を当ててください。\n- 質問部分は、開発チームが作業を開始するのに十分な情報を得られるよう具体的である必要があります。例：「お客様は『より速い処理』を望んでいますが、『より速い』とは具体的に何秒未満ですか？」`,
+                    prompt_comm_2: `# 役割\nあなたは日本の職場環境におけるコミュニケーションのニュアンスを深く理解している経験豊富なブリッジSE（BrSE）です。\n\n# 文脈\nベトナムの開発チームが日本の顧客に技術的な質問を送る必要があります。質問はベトナム語で書かれています。\n\n# 目的\n以下の質問を日本語に翻訳してください。翻訳が技術的に正確であるだけでなく、敬意を示すために適切な敬語（Keigo）と文体を使用していることを確認してください。\n\n# 期待\n- 日本語訳とローマ字の読み方を提供してください。\n- なぜその敬語レベルを選んだのかを簡潔に説明してください。\n- 元の質問（ベトナム語）：[ここにベトナム語の質問を貼り付け]`,
+                    prompt_lead_1: `# 役割\nあなたはマイクロサービスシステムの設計経験が10年あるテックリードです。\n\n# 文脈\nモバイルアプリケーション向けに新しい機能「プッシュ通知」を構築する必要があります。現在のシステムには、User、Order、Productのサービスが含まれています。\n\n# 目的\nこの機能を実装するための技術的な解決策を提案してください。\n\n# 期待\n- 動作フローを説明するために、シンプルなアーキテクチャ図（テキストベースまたはmermaid.js形式）を描いてください。\n- 新しいサービス（Notification Service）を作成すべきか、既存のサービスに統合すべきかを提案してください。各アプローチの長所と短所を分析してください。\n- 使用可能な技術（例：Firebase Cloud Messaging、RabbitMQ、Kafka）をリストアップしてください。\n- 作業を開発者向けの具体的なタスクに分割してください。`,
+                    prompt_pm_1: `# 役割\nあなたはAgile/Scrum手法に従うプロのプロジェクトマネージャー（PM）です。\n\n# 文脈\nEラーニングプロジェクトの新しいスプリントを開始します。このスプリントの目標は、「各レッスンの下にコメント機能」を構築することです。\n\n# 目的\n1. 管理者の役割を含め、この機能のユーザーストーリーを作成してください。\n2. それらのユーザーストーリーから実行すべきタスクのリストを作成し、バックエンド、フロントエンド、QAに割り当ててください。\n3. チーム全体にスプリント開始を知らせるメールを作成してください。\n\n# 期待\n- ユーザーストーリーは「[ユーザー]として、[利益]のために[行動]したい」という形式でなければなりません。\n- タスクリストは明確で、時間を見積もることができる必要があります。\n- 通知メールには、スプリントの目標、期間、参加メンバーを明記する必要があります。`,
+                    prompt_manager_1: `# 役割\nあなたは戦略的思考を持つ最高技術責任者（CTO）です。\n\n# 文脈\n以下は過去1か月間の3つのプロジェクトの進捗報告です。報告には、完成率、バグ数、コスト、顧客からのフィードバックなどの指標が含まれています。\n[ここにレポートデータを貼り付け]\n\n# 目的\nデータを分析し、取締役会（BOD）向けの簡潔なレポートにまとめてください。\n\n# 期待\n- 要約レポートはA4用紙1ページ以内とします。\n- 主な成果を強調してください。\n- 注意が必要なリスクやホットスポット（例：プロジェクトAの遅延、プロジェクトBの重大なバグの多さ）を指摘してください。\n- 次の月のための2〜3の戦略的なアクションを提案してください。\n- 結果と方向性に焦点を当てたプロフェッショナルなトーンを使用してください。`,
+                    prompt_other_1: `# 役割\nあなたは経験豊富なソフトウェアセールスの専門家です。\n\n# 文脈\n当社はカスタムモバイルアプリケーション開発サービスを提供しています。まだアプリを持っていないファッション小売分野のABC社にアプローチしたいと考えています。\n\n# 目的\nABC社のマーケティングディレクターに送る、簡潔でプロフェッショナルな紹介メールを作成してください。\n\n# 期待\n- 魅力的なメールの件名。\n- メールの内容は、モバイルアプリがファッション小売業界にもたらす利益（エンゲージメント向上、ロイヤルティプログラムなど）に焦点を当ててください。\n- 明確な行動喚起（Call to Action）、例えば15分間のデモへの招待などを含めてください。\n- 丁寧で、馴れ馴れしすぎないトーン。`,
+                    prompt_other_2: `# 役割\nあなたはIT分野を専門とするタレントアクイジションの専門家です。\n\n# 文脈\n「シニアフロントエンド開発者（ReactJS）」のポジションを1名採用する必要があります。\n\n# 目的\nLinkedInや他の採用サイトに掲載するための、完全で魅力的な職務記述書（JD）を作成してください。\n\n# 期待\n- JDには、会社概要、職務内容、必須要件、福利厚生などの明確なセクションが必要です。\n- 優秀な候補者を引き付けるために、会社の文化や興味深いプロジェクトに焦点を当てた魅力的な言葉遣いをしてください。\n- 技術要件は具体的である必要があります（例：「Redux Toolkit、Next.js、TypeScriptの経験があれば尚可」）。`
+                }
+            };
+            
+            // --- STATE ---
+            let currentLang = 'vi';
+            
+            // --- DOM ELEMENTS ---
+            const langSwitcher = document.querySelector('.lang-switcher');
+            const navContainer = document.getElementById('nav-container');
+            const contentContainer = document.getElementById('content-container');
+            const playgroundInputs = document.getElementById('playground-inputs');
+            const playgroundOutput = document.getElementById('playground-output');
+            
+            // --- FUNCTIONS ---
+            function setActiveSection(targetId) {
+                navContainer.querySelectorAll('.nav-btn').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.target === targetId);
+                });
+                contentContainer.querySelectorAll('.content-section').forEach(section => {
+                    section.classList.toggle('hidden', section.id !== targetId);
+                });
+            }
+
+            function switchLanguage(lang) {
+                if (currentLang === lang) return;
+                currentLang = lang;
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll('[data-key]').forEach(elem => {
+                    const key = elem.dataset.key;
+                    if (translations[lang][key]) {
+                        if (elem.tagName === 'CODE') {
+                             elem.textContent = translations[lang][key];
+                        } else {
+                            elem.innerText = translations[lang][key];
+                        }
+                    }
+                });
+
+                langSwitcher.querySelectorAll('button').forEach(btn => {
+                    btn.classList.toggle('active', btn.dataset.lang === lang);
+                });
+            }
+
+            function updatePlaygroundPrompt() {
+                if (!playgroundInputs) return;
+
+                const role = document.getElementById('role-input').value;
+                const context = document.getElementById('context-input').value;
+                const objective = document.getElementById('objective-input').value;
+                const expectation = document.getElementById('expectation-input').value;
+
+                const role_header = currentLang === 'vi' ? '# VAI TRÒ (Role)' : '# 役割 (Role)';
+                const context_header = currentLang === 'vi' ? '# NGỮ CẢNH (Context)' : '# 文脈 (Context)';
+                const objective_header = currentLang === 'vi' ? '# MỤC TIÊU (Objective)' : '# 目的 (Objective)';
+                const expectation_header = currentLang === 'vi' ? '# KỲ VỌNG (Expectation)' : '# 期待 (Expectation)';
+
+                const fullPrompt = `${role_header}\n${role}\n\n${context_header}\n${context}\n\n${objective_header}\n${objective}\n\n${expectation_header}\n${expectation}`;
+                playgroundOutput.textContent = fullPrompt;
+            }
+
+            function copyFallback(text) {
+                const textArea = document.createElement("textarea");
+                textArea.value = text;
+                
+                // Avoid scrolling to bottom
+                textArea.style.top = "0";
+                textArea.style.left = "0";
+                textArea.style.position = "fixed";
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    document.body.removeChild(textArea);
+                    return successful ? Promise.resolve() : Promise.reject(new Error('Copy command was unsuccessful'));
+                } catch (err) {
+                    document.body.removeChild(textArea);
+                    return Promise.reject(err);
+                }
+            }
+
+
+            // --- EVENT LISTENERS ---
+            navContainer.addEventListener('click', function(e) {
+                if (e.target.closest('.nav-btn')) {
+                    const targetId = e.target.closest('.nav-btn').dataset.target;
+                    setActiveSection(targetId);
+                }
+            });
+
+            document.querySelectorAll('.copy-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    let textToCopy = '';
+                    if (this.id === 'playground-copy-btn') {
+                        textToCopy = document.getElementById('playground-output').textContent;
+                    } else {
+                        textToCopy = this.nextElementSibling.textContent;
+                    }
+
+                    copyFallback(textToCopy).then(() => {
+                        const originalText = this.innerText;
+                        this.innerText = translations[currentLang].copy_success;
+                        this.style.backgroundColor = '#14b8a6'; // teal-500
+                        setTimeout(() => {
+                            this.innerText = originalText;
+                            this.style.backgroundColor = ''; // Revert to original
+                        }, 2000);
+                    }).catch(err => {
+                        console.error('Không thể sao chép văn bản: ', err);
+                    });
+                });
+            });
+
+            langSwitcher.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const lang = e.target.dataset.lang;
+                    switchLanguage(lang);
+                    updatePlaygroundPrompt(); // Update headers on lang switch
+                }
+            });
+
+            if (playgroundInputs) {
+                playgroundInputs.addEventListener('input', updatePlaygroundPrompt);
+            }
+
+            // --- INITIALIZATION ---
+            setActiveSection('principles');
+            switchLanguage('vi');
+            updatePlaygroundPrompt();
+        });
+    </script>
+</body>
+</html>

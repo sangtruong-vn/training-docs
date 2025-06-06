@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cẩm Nang Tương Tác: AI Prompt Engineering & AWS AI Practitioner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony Neutrals -->
+    <!-- Application Structure Plan: A three-tab single-page application (SPA). 1) Prompt Engineering 101: Covers core principles and the CRISPE framework using interactive accordions. 2) Prompt Playground: An interactive tool to build prompts using the CRISPE framework, turning theory into practice. 3) AWS AI Practitioner Hub: Features an interactive chart for exam domains, a clickable list to explore AWS services, and a direct link to the official practice quiz. This tabbed structure separates distinct topics for clarity, enhances engagement through interactivity, and provides a practical tool, making the learning process more effective and user-friendly than a linear document. Added i18n support. -->
+    <!-- Visualization & Content Choices: 1. Prompting Concepts: Presented in styled cards for scannability. 2. CRISPE Framework: An interactive accordion to manage information density. 3. CRISPE Example: Evolved into an interactive "Prompt Playground" (HTML form, JS logic) for hands-on learning. 4. AWS Exam Domains: A Chart.js doughnut chart to visually represent content weights. 5. AWS Services List: An interactive master-detail view (clickable list updating a content panel) to prevent information overload. Added a prominent CTA button for the practice quiz. All choices prioritize interaction and clarity over static text. All text content is now managed via a JS dictionary for i18n. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', 'Noto Sans JP', sans-serif;
+            background-color: #F9F9F9;
+            color: #333;
+        }
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: #0B65C6;
+            color: #0B65C6;
+            font-weight: 600;
+        }
+        .card {
+            background-color: #FFFFFF;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            padding: 1.5rem;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            height: 100%;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+        .accordion-header {
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .chart-container {
+            position: relative;
+            margin: auto;
+            height: 300px;
+            width: 100%;
+            max-width: 300px;
+        }
+        .lang-btn {
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            background-color: #fff;
+            transition: all 0.2s ease;
+        }
+        .lang-btn.active {
+            background-color: #0B65C6;
+            color: white;
+            border-color: #0B65C6;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-white shadow-sm py-4">
+        <div class="container mx-auto px-4 flex justify-between items-center">
+            <div class="text-center flex-grow">
+                <h1 class="text-3xl font-bold text-gray-800" data-lang="header_title">Cẩm Nang Tương Tác AI</h1>
+                <p class="text-md text-gray-600 mt-1" data-lang="header_subtitle">Khám phá Prompt Engineering và Luyện thi AWS AI Practitioner</p>
+            </div>
+            <div id="lang-switcher" class="flex space-x-2">
+                <button class="lang-btn active" data-lang-switch="vi">VI</button>
+                <button class="lang-btn" data-lang-switch="ja">JP</button>
+            </div>
+        </div>
+    </header>
+
+    <nav class="bg-white sticky top-0 z-10 shadow-md">
+        <div class="container mx-auto px-4">
+            <div class="flex justify-center border-b">
+                <button id="tab-btn-prompt" class="tab-btn active py-4 px-6 text-lg" data-lang="tab_prompt">🚀 Prompt Engineering</button>
+                <button id="tab-btn-playground" class="tab-btn py-4 px-6 text-lg" data-lang="tab_playground">🎮 Sân Chơi Prompt</button>
+                <button id="tab-btn-aws" class="tab-btn py-4 px-6 text-lg" data-lang="tab_aws">☁️ AWS AI Practitioner</button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="tab-content-prompt" class="container mx-auto p-4 md:p-8">
+        <section id="introduction" class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-2" data-lang="prompt_intro_title">Bí Quyết Giao Tiếp với AI</h2>
+            <p class="max-w-3xl mx-auto text-gray-600" data-lang="prompt_intro_desc">
+                Prompt Engineering là nghệ thuật và khoa học về việc tạo ra các câu lệnh hiệu quả để AI có thể hiểu và thực hiện yêu cầu của bạn một cách chính xác nhất. Phần này sẽ cung cấp các nguyên tắc cốt lõi và giới thiệu framework CRISPE để bạn có thể xây dựng những prompt mạnh mẽ.
+            </p>
+        </section>
+
+        <section id="core-principles">
+            <h3 class="text-xl font-semibold mb-6 text-center" data-lang="principles_title">Nguyên Tắc Vàng</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="card text-center">
+                    <div class="text-4xl mb-3">👑</div>
+                    <h4 class="font-bold text-lg mb-2" data-lang="principle1_title">Rõ Ràng là Vua</h4>
+                    <p class="text-gray-600" data-lang="principle1_desc">AI không đọc được suy nghĩ. Hãy diễn đạt yêu cầu một cách tường minh, cụ thể và không mơ hồ.</p>
+                </div>
+                <div class="card text-center">
+                    <div class="text-4xl mb-3">👸</div>
+                    <h4 class="font-bold text-lg mb-2" data-lang="principle2_title">Ngữ Cảnh là Nữ Hoàng</h4>
+                    <p class="text-gray-600" data-lang="principle2_desc">Cung cấp càng nhiều thông tin nền liên quan, AI càng có cơ sở để đưa ra câu trả lời chất lượng.</p>
+                </div>
+                <div class="card text-center">
+                    <div class="text-4xl mb-3">🔄</div>
+                    <h4 class="font-bold text-lg mb-2" data-lang="principle3_title">Thử, Sai & Tinh Chỉnh</h4>
+                    <p class="text-gray-600" data-lang="principle3_desc">Coi việc viết prompt là một quá trình lặp đi lặp lại. Thử nghiệm, đánh giá và tinh chỉnh liên tục.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="crispe-framework" class="mt-12">
+            <h3 class="text-xl font-semibold mb-6 text-center" data-lang="crispe_title">Framework Xây Dựng Prompt: C.R.I.S.P.E.</h3>
+            <div class="max-w-3xl mx-auto space-y-3">
+                <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_c_title">C - Capacity & Role (Năng lực & Vai trò)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_c_desc">Giao cho AI một vai trò, chuyên môn cụ thể. Điều này giúp AI tập trung vào một lĩnh vực kiến thức và phong cách nhất định. <br><em>Ví dụ: "Hãy đóng vai một chuyên gia marketing..."</em></p>
+                    </div>
+                </div>
+                 <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_r_title">R - Request (Yêu cầu)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_r_desc">Nêu rõ nhiệm vụ chính bạn muốn AI thực hiện. Đây là phần cốt lõi của prompt. <br><em>Ví dụ: "...hãy viết một kế hoạch truyền thông cho sản phẩm mới."</em></p>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_i_title">I - Input & Context (Đầu vào & Ngữ cảnh)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_i_desc">Cung cấp thông tin nền, dữ liệu, hoặc bối cảnh cần thiết để AI hoàn thành nhiệm vụ. <br><em>Ví dụ: "Sản phẩm tên là 'X', hướng đến đối tượng gen Z..."</em></p>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_s_title">S - Steps (Các bước thực hiện)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_s_desc">Chia nhỏ yêu cầu thành các bước hoặc yêu cầu cụ thể cần tuân theo để có kết quả cấu trúc. <br><em>Ví dụ: "Kế hoạch cần bao gồm: 1. Phân tích... 2. Đề xuất..."</em></p>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_p_title">P - Persona (Phong cách)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_p_desc">Xác định văn phong, giọng điệu mà bạn muốn AI sử dụng. <br><em>Ví dụ: "Sử dụng giọng văn trẻ trung, năng động, bắt trend."</em></p>
+                    </div>
+                </div>
+                <div class="accordion-item bg-white rounded-lg shadow-sm">
+                    <div class="accordion-header flex justify-between items-center p-4">
+                        <h4 class="font-semibold text-lg" data-lang="crispe_e_title">E - Evaluation & Example (Đánh giá & Ví dụ)</h4>
+                        <span class="text-xl font-light transform transition-transform duration-300">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <p class="p-4 pt-0 text-gray-700" data-lang-html="crispe_e_desc">Đưa ra tiêu chí để AI tự đánh giá kết quả hoặc cung cấp một ví dụ mẫu (few-shot) để AI học theo. <br><em>Ví dụ: "Kết quả phải thuyết phục và có tính ứng dụng cao."</em></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <main id="tab-content-playground" class="hidden container mx-auto p-4 md:p-8">
+        <section id="playground-intro" class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-2" data-lang="playground_title">Sân Chơi Prompt Builder</h2>
+            <p class="max-w-3xl mx-auto text-gray-600" data-lang="playground_desc">
+                Hãy áp dụng framework CRISPE vừa học để xây dựng câu lệnh của riêng bạn. Điền thông tin vào các ô bên dưới và xem prompt hoàn chỉnh được tạo ra như thế nào. Đây là cách tốt nhất để biến lý thuyết thành kỹ năng thực tế.
+            </p>
+        </section>
+
+        <section class="grid md:grid-cols-2 gap-8">
+            <div class="space-y-4">
+                <h3 class="text-xl font-semibold" data-lang="builder_title">Bộ Xây Dựng Prompt</h3>
+                <div>
+                    <label for="crispe-c" class="font-semibold block mb-1" data-lang="builder_c_label">C - Vai trò</label>
+                    <input type="text" id="crispe-c" class="w-full p-2 border rounded-md" data-lang-placeholder="builder_c_placeholder">
+                </div>
+                 <div>
+                    <label for="crispe-r" class="font-semibold block mb-1" data-lang="builder_r_label">R - Yêu cầu</label>
+                    <input type="text" id="crispe-r" class="w-full p-2 border rounded-md" data-lang-placeholder="builder_r_placeholder">
+                </div>
+                <div>
+                    <label for="crispe-i" class="font-semibold block mb-1" data-lang="builder_i_label">I - Ngữ cảnh</label>
+                    <textarea id="crispe-i" class="w-full p-2 border rounded-md" rows="3" data-lang-placeholder="builder_i_placeholder"></textarea>
+                </div>
+                <div>
+                    <label for="crispe-s" class="font-semibold block mb-1" data-lang="builder_s_label">S - Các bước</label>
+                    <textarea id="crispe-s" class="w-full p-2 border rounded-md" rows="3" data-lang-placeholder="builder_s_placeholder"></textarea>
+                </div>
+                 <div>
+                    <label for="crispe-p" class="font-semibold block mb-1" data-lang="builder_p_label">P - Phong cách</label>
+                    <input type="text" id="crispe-p" class="w-full p-2 border rounded-md" data-lang-placeholder="builder_p_placeholder">
+                </div>
+                <div>
+                    <label for="crispe-e" class="font-semibold block mb-1" data-lang="builder_e_label">E - Đánh giá / Ví dụ</label>
+                    <input type="text" id="crispe-e" class="w-full p-2 border rounded-md" data-lang-placeholder="builder_e_placeholder">
+                </div>
+                 <button id="generate-prompt-btn" class="w-full bg-[#0B65C6] text-white font-bold py-3 px-4 rounded-lg hover:bg-[#084A94] transition-colors" data-lang="builder_generate_btn">Tạo Prompt</button>
+            </div>
+
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4" data-lang="builder_output_title">Prompt Hoàn Chỉnh Của Bạn</h3>
+                <div id="generated-prompt-output" class="bg-gray-100 rounded-md p-4 min-h-[300px] text-gray-800 whitespace-pre-wrap font-mono text-sm">
+                    <span class="text-gray-400" data-lang="builder_output_placeholder">Kết quả sẽ hiện ở đây...</span>
+                </div>
+                <button id="copy-prompt-btn" class="mt-4 w-full bg-gray-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-700 transition-colors hidden" data-lang="builder_copy_btn">Sao Chép Prompt</button>
+                <div id="copy-success-msg" class="text-green-600 text-center mt-2 font-semibold hidden" data-lang="builder_copy_success">Đã sao chép thành công!</div>
+            </div>
+        </section>
+    </main>
+
+    <main id="tab-content-aws" class="hidden container mx-auto p-4 md:p-8">
+        <section id="aws-intro" class="text-center mb-12">
+            <h2 class="text-2xl font-semibold mb-2" data-lang="aws_title">Chinh Phục Chứng Chỉ AWS AI Practitioner</h2>
+            <p class="max-w-3xl mx-auto text-gray-600" data-lang="aws_desc">
+                Đây là chứng chỉ nền tảng của AWS, xác nhận hiểu biết của bạn về các dịch vụ AI và Machine Learning. Khám phá nội dung bài thi và các dịch vụ quan trọng bạn cần nắm vững.
+            </p>
+        </section>
+
+        <div class="text-center mb-12">
+            <a href="./exam" 
+               target="_ai-practitioner-exam" 
+               class="inline-block bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors text-lg shadow-md"
+               data-lang="aws_quiz_link">
+               Tìm Hiểu Thêm
+            </a>
+        </div>
+
+        <section class="grid md:grid-cols-2 gap-8 items-center">
+            <div>
+                <h3 class="text-xl font-semibold mb-4 text-center" data-lang="aws_chart_title">Phân Bổ Nội Dung Bài Thi (CLF-C02)</h3>
+                <div class="chart-container">
+                    <canvas id="awsExamChart"></canvas>
+                </div>
+            </div>
+            <div class="card">
+                <h3 class="text-xl font-semibold mb-4" data-lang="aws_services_title">Khám Phá Các Dịch Vụ AWS AI</h3>
+                <p class="text-gray-600 mb-4" data-lang="aws_services_desc">Nhấp vào một dịch vụ để xem mô tả chi tiết.</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <ul id="aws-service-list" class="space-y-2 cursor-pointer">
+                    </ul>
+                    <div id="aws-service-description" class="bg-gray-50 rounded-lg p-4 text-gray-700 min-h-[150px]">
+                       <span class="text-gray-400" data-lang="aws_service_placeholder">Chọn một dịch vụ từ danh sách bên trái.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const translations = {
+                vi: {
+                    header_title: "Cẩm Nang Tương Tác AI",
+                    header_subtitle: "Khám phá Prompt Engineering và Luyện thi AWS AI Practitioner",
+                    tab_prompt: "🚀 Prompt Engineering",
+                    tab_playground: "🎮 Sân Chơi Prompt",
+                    tab_aws: "☁️ AWS AI Practitioner",
+                    prompt_intro_title: "Bí Quyết Giao Tiếp với AI",
+                    prompt_intro_desc: "Prompt Engineering là nghệ thuật và khoa học về việc tạo ra các câu lệnh hiệu quả để AI có thể hiểu và thực hiện yêu cầu của bạn một cách chính xác nhất. Phần này sẽ cung cấp các nguyên tắc cốt lõi và giới thiệu framework CRISPE để bạn có thể xây dựng những prompt mạnh mẽ.",
+                    principles_title: "Nguyên Tắc Vàng",
+                    principle1_title: "Rõ Ràng là Vua",
+                    principle1_desc: "AI không đọc được suy nghĩ. Hãy diễn đạt yêu cầu một cách tường minh, cụ thể và không mơ hồ.",
+                    principle2_title: "Ngữ Cảnh là Nữ Hoàng",
+                    principle2_desc: "Cung cấp càng nhiều thông tin nền liên quan, AI càng có cơ sở để đưa ra câu trả lời chất lượng.",
+                    principle3_title: "Thử, Sai & Tinh Chỉnh",
+                    principle3_desc: "Coi việc viết prompt là một quá trình lặp đi lặp lại. Thử nghiệm, đánh giá và tinh chỉnh liên tục.",
+                    crispe_title: "Framework Xây Dựng Prompt: C.R.I.S.P.E.",
+                    crispe_c_title: "C - Capacity & Role (Năng lực & Vai trò)",
+                    crispe_c_desc: 'Giao cho AI một vai trò, chuyên môn cụ thể. Điều này giúp AI tập trung vào một lĩnh vực kiến thức và phong cách nhất định. <br><em>Ví dụ: "Hãy đóng vai một chuyên gia marketing..."</em>',
+                    crispe_r_title: "R - Request (Yêu cầu)",
+                    crispe_r_desc: 'Nêu rõ nhiệm vụ chính bạn muốn AI thực hiện. Đây là phần cốt lõi của prompt. <br><em>Ví dụ: "...hãy viết một kế hoạch truyền thông cho sản phẩm mới."</em>',
+                    crispe_i_title: "I - Input & Context (Đầu vào & Ngữ cảnh)",
+                    crispe_i_desc: 'Cung cấp thông tin nền, dữ liệu, hoặc bối cảnh cần thiết để AI hoàn thành nhiệm vụ. <br><em>Ví dụ: "Sản phẩm tên là \'X\', hướng đến đối tượng gen Z..."</em>',
+                    crispe_s_title: "S - Steps (Các bước thực hiện)",
+                    crispe_s_desc: 'Chia nhỏ yêu cầu thành các bước hoặc yêu cầu cụ thể cần tuân theo để có kết quả cấu trúc. <br><em>Ví dụ: "Kế hoạch cần bao gồm: 1. Phân tích... 2. Đề xuất..."</em>',
+                    crispe_p_title: "P - Persona (Phong cách)",
+                    crispe_p_desc: 'Xác định văn phong, giọng điệu mà bạn muốn AI sử dụng. <br><em>Ví dụ: "Sử dụng giọng văn trẻ trung, năng động, bắt trend."</em>',
+                    crispe_e_title: "E - Evaluation & Example (Đánh giá & Ví dụ)",
+                    crispe_e_desc: 'Đưa ra tiêu chí để AI tự đánh giá kết quả hoặc cung cấp một ví dụ mẫu (few-shot) để AI học theo. <br><em>Ví dụ: "Kết quả phải thuyết phục và có tính ứng dụng cao."</em>',
+                    playground_title: "Sân Chơi Prompt Builder",
+                    playground_desc: "Hãy áp dụng framework CRISPE vừa học để xây dựng câu lệnh của riêng bạn. Điền thông tin vào các ô bên dưới và xem prompt hoàn chỉnh được tạo ra như thế nào. Đây là cách tốt nhất để biến lý thuyết thành kỹ năng thực tế.",
+                    builder_title: "Bộ Xây Dựng Prompt",
+                    builder_c_label: "C - Vai trò",
+                    builder_c_placeholder: "Ví dụ: Bạn là một chuyên gia du lịch...",
+                    builder_r_label: "R - Yêu cầu",
+                    builder_r_placeholder: "Ví dụ: Hãy lên kế hoạch cho chuyến đi 3 ngày...",
+                    builder_i_label: "I - Ngữ cảnh",
+                    builder_i_placeholder: "Ví dụ: ...đến Đà Lạt cho một cặp đôi, thích thiên nhiên và ẩm thực.",
+                    builder_s_label: "S - Các bước",
+                    builder_s_placeholder: "Ví dụ: 1. Lịch trình chi tiết mỗi ngày. 2. Gợi ý 5 quán ăn ngon. 3. Ước tính chi phí.",
+                    builder_p_label: "P - Phong cách",
+                    builder_p_placeholder: "Ví dụ: Giọng văn thân thiện, chi tiết, truyền cảm hứng.",
+                    builder_e_label: "E - Đánh giá / Ví dụ",
+                    builder_e_placeholder: "Ví dụ: Kế hoạch phải hợp lý và tiết kiệm.",
+                    builder_generate_btn: "Tạo Prompt",
+                    builder_output_title: "Prompt Hoàn Chỉnh Của Bạn",
+                    builder_output_placeholder: "Kết quả sẽ hiện ở đây...",
+                    builder_output_empty: "Hãy điền ít nhất một trường để tạo prompt.",
+                    builder_copy_btn: "Sao Chép Prompt",
+                    builder_copy_success: "Đã sao chép thành công!",
+                    aws_title: "Chinh Phục Chứng Chỉ AWS AI Practitioner",
+                    aws_desc: "Đây là chứng chỉ nền tảng của AWS, xác nhận hiểu biết của bạn về các dịch vụ AI và Machine Learning. Khám phá nội dung bài thi và các dịch vụ quan trọng bạn cần nắm vững.",
+                    aws_quiz_link: "Tìm Hiểu Thêm",
+                    aws_chart_title: "Phân Bổ Nội Dung Bài Thi (CLF-C02)",
+                    aws_chart_label: "Phân Bổ Nội Dung",
+                    aws_chart_domains: ['Define AI/ML', 'ML Pipeline', 'AWS AI Services', 'Responsible AI'],
+                    aws_services_title: "Khám Phá Các Dịch Vụ AWS AI",
+                    aws_services_desc: "Nhấp vào một dịch vụ để xem mô tả chi tiết.",
+                    aws_service_placeholder: "Chọn một dịch vụ từ danh sách bên trái.",
+                    footer_text: "Được tạo ra để giúp bạn học tập hiệu quả hơn."
+                },
+                ja: {
+                    header_title: "インタラクティブAIハンドブック",
+                    header_subtitle: "プロンプトエンジニアリングとAWS AI Practitioner認定の探求",
+                    tab_prompt: "🚀 プロンプトエンジニアリング",
+                    tab_playground: "🎮 プロンプトプレイグラウンド",
+                    tab_aws: "☁️ AWS AI Practitioner",
+                    prompt_intro_title: "AIとの対話の秘訣",
+                    prompt_intro_desc: "プロンプトエンジニアリングは、AIがあなたの要求を正確に理解し実行するための効果的なコマンドを作成する芸術であり科学です。このセクションでは、中核となる原則を説明し、強力なプロンプトを構築するためのCRISPEフレームワークを紹介します。",
+                    principles_title: "黄金の原則",
+                    principle1_title: "明確さが王様",
+                    principle1_desc: "AIは心を読むことができません。要求を明確、具体的、そして曖昧さなく表現してください。",
+                    principle2_title: "コンテキストが女王",
+                    principle2_desc: "関連する背景情報を提供すればするほど、AIは質の高い回答を生成するための基盤を得ます。",
+                    principle3_title: "試行錯誤と改良",
+                    principle3_desc: "プロンプト作成を反復的なプロセスとして捉えましょう。実験し、評価し、継続的に改良してください。",
+                    crispe_title: "プロンプト構築フレームワーク: C.R.I.S.P.E.",
+                    crispe_c_title: "C - 能力と役割 (Capacity & Role)",
+                    crispe_c_desc: 'AIに特定の役割や専門知識を与えます。これにより、AIは特定の知識分野とスタイルに集中できます。<br><em>例：「あなたはマーケティングの専門家として行動してください...」</em>',
+                    crispe_r_title: "R - 要求 (Request)",
+                    crispe_r_desc: 'AIに実行させたい主要なタスクを明確に述べます。これはプロンプトの中核部分です。<br><em>例：「...新製品のコミュニケーション計画を作成してください。」</em>',
+                    crispe_i_title: "I - 入力とコンテキスト (Input & Context)",
+                    crispe_i_desc: 'タスクを完了するために必要な背景情報、データ、または文脈を提供します。<br><em>例：「製品名は「X」で、Z世代を対象としています...」</em>',
+                    crispe_s_title: "S - 手順 (Steps)",
+                    crispe_s_desc: '要求を小さなステップや具体的な指示に分割し、構造化された結果を得るために従うべき手順を示します。<br><em>例：「計画には以下を含める必要があります：1. 分析... 2. 提案...」</em>',
+                    crispe_p_title: "P - ペルソナ (Persona)",
+                    crispe_p_desc: 'AIに使用させたい文体やトーンを指定します。<br><em>例：「若々しく、ダイナミックで、トレンドに合ったトーンを使用してください。」</em>',
+                    crispe_e_title: "E - 評価と例 (Evaluation & Example)",
+                    crispe_e_desc: 'AIが自己評価するための基準を提供するか、学習させるための模範例（フューショット）を提示します。<br><em>例：「結果は説得力があり、実用性が高い必要があります。」</em>',
+                    playground_title: "プロンプトビルダープレイグラウンド",
+                    playground_desc: "学んだCRISPEフレームワークを適用して、独自のコマンドを作成してみましょう。以下のフィールドに情報を入力し、完成したプロンプトがどのように生成されるかを確認してください。これは理論を実践的なスキルに変える最良の方法です。",
+                    builder_title: "プロンプトビルダー",
+                    builder_c_label: "C - 役割",
+                    builder_c_placeholder: "例：あなたは旅行の専門家です...",
+                    builder_r_label: "R - 要求",
+                    builder_r_placeholder: "例：3日間の旅行計画を立ててください...",
+                    builder_i_label: "I - コンテキスト",
+                    builder_i_placeholder: "例：...ダラットへ、自然と食事が好きなカップルのために。",
+                    builder_s_label: "S - 手順",
+                    builder_s_placeholder: "例：1. 各日の詳細な旅程。 2. おすすめの美味しいレストラン5選。 3. 費用の見積もり。",
+                    builder_p_label: "P - スタイル",
+                    builder_p_placeholder: "例：フレンドリーで詳細、インスピレーションを与える口調。",
+                    builder_e_label: "E - 評価 / 例",
+                    builder_e_placeholder: "例：計画は合理的で経済的でなければならない。",
+                    builder_generate_btn: "プロンプトを作成",
+                    builder_output_title: "完成したプロンプト",
+                    builder_output_placeholder: "結果はここに表示されます...",
+                    builder_output_empty: "プロンプトを生成するには、少なくとも1つのフィールドを入力してください。",
+                    builder_copy_btn: "プロンプトをコピー",
+                    builder_copy_success: "正常にコピーされました！",
+                    aws_title: "AWS AI Practitioner認定を制覇する",
+                    aws_desc: "これはAWSの基礎レベルの認定資格であり、AIおよび機械学習サービスに関するあなたの理解を証明します。試験内容と習得すべき重要なサービスを探ってみましょう。",
+                    aws_quiz_link: "詳細はこちら",
+                    aws_chart_title: "試験内容の配分 (CLF-C02)",
+                    aws_chart_label: "内容の配分",
+                    aws_chart_domains: ['AI/MLの定義', 'MLパイプライン', 'AWS AIサービス', '責任あるAI'],
+                    aws_services_title: "AWS AIサービスを探る",
+                    aws_services_desc: "サービスをクリックして詳細な説明を表示します。",
+                    aws_service_placeholder: "左のリストからサービスを選択してください。",
+                    footer_text: "より効果的な学習を支援するために作成されました。"
+                }
+            };
+
+            const awsServices = {
+                vi: [
+                    { name: 'Rekognition', desc: 'Phân tích hình ảnh và video để nhận dạng vật thể, con người, văn bản, cảnh và hoạt động.' },
+                    { name: 'Comprehend', desc: 'Sử dụng xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin chi tiết từ văn bản.' },
+                    { name: 'Translate', desc: 'Dịch văn bản giữa các ngôn ngữ một cách tự nhiên và chính xác.' },
+                    { name: 'Lex', desc: 'Xây dựng chatbot và giao diện hội thoại cho các ứng dụng sử dụng giọng nói và văn bản.' },
+                    { name: 'Polly', desc: 'Chuyển đổi văn bản thành giọng nói tự nhiên, giống như người thật.' },
+                    { name: 'Transcribe', desc: 'Chuyển đổi giọng nói thành văn bản một cách nhanh chóng và chính xác.' },
+                    { name: 'Kendra', desc: 'Dịch vụ tìm kiếm thông minh được hỗ trợ bởi machine learning cho doanh nghiệp.' },
+                    { name: 'CodeWhisperer', desc: 'Trợ lý lập trình AI, gợi ý code theo thời gian thực để tăng tốc độ phát triển.' }
+                ],
+                ja: [
+                    { name: 'Rekognition', desc: '画像や動画を分析し、物体、人物、テキスト、シーン、活動を認識します。' },
+                    { name: 'Comprehend', desc: '自然言語処理（NLP）を使用して、テキストから詳細な情報を抽出します。' },
+                    { name: 'Translate', desc: 'テキストを自然かつ正確に言語間で翻訳します。' },
+                    { name: 'Lex', desc: '音声とテキストを使用するアプリケーション向けのチャットボットと対話型インターフェースを構築します。' },
+                    { name: 'Polly', desc: 'テキストを自然で人間らしい音声に変換します。' },
+                    { name: 'Transcribe', desc: '音声を迅速かつ正確にテキストに変換します。' },
+                    { name: 'Kendra', desc: '企業向けの機械学習を活用したインテリジェント検索サービスです。' },
+                    { name: 'CodeWhisperer', desc: 'リアルタイムでコードを提案し、開発を高速化するAIプログラミングアシスタントです。' }
+                ]
+            };
+            
+            let currentLang = 'vi';
+            let awsChart;
+
+            function switchLanguage(lang) {
+                currentLang = lang;
+                document.documentElement.lang = lang;
+
+                document.querySelectorAll('[data-lang]').forEach(el => {
+                    const key = el.getAttribute('data-lang');
+                    if (translations[lang][key]) {
+                        el.textContent = translations[lang][key];
+                    }
+                });
+
+                document.querySelectorAll('[data-lang-html]').forEach(el => {
+                    const key = el.getAttribute('data-lang-html');
+                    if (translations[lang][key]) {
+                        el.innerHTML = translations[lang][key];
+                    }
+                });
+                
+                document.querySelectorAll('[data-lang-placeholder]').forEach(el => {
+                    const key = el.getAttribute('data-lang-placeholder');
+                    if (translations[lang][key]) {
+                        el.placeholder = translations[lang][key];
+                    }
+                });
+
+                updateAwsServices(lang);
+                updateAwsChart(lang);
+                
+                document.querySelectorAll('#lang-switcher button').forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.getAttribute('data-lang-switch') === lang) {
+                        btn.classList.add('active');
+                    }
+                });
+            }
+            
+            document.querySelectorAll('#lang-switcher button').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const lang = e.target.getAttribute('data-lang-switch');
+                    switchLanguage(lang);
+                });
+            });
+
+            // Tab navigation
+            const tabs = [
+                { btn: 'tab-btn-prompt', content: 'tab-content-prompt' },
+                { btn: 'tab-btn-playground', content: 'tab-content-playground' },
+                { btn: 'tab-btn-aws', content: 'tab-content-aws' }
+            ];
+
+            const tabButtons = tabs.map(tab => document.getElementById(tab.btn));
+            const tabContents = tabs.map(tab => document.getElementById(tab.content));
+
+            tabs.forEach((tab) => {
+                const button = document.getElementById(tab.btn);
+                button.addEventListener('click', () => {
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(tab.content).classList.remove('hidden');
+                });
+            });
+
+            // Accordion
+            const accordionItems = document.querySelectorAll('.accordion-item');
+            accordionItems.forEach(item => {
+                const header = item.querySelector('.accordion-header');
+                const content = item.querySelector('.accordion-content');
+                const icon = header.querySelector('span');
+
+                header.addEventListener('click', () => {
+                    const isOpen = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    accordionItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                           otherItem.querySelector('.accordion-content').style.maxHeight = '0px';
+                           otherItem.querySelector('.accordion-header span').style.transform = 'rotate(0deg)';
+                        }
+                    });
+                    if (isOpen) {
+                        content.style.maxHeight = '0px';
+                        icon.style.transform = 'rotate(0deg)';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.style.transform = 'rotate(45deg)';
+                    }
+                });
+            });
+            
+            // Prompt Playground
+            const generateBtn = document.getElementById('generate-prompt-btn');
+            const outputDiv = document.getElementById('generated-prompt-output');
+            const copyBtn = document.getElementById('copy-prompt-btn');
+            const copySuccessMsg = document.getElementById('copy-success-msg');
+
+            generateBtn.addEventListener('click', () => {
+                const fields = { 'C': document.getElementById('crispe-c').value.trim(), 'R': document.getElementById('crispe-r').value.trim(), 'I': document.getElementById('crispe-i').value.trim(), 'S': document.getElementById('crispe-s').value.trim(), 'P': document.getElementById('crispe-p').value.trim(), 'E': document.getElementById('crispe-e').value.trim() };
+                let promptText = '';
+                if (fields.C) promptText += `[${translations[currentLang].builder_c_label.replace('C - ','')}]:\n${fields.C}\n\n`;
+                if (fields.R) promptText += `[${translations[currentLang].builder_r_label.replace('R - ','')}]:\n${fields.R}\n\n`;
+                if (fields.I) promptText += `[${translations[currentLang].builder_i_label.replace('I - ','')}]:\n${fields.I}\n\n`;
+                if (fields.S) promptText += `[${translations[currentLang].builder_s_label.replace('S - ','')}]:\n${fields.S}\n\n`;
+                if (fields.P) promptText += `[${translations[currentLang].builder_p_label.replace('P - ','')}]:\n${fields.P}\n\n`;
+                if (fields.E) promptText += `[${translations[currentLang].builder_e_label.replace('E - ','')}]:\n${fields.E}`;
+                
+                if (promptText) {
+                    outputDiv.textContent = promptText.trim();
+                    copyBtn.classList.remove('hidden');
+                } else {
+                    outputDiv.innerHTML = `<span class="text-gray-400">${translations[currentLang].builder_output_empty}</span>`;
+                    copyBtn.classList.add('hidden');
+                }
+                copySuccessMsg.classList.add('hidden');
+            });
+
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = outputDiv.textContent;
+                navigator.clipboard.writeText(textToCopy).then(() => {
+                    copySuccessMsg.classList.remove('hidden');
+                    setTimeout(() => copySuccessMsg.classList.add('hidden'), 2000);
+                });
+            });
+            
+            function updateAwsChart(lang) {
+                const chartData = {
+                    labels: translations[lang].aws_chart_domains,
+                    datasets: [{
+                        label: translations[lang].aws_chart_label,
+                        data: [18, 26, 40, 16],
+                        backgroundColor: ['rgba(54, 162, 235, 0.8)','rgba(255, 206, 86, 0.8)','rgba(75, 192, 192, 0.8)','rgba(153, 102, 255, 0.8)'],
+                        borderColor: ['rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(75, 192, 192, 1)','rgba(153, 102, 255, 1)'],
+                        borderWidth: 1
+                    }]
+                };
+
+                if (awsChart) {
+                    awsChart.data = chartData;
+                    awsChart.update();
+                } else {
+                    const ctx = document.getElementById('awsExamChart').getContext('2d');
+                    awsChart = new Chart(ctx, {
+                        type: 'doughnut',
+                        data: chartData,
+                        options: {
+                            responsive: true, maintainAspectRatio: false,
+                            plugins: {
+                                legend: { position: 'bottom' },
+                                tooltip: { callbacks: { label: (c) => `${c.label}: ${c.raw}%` } }
+                            }
+                        }
+                    });
+                }
+            }
+
+            function updateAwsServices(lang) {
+                const serviceList = document.getElementById('aws-service-list');
+                const serviceDesc = document.getElementById('aws-service-description');
+                serviceList.innerHTML = '';
+                let activeServiceItem = null;
+
+                awsServices[lang].forEach(service => {
+                    const li = document.createElement('li');
+                    li.textContent = service.name;
+                    li.className = 'p-2 rounded-md hover:bg-gray-100 font-medium text-gray-700 cursor-pointer';
+                    li.addEventListener('click', () => {
+                        serviceDesc.textContent = service.desc;
+                        if (activeServiceItem) activeServiceItem.classList.remove('bg-blue-100', 'text-blue-700');
+                        li.classList.add('bg-blue-100', 'text-blue-700');
+                        activeServiceItem = li;
+                    });
+                    serviceList.appendChild(li);
+                });
+                serviceDesc.innerHTML = `<span class="text-gray-400">${translations[lang].aws_service_placeholder}</span>`;
+            }
+
+            switchLanguage('vi');
+        });
+    </script>
+</body>
+</html>

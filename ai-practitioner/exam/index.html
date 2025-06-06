@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng Điều Khiển Luyện Thi AWS AI Practitioner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Slate, Amber, Sky) -->
+    <!-- Application Structure Plan: A dashboard-style SPA designed for interactive learning. The structure prioritizes user tasks: 1) Get an overview with a visual chart, 2) Explore services with dynamic filters, 3) Understand SageMaker via an organized accordion, 4) Practice with an interactive quiz. This task-oriented flow is more engaging and efficient for studying than a linear document, allowing users to jump directly to what they need and interact with the content to reinforce learning. -->
+    <!-- Visualization & Content Choices: 1) Exam Weights -> Donut Chart (Chart.js) to visually emphasize domain importance. 2) AI Services Table -> Filterable Cards (JS) for interactive exploration by category. 3) SageMaker Components -> Accordion (JS/HTML) to simplify a complex topic. 4) Quiz -> Interactive Module (JS) for active self-assessment. These choices transform static information into engaging, user-centered tools. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 400px;
+            margin-left: auto;
+            margin-right: auto;
+            height: auto;
+            max-height: 400px;
+        }
+        .nav-link {
+            transition: color 0.2s;
+        }
+        .nav-link:hover {
+            color: #fbbf24; /* amber-400 */
+        }
+        .service-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .quiz-option.correct {
+            background-color: #dcfce7 !important; /* green-100 */
+            border-color: #22c55e !important; /* green-500 */
+            color: #166534; /* green-800 */
+        }
+        .quiz-option.incorrect {
+            background-color: #fee2e2 !important; /* red-100 */
+            border-color: #ef4444 !important; /* red-500 */
+            color: #991b1b; /* red-800 */
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <!-- Header -->
+    <header class="bg-slate-800 text-white sticky top-0 z-50 shadow-md">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold text-white">AWS AI Practitioner</h1>
+            <div class="hidden md:flex space-x-6">
+                <a href="#overview" class="nav-link font-medium">Tổng quan</a>
+                <a href="#services" class="nav-link font-medium">Dịch vụ AI</a>
+                <a href="#sagemaker" class="nav-link font-medium">Nền tảng SageMaker</a>
+                <a href="#quiz" class="nav-link font-medium">Trắc nghiệm</a>
+            </div>
+            <div class="md:hidden">
+                <select id="mobile-nav" class="bg-slate-700 text-white border-slate-600 rounded-md p-2">
+                    <option value="#overview">Tổng quan</option>
+                    <option value="#services">Dịch vụ AI</option>
+                    <option value="#sagemaker">Nền tảng SageMaker</option>
+                    <option value="#quiz">Trắc nghiệm</option>
+                </select>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12">
+
+        <!-- Section 1: Overview -->
+        <section id="overview" class="mb-16">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Lộ Trình Chinh Phục Chứng Chỉ</h2>
+            <p class="text-lg text-slate-600 mb-12 max-w-3xl mx-auto text-center">
+                Ứng dụng này hệ thống hóa kiến thức trọng tâm giúp bạn hiểu rõ các dịch vụ AI/ML của AWS và tự tin vượt qua bài thi. Hãy bắt đầu với việc tìm hiểu cấu trúc bài thi.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-6 rounded-xl shadow-lg">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Các Lĩnh Vực Kiến Thức Chính</h3>
+                    <div class="chart-container">
+                        <canvas id="domainsChart"></canvas>
+                    </div>
+                </div>
+                <div id="domain-details" class="space-y-4">
+                    <!-- Details will be populated by JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: AI Services -->
+        <section id="services" class="mb-16">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Khám Phá Các Dịch Vụ AI</h2>
+            <p class="text-lg text-slate-600 mb-8 max-w-3xl mx-auto text-center">
+                AWS cung cấp một bộ sưu tập phong phú các dịch vụ AI chuyên biệt. Sử dụng bộ lọc bên dưới để tìm hiểu dịch vụ phù hợp với từng lĩnh vực ứng dụng cụ thể.
+            </p>
+            <div id="service-filters" class="flex flex-wrap justify-center gap-2 mb-8">
+                <!-- Filters will be populated by JS -->
+            </div>
+            <div id="service-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Service cards will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Section 3: SageMaker Platform -->
+        <section id="sagemaker" class="mb-16">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Nền tảng Amazon SageMaker</h2>
+            <p class="text-lg text-slate-600 mb-8 max-w-3xl mx-auto text-center">
+                SageMaker là nền tảng tích hợp toàn diện để xây dựng, huấn luyện và triển khai các mô hình Machine Learning. Khám phá các thành phần chính của nó dưới đây.
+            </p>
+            <div id="sagemaker-accordion" class="max-w-4xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+                <!-- Accordion items will be populated by JS -->
+            </div>
+        </section>
+
+        <!-- Section 4: Quiz -->
+        <section id="quiz">
+            <h2 class="text-3xl font-bold text-slate-900 mb-2 text-center">Luyện Tập Trắc Nghiệm</h2>
+            <p class="text-lg text-slate-600 mb-8 max-w-3xl mx-auto text-center">
+                Kiểm tra kiến thức của bạn với các câu hỏi trắc nghiệm mô phỏng bài thi thật. Chọn đáp án và nhận phản hồi tức thì để củng cố kiến thức đã học.
+            </p>
+            <div id="quiz-container" class="max-w-3xl mx-auto bg-white p-6 sm:p-8 rounded-xl shadow-lg">
+                 <div id="quiz-progress" class="mb-4">
+                     <p class="text-sm font-medium text-slate-600 text-right" id="progress-text"></p>
+                     <div class="w-full bg-slate-200 rounded-full h-2.5">
+                         <div id="progress-bar" class="bg-sky-600 h-2.5 rounded-full transition-all duration-500"></div>
+                     </div>
+                 </div>
+                <h3 id="quiz-question" class="text-xl font-semibold text-slate-800 mb-6"></h3>
+                <div id="quiz-options" class="grid grid-cols-1 gap-4"></div>
+                <div id="quiz-feedback" class="mt-6 p-4 rounded-lg text-sm hidden"></div>
+                <div class="mt-6 flex justify-between items-center">
+                    <button id="quiz-restart-btn" class="bg-slate-200 text-slate-700 font-bold py-2 px-4 rounded-lg hover:bg-slate-300 transition">Làm lại</button>
+                    <button id="quiz-next-btn" class="bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 transition hidden">Câu tiếp theo</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-gray-300 py-8 text-center">
+        <div class="container mx-auto px-6">
+            <p class="mb-2">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // --- DATA ---
+            const domainData = {
+                labels: ['Nền tảng AI/ML', 'Dịch vụ AI của AWS', 'Nền tảng ML của AWS', 'AI có trách nhiệm & Bảo mật'],
+                weights: [20, 40, 30, 10],
+                details: [
+                    { title: 'Lĩnh vực 1: Nền tảng AI và Machine Learning (20%)', content: 'Hiểu các khái niệm cốt lõi về AI, ML, Deep Learning, các loại hình học máy và vòng đời của một dự án ML.' },
+                    { title: 'Lĩnh vực 2: Các Dịch vụ AI của AWS (40%)', content: 'Trọng tâm của bài thi. Hiểu rõ tính năng và ứng dụng của các dịch vụ AI chuyên biệt như Rekognition, Comprehend, Polly, Lex...' },
+                    { title: 'Lĩnh vực 3: Nền tảng Machine Learning của AWS (30%)', content: 'Hiểu về Amazon SageMaker và các thành phần chính của nó để xây dựng, huấn luyện và triển khai mô hình tùy chỉnh.' },
+                    { title: 'Lĩnh vực 4: AI có trách nhiệm và Bảo mật (10%)', content: 'Hiểu các khía cạnh về đạo đức (thiên vị, khả năng giải thích) và các biện pháp bảo mật cho các ứng dụng AI/ML.' }
+                ]
+            };
+
+            const servicesData = [
+                { category: 'Thị giác Máy tính', name: 'Amazon Rekognition', icon: '👁️', description: 'Phân tích hình ảnh và video để nhận dạng vật thể, con người, văn bản, và cảnh.', example: 'Kiểm duyệt nội dung, nhận diện người nổi tiếng, phân tích cảm xúc khuôn mặt.' },
+                { category: 'Phân tích Tài liệu', name: 'Amazon Textract', icon: '📄', description: 'Tự động trích xuất văn bản, chữ viết tay, và dữ liệu từ tài liệu được quét.', example: 'Xử lý hóa đơn, trích xuất thông tin từ biểu mẫu, số hóa tài liệu.' },
+                { category: 'Chuyển đổi Giọng nói', name: 'Amazon Polly', icon: '🗣️', description: 'Chuyển văn bản thành giọng nói tự nhiên (Text-to-Speech).', example: 'Tạo sách nói, hướng dẫn bằng giọng nói trong ứng dụng.' },
+                { category: 'Chuyển đổi Giọng nói', name: 'Amazon Transcribe', icon: '🎤', description: 'Chuyển giọng nói thành văn bản (Speech-to-Text).', example: 'Ghi lại nội dung cuộc họp, tạo phụ đề cho video.' },
+                { category: 'Xử lý Ngôn ngữ Tự nhiên', name: 'Amazon Comprehend', icon: '🧠', description: 'Hiểu ý nghĩa văn bản, trích xuất thực thể, phân tích cảm xúc.', example: 'Phân tích phản hồi khách hàng, phân loại tài liệu.' },
+                { category: 'Xử lý Ngôn ngữ Tự nhiên', name: 'Amazon Translate', icon: '🌐', description: 'Dịch thuật ngôn ngữ tự động và chính xác.', example: 'Dịch trang web, dịch nội dung chat theo thời gian thực.' },
+                { category: 'Chatbot', name: 'Amazon Lex', icon: '🤖', description: 'Xây dựng các giao diện đàm thoại (chatbot) bằng giọng nói và văn bản.', example: 'Tạo chatbot hỗ trợ khách hàng, đặt lịch hẹn tự động.' },
+                { category: 'Tìm kiếm Thông minh', name: 'Amazon Kendra', icon: '🔍', description: 'Dịch vụ tìm kiếm thông minh cho doanh nghiệp, sử dụng NLP.', example: 'Xây dựng hệ thống hỏi-đáp nội bộ, tìm kiếm tài liệu kỹ thuật.' },
+                { category: 'Cá nhân hóa', name: 'Amazon Personalize', icon: '🎁', description: 'Cung cấp các đề xuất được cá nhân hóa cho người dùng.', example: 'Gợi ý sản phẩm, đề xuất phim/nhạc, cá nhân hóa nội dung email.' },
+                { category: 'Dự báo', name: 'Amazon Forecast', icon: '📈', description: 'Xây dựng các mô hình dự báo chuỗi thời gian chính xác.', example: 'Dự báo doanh thu, nhu cầu hàng tồn kho, lượng truy cập web.' },
+                { category: 'Phát hiện Bất thường', name: 'Amazon Lookout for...', icon: '🚨', description: 'Phát hiện hành vi bất thường trong thiết bị, chỉ số, và thị giác.', example: 'Giám sát lỗi dây chuyền sản xuất, phát hiện giao dịch đáng ngờ.' },
+                { category: 'Hỗ trợ Lập trình viên', name: 'Amazon CodeWhisperer', icon: '💻', description: 'Gợi ý code theo thời gian thực, giúp lập trình nhanh và an toàn hơn.', example: 'Tự động hoàn thành các hàm, khối mã phức tạp dựa trên comments.' }
+            ];
+
+            const sagemakerData = [
+                { title: 'SageMaker Studio', content: 'Một IDE dựa trên web duy nhất cho tất cả các bước phát triển ML, từ chuẩn bị dữ liệu đến xây dựng, huấn luyện và triển khai mô hình.' },
+                { title: 'Chuẩn bị dữ liệu', content: 'Bao gồm <strong>SageMaker Data Wrangler</strong> để chuẩn bị dữ liệu một cách trực quan và <strong>SageMaker Feature Store</strong> để lưu trữ, quản lý và chia sẻ các đặc trưng (features) cho mô hình.' },
+                { title: 'Xây dựng và Huấn luyện', content: 'Cung cấp các thuật toán tích hợp sẵn, được tối ưu hóa. Nổi bật là <strong>SageMaker Autopilot</strong>, dịch vụ tự động hóa việc xây dựng và tinh chỉnh các mô hình tốt nhất (AutoML).' },
+                { title: 'Triển khai và Giám sát', content: 'Dễ dàng triển khai mô hình thông qua <strong>SageMaker Endpoints</strong> để nhận dự đoán theo thời gian thực. Cung cấp các công cụ MLOps để tự động hóa vòng đời ML.' }
+            ];
+
+            const quizData = [
+                // --- Original Questions ---
+                { question: "Một công ty bán lẻ trực tuyến muốn triển khai tính năng gợi ý sản phẩm cho người dùng dựa trên lịch sử xem và mua hàng của họ. Dịch vụ AWS nào phù hợp nhất?", options: ["Amazon Forecast", "Amazon Comprehend", "Amazon Personalize", "Amazon Rekognition"], answer: "Amazon Personalize", explanation: "Amazon Personalize được thiết kế đặc biệt để xây dựng các hệ thống gợi ý và cá nhân hóa, sử dụng công nghệ tương tự của Amazon.com." },
+                { question: "Một tòa soạn báo muốn tự động hóa việc gán thẻ chủ đề như 'thể thao', 'chính trị' cho các bài báo. Họ nên sử dụng dịch vụ nào?", options: ["Amazon Transcribe", "Amazon Comprehend", "Amazon Polly", "Amazon Translate"], answer: "Amazon Comprehend", explanation: "Amazon Comprehend có chức năng phân tích văn bản, bao gồm cả việc xác định các chủ đề chính (topic modeling) và phân loại tài liệu." },
+                { question: "Một công ty luật cần trích xuất các điều khoản và tên bên liên quan từ hàng triệu trang tài liệu được quét. Dịch vụ nào có thể tự động hóa việc này?", options: ["Amazon Rekognition", "Amazon Textract", "Amazon Kendra", "Amazon Lex"], answer: "Amazon Textract", explanation: "Amazon Textract chuyên về việc trích xuất văn bản (cả in và viết tay) và dữ liệu có cấu trúc từ các biểu mẫu và bảng trong tài liệu." },
+                { question: "Một ứng dụng cần chuyển đổi giọng nói của người dùng thành văn bản để xử lý. Dịch vụ nào thực hiện chức năng cốt lõi này?", options: ["Amazon Polly", "Amazon Lex", "Amazon Transcribe", "Amazon Comprehend"], answer: "Amazon Transcribe", explanation: "Amazon Transcribe là dịch vụ chuyển đổi giọng nói thành văn bản (Speech-to-Text)." },
+                { question: "Đội ngũ khoa học dữ liệu cần một IDE duy nhất để thực hiện toàn bộ vòng đời ML. Họ nên sử dụng công cụ nào của AWS?", options: ["AWS Cloud9", "Amazon SageMaker Studio", "AWS Lambda", "Amazon EC2 Instance"], answer: "Amazon SageMaker Studio", explanation: "SageMaker Studio là IDE web-based toàn diện duy nhất dành cho machine learning, tích hợp mọi công cụ cần thiết." },
+                { question: "Tính năng nào của SageMaker giúp phát hiện thiên vị (bias) trong dữ liệu và giải thích cách mô hình đưa ra dự đoán?", options: ["SageMaker Autopilot", "SageMaker Data Wrangler", "SageMaker Clarify", "SageMaker Feature Store"], answer: "SageMaker Clarify", explanation: "SageMaker Clarify được thiết kế để cung cấp khả năng giải thích mô hình và phát hiện thiên vị (bias) trong dữ liệu và mô hình ML." },
+                
+                // --- New Questions ---
+                { question: "Mục tiêu chính của mô hình hồi quy (regression) là gì?", options: ["Phân loại dữ liệu vào các nhóm", "Dự đoán một giá trị số liên tục", "Tìm các cụm trong dữ liệu", "Học từ phần thưởng và hình phạt"], answer: "Dự đoán một giá trị số liên tục", explanation: "Hồi quy được sử dụng để dự đoán các kết quả có giá trị liên tục, ví dụ như dự đoán giá nhà hoặc nhiệt độ." },
+                { question: "Loại hình học máy nào được sử dụng để huấn luyện một mô hình chơi cờ vua?", options: ["Học có giám sát", "Học không giám sát", "Học tăng cường", "Học bán giám sát"], answer: "Học tăng cường", explanation: "Học tăng cường (Reinforcement Learning) là phương pháp phù hợp cho các bài toán mà tác nhân (agent) học cách hành động trong một môi trường để tối đa hóa phần thưởng, ví dụ như thắng một ván cờ." },
+                { question: "Hiện tượng một mô hình hoạt động rất tốt trên dữ liệu huấn luyện nhưng kém hiệu quả trên dữ liệu mới được gọi là gì?", options: ["Underfitting", "Bias", "Variance", "Overfitting"], answer: "Overfitting", explanation: "Overfitting (học quá khớp) xảy ra khi mô hình học thuộc cả nhiễu trong dữ liệu huấn luyện, khiến nó mất khả năng tổng quát hóa trên dữ liệu chưa từng thấy." },
+                { question: "Một công ty muốn xây dựng một công cụ tìm kiếm cho cơ sở tri thức nội bộ có khả năng hiểu các câu hỏi bằng ngôn ngữ tự nhiên. Dịch vụ nào là lựa chọn tốt nhất?", options: ["Amazon Lex", "Amazon Comprehend", "Amazon Kendra", "Amazon Textract"], answer: "Amazon Kendra", explanation: "Amazon Kendra là một dịch vụ tìm kiếm thông minh được tối ưu hóa cho doanh nghiệp, sử dụng NLP để hiểu ý định của người dùng và tìm câu trả lời chính xác từ các nguồn dữ liệu khác nhau." },
+                { question: "Để tự động dịch văn bản giao diện người dùng của một ứng dụng sang nhiều ngôn ngữ, nhà phát triển nên sử dụng dịch vụ nào?", options: ["Amazon Polly", "Amazon Translate", "Amazon Transcribe", "Amazon Comprehend"], answer: "Amazon Translate", explanation: "Amazon Translate cung cấp khả năng dịch thuật ngôn ngữ nhanh chóng và chính xác, phù hợp cho việc bản địa hóa ứng dụng." },
+                { question: "Một nhà máy muốn sử dụng camera để tự động phát hiện các sản phẩm lỗi trên dây chuyền. Dịch vụ nào phù hợp nhất cho việc này?", options: ["Amazon Textract", "Amazon Lookout for Vision", "Amazon Forecast", "Amazon Polly"], answer: "Amazon Lookout for Vision", explanation: "Amazon Lookout for Vision được thiết kế đặc biệt cho các bài toán kiểm tra chất lượng bằng thị giác máy tính, giúp phát hiện các khiếm khuyết và sự bất thường trong sản phẩm." },
+                { question: "Một đội marketing muốn phân tích hàng nghìn bình luận của khách hàng để hiểu được cảm xúc chung (tích cực, tiêu cực, trung tính). Họ nên dùng dịch vụ nào?", options: ["Amazon Rekognition", "Amazon Personalize", "Amazon Comprehend", "Amazon Lex"], answer: "Amazon Comprehend", explanation: "Amazon Comprehend có chức năng phân tích cảm xúc (sentiment analysis) mạnh mẽ để rút ra những hiểu biết sâu sắc từ dữ liệu văn bản." },
+                { question: "Tính năng nào của SageMaker giúp chuẩn bị dữ liệu cho mô hình ML thông qua một giao diện trực quan, không cần viết code?", options: ["SageMaker Autopilot", "SageMaker Feature Store", "SageMaker Ground Truth", "SageMaker Data Wrangler"], answer: "SageMaker Data Wrangler", explanation: "SageMaker Data Wrangler giảm thời gian chuẩn bị dữ liệu bằng cách cung cấp một giao diện trực quan để làm sạch, chuyển đổi và trực quan hóa dữ liệu." },
+                { question: "Vai trò chính của một SageMaker Endpoint là gì?", options: ["Lưu trữ dữ liệu huấn luyện", "Huấn luyện một mô hình ML", "Triển khai mô hình và cung cấp dự đoán thời gian thực", "Gán nhãn cho dữ liệu"], answer: "Triển khai mô hình và cung cấp dự đoán thời gian thực", explanation: "Sau khi mô hình được huấn luyện, bạn triển khai nó vào một SageMaker Endpoint để các ứng dụng khác có thể gọi API và nhận về các dự đoán." },
+                { question: "Một nhà khoa học dữ liệu muốn tự động xây dựng, huấn luyện và tinh chỉnh mô hình tốt nhất cho một bộ dữ liệu dạng bảng mà không cần viết nhiều code. Họ nên sử dụng tính năng SageMaker nào?", options: ["SageMaker Studio", "SageMaker Autopilot", "SageMaker Pipelines", "SageMaker Data Wrangler"], answer: "SageMaker Autopilot", explanation: "SageMaker Autopilot tự động hóa quy trình AutoML, giúp người dùng nhanh chóng có được mô hình hiệu suất cao mà không cần chuyên môn sâu." },
+                { question: "Đội ngũ ML muốn lưu trữ và chia sẻ các đặc trưng (features) đã được quản lý để đảm bảo tính nhất quán và tái sử dụng trên nhiều mô hình. Họ nên dùng gì?", options: ["Amazon S3", "SageMaker Feature Store", "AWS Glue Data Catalog", "Amazon DynamoDB"], answer: "SageMaker Feature Store", explanation: "SageMaker Feature Store là một kho lưu trữ tập trung cho các đặc trưng, giúp dễ dàng khám phá, chia sẻ và tái sử dụng các đặc trưng trong các dự án ML." },
+                { question: "Để đảm bảo rằng dữ liệu truyền giữa notebook SageMaker và S3 không bị chặn bắt, biện pháp bảo mật nào là cần thiết?", options: ["IAM Role", "VPC", "Mã hóa khi nghỉ (at-rest)", "Mã hóa khi truyền (in-transit)"], answer: "Mã hóa khi truyền (in-transit)", explanation: "Mã hóa khi truyền (sử dụng TLS) bảo vệ dữ liệu khi nó di chuyển giữa các tài nguyên AWS, ngăn chặn việc nghe lén." },
+                { question: "Dịch vụ AWS nào giúp kiểm soát ai có quyền truy cập vào các notebook và công việc huấn luyện của SageMaker?", options: ["AWS Shield", "Amazon GuardDuty", "AWS KMS", "AWS IAM"], answer: "AWS IAM", explanation: "AWS Identity and Access Management (IAM) là dịch vụ cốt lõi để quản lý quyền truy cập vào các tài nguyên AWS một cách an toàn." },
+                { question: "Việc đảm bảo một mô hình không đưa ra các kết quả thiên vị một cách có hệ thống đối với các nhóm người nhất định được gọi là gì?", options: ["Khả năng giải thích (Explainability)", "Công bằng (Fairness)", "Độ bền (Robustness)", "Bảo mật (Privacy)"], answer: "Công bằng (Fairness)", explanation: "Công bằng là một trụ cột quan trọng của AI có trách nhiệm, nhằm mục đích giảm thiểu và đo lường sự thiên vị (bias) trong các mô hình." },
+                { question: "Một ứng dụng thời tiết muốn tạo ra các bản tin âm thanh ngắn từ dữ liệu văn bản. Dịch vụ nào phù hợp nhất?", options: ["Amazon Transcribe", "Amazon Lex", "Amazon Polly", "Amazon Translate"], answer: "Amazon Polly", explanation: "Amazon Polly là dịch vụ chuyển văn bản thành giọng nói (Text-to-Speech), lý tưởng để tạo ra nội dung âm thanh từ văn bản." },
+                { question: "Bước đầu tiên trong vòng đời của một dự án Machine Learning điển hình là gì?", options: ["Huấn luyện mô hình", "Thu thập dữ liệu", "Xác định bài toán kinh doanh", "Triển khai mô hình"], answer: "Xác định bài toán kinh doanh", explanation: "Trước khi thực hiện bất kỳ công việc kỹ thuật nào, điều quan trọng nhất là phải hiểu rõ vấn đề cần giải quyết và mục tiêu kinh doanh." },
+                { question: "Một công ty muốn cô lập các tài nguyên huấn luyện SageMaker của họ trong một mạng riêng ảo để tăng cường bảo mật. Họ nên sử dụng dịch vụ nào?", options: ["AWS Direct Connect", "Amazon VPC", "AWS Shield", "IAM"], answer: "Amazon VPC", explanation: "Amazon Virtual Private Cloud (VPC) cho phép bạn tạo một môi trường mạng bị cô lập để triển khai các tài nguyên AWS một cách an toàn." },
+                { question: "Phân biệt giữa Học có giám sát và Học không giám sát là gì?", options: ["Một loại dùng cho số, loại kia dùng cho văn bản", "Một loại cần dữ liệu có nhãn, loại kia không cần", "Một loại nhanh hơn loại kia", "Một loại dùng cho hình ảnh, loại kia cho giọng nói"], answer: "Một loại cần dữ liệu có nhãn, loại kia không cần", explanation: "Sự khác biệt cơ bản là Học có giám sát học từ dữ liệu đã được gán nhãn (ví dụ: ảnh con mèo được gán nhãn 'mèo'), trong khi Học không giám sát tự tìm ra cấu trúc trong dữ liệu không có nhãn." }
+            ];
+
+            // --- Section 1: Overview Chart ---
+            const ctx = document.getElementById('domainsChart').getContext('2d');
+            const domainsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: domainData.labels,
+                    datasets: [{
+                        label: 'Tỷ trọng kiến thức',
+                        data: domainData.weights,
+                        backgroundColor: ['#0ea5e9', '#f59e0b', '#10b981', '#64748b'],
+                        borderColor: '#f8fafc',
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                font: {
+                                    size: 14
+                                }
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const domainDetailsContainer = document.getElementById('domain-details');
+            domainData.details.forEach((item, index) => {
+                const color = domainsChart.data.datasets[0].backgroundColor[index];
+                domainDetailsContainer.innerHTML += `
+                    <div class="bg-white p-4 rounded-lg shadow-sm border-l-4" style="border-color: ${color};">
+                        <h4 class="font-bold text-slate-800">${item.title}</h4>
+                        <p class="text-sm text-slate-600">${item.content}</p>
+                    </div>
+                `;
+            });
+            
+            // --- Mobile Navigation ---
+            const mobileNav = document.getElementById('mobile-nav');
+            mobileNav.addEventListener('change', (e) => {
+                window.location.hash = e.target.value;
+            });
+
+
+            // --- Section 2: AI Services ---
+            const serviceFiltersContainer = document.getElementById('service-filters');
+            const serviceGrid = document.getElementById('service-grid');
+
+            const categories = ['Tất cả', ...new Set(servicesData.map(s => s.category))];
+            
+            categories.forEach(category => {
+                const button = document.createElement('button');
+                button.className = 'px-4 py-2 text-sm font-medium rounded-full transition';
+                button.textContent = category;
+                button.dataset.filter = category;
+                if (category === 'Tất cả') {
+                    button.classList.add('bg-sky-600', 'text-white');
+                } else {
+                    button.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+                }
+                serviceFiltersContainer.appendChild(button);
+            });
+
+            const renderServices = (filter) => {
+                serviceGrid.innerHTML = '';
+                const filteredServices = filter === 'Tất cả' ? servicesData : servicesData.filter(s => s.category === filter);
+                
+                filteredServices.forEach(service => {
+                    const card = document.createElement('div');
+                    card.className = 'service-card bg-white rounded-xl shadow-lg overflow-hidden p-6 flex flex-col';
+                    card.innerHTML = `
+                        <div class="flex items-center mb-4">
+                            <span class="text-3xl mr-4">${service.icon}</span>
+                            <h3 class="text-xl font-bold text-slate-800">${service.name}</h3>
+                        </div>
+                        <p class="text-slate-600 mb-4 flex-grow">${service.description}</p>
+                        <div>
+                            <p class="text-sm font-semibold text-sky-700">Ví dụ:</p>
+                            <p class="text-sm text-slate-500">${service.example}</p>
+                        </div>
+                    `;
+                    serviceGrid.appendChild(card);
+                });
+            };
+
+            serviceFiltersContainer.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON') {
+                    const filter = e.target.dataset.filter;
+                    document.querySelectorAll('#service-filters button').forEach(btn => {
+                        btn.classList.remove('bg-sky-600', 'text-white');
+                        btn.classList.add('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+                    });
+                    e.target.classList.add('bg-sky-600', 'text-white');
+                    e.target.classList.remove('bg-white', 'text-slate-700', 'hover:bg-slate-100');
+                    renderServices(filter);
+                }
+            });
+
+            renderServices('Tất cả');
+
+
+            // --- Section 3: SageMaker Accordion ---
+            const accordionContainer = document.getElementById('sagemaker-accordion');
+            sagemakerData.forEach((item, index) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'border-b border-slate-200 last:border-b-0';
+                accordionItem.innerHTML = `
+                    <button class="accordion-button w-full flex justify-between items-center p-6 text-left hover:bg-slate-50 transition">
+                        <span class="text-lg font-semibold text-slate-800">${item.title}</span>
+                        <span class="accordion-icon text-2xl font-light text-sky-600 transform transition-transform">+</span>
+                    </button>
+                    <div class="accordion-content max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <div class="p-6 pt-0 text-slate-600">
+                           <p>${item.content}</p>
+                        </div>
+                    </div>
+                `;
+                accordionContainer.appendChild(accordionItem);
+            });
+
+            accordionContainer.addEventListener('click', (e) => {
+                const button = e.target.closest('.accordion-button');
+                if (button) {
+                    const content = button.nextElementSibling;
+                    const icon = button.querySelector('.accordion-icon');
+                    const isOpen = content.style.maxHeight !== '0px';
+
+                    // Close all others
+                    document.querySelectorAll('.accordion-content').forEach(el => {
+                        el.style.maxHeight = '0px';
+                        el.previousElementSibling.querySelector('.accordion-icon').textContent = '+';
+                        el.previousElementSibling.querySelector('.accordion-icon').classList.remove('rotate-45');
+
+                    });
+
+                    if (!isOpen) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        icon.textContent = '+';
+                        icon.classList.add('rotate-45');
+                    }
+                }
+            });
+
+            // --- Section 4: Quiz ---
+            const questionEl = document.getElementById('quiz-question');
+            const optionsEl = document.getElementById('quiz-options');
+            const feedbackEl = document.getElementById('quiz-feedback');
+            const nextBtn = document.getElementById('quiz-next-btn');
+            const restartBtn = document.getElementById('quiz-restart-btn');
+            const progressText = document.getElementById('progress-text');
+            const progressBar = document.getElementById('progress-bar');
+            
+            let currentQuestionIndex = 0;
+            let answered = false;
+            let shuffledQuizData = [];
+
+            function shuffleArray(array) {
+                for (let i = array.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [array[i], array[j]] = [array[j], array[i]];
+                }
+            }
+            
+            function startQuiz() {
+                currentQuestionIndex = 0;
+                shuffledQuizData = [...quizData];
+                shuffleArray(shuffledQuizData);
+                loadQuestion();
+                restartBtn.textContent = "Làm lại";
+            }
+
+            function loadQuestion() {
+                answered = false;
+                const currentQuestion = shuffledQuizData[currentQuestionIndex];
+                questionEl.textContent = currentQuestion.question;
+                optionsEl.innerHTML = '';
+                
+                currentQuestion.options.forEach(option => {
+                    const button = document.createElement('button');
+                    button.className = 'quiz-option w-full p-4 border-2 border-slate-200 rounded-lg text-left hover:bg-slate-100 hover:border-sky-300 transition';
+                    button.textContent = option;
+                    optionsEl.appendChild(button);
+                });
+
+                feedbackEl.classList.add('hidden');
+                nextBtn.classList.add('hidden');
+
+                progressText.textContent = `Câu ${currentQuestionIndex + 1} / ${shuffledQuizData.length}`;
+                const progressPercentage = ((currentQuestionIndex + 1) / shuffledQuizData.length) * 100;
+                progressBar.style.width = `${progressPercentage}%`;
+            }
+
+            optionsEl.addEventListener('click', (e) => {
+                if (e.target.tagName === 'BUTTON' && !answered) {
+                    answered = true;
+                    const selectedOption = e.target;
+                    const answer = shuffledQuizData[currentQuestionIndex].answer;
+                    
+                    if (selectedOption.textContent === answer) {
+                        selectedOption.classList.add('correct');
+                        feedbackEl.textContent = "Chính xác! " + shuffledQuizData[currentQuestionIndex].explanation;
+                        feedbackEl.className = 'mt-6 p-4 rounded-lg bg-green-50 border border-green-200 text-green-800';
+                    } else {
+                        selectedOption.classList.add('incorrect');
+                        feedbackEl.textContent = "Không đúng. " + shuffledQuizData[currentQuestionIndex].explanation;
+                        feedbackEl.className = 'mt-6 p-4 rounded-lg bg-red-50 border border-red-200 text-red-800';
+                        // Highlight the correct answer
+                        Array.from(optionsEl.children).forEach(btn => {
+                            if(btn.textContent === answer) {
+                                btn.classList.add('correct');
+                            }
+                        });
+                    }
+                    feedbackEl.classList.remove('hidden');
+
+                    if (currentQuestionIndex < shuffledQuizData.length - 1) {
+                        nextBtn.classList.remove('hidden');
+                    } else {
+                        questionEl.textContent = "Bạn đã hoàn thành bài trắc nghiệm!";
+                        restartBtn.textContent = "Làm lại từ đầu";
+                    }
+                }
+            });
+
+            nextBtn.addEventListener('click', () => {
+                currentQuestionIndex++;
+                loadQuestion();
+            });
+
+            restartBtn.addEventListener('click', startQuiz);
+
+            startQuiz();
+        });
+    </script>
+</body>
+</html>

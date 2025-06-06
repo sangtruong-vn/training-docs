@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bảng điều khiển Kế hoạch - Hệ thống Chấm công</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 320px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+        .nav-link {
+            transition: all 0.3s ease;
+        }
+        .nav-link.active {
+            color: #2563eb; /* blue-600 */
+            border-bottom-color: #2563eb;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            width: 1.25rem;
+            height: 1.25rem;
+            border-radius: 9999px;
+            background-color: #ffffff;
+            border: 4px solid #3b82f6;
+            left: -0.625rem;
+            top: 0;
+            z-index: 10;
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <!-- Chosen Palette: Calm Harmony Neutrals -->
+    <!-- Application Structure Plan: The application is designed as an interactive dashboard with tab-based navigation. This structure was chosen to transform the linear, static project plan into a non-linear, exploratory experience. Users can directly access key sections (Overview, Database, Features, Roadmap, Analytics) without scrolling through a long document. This task-oriented design enhances usability for developers who need to quickly reference specific parts of the plan, such as API endpoints or roadmap phases. -->
+    <!-- Visualization & Content Choices: 
+        1. Architecture: (Goal: Inform) Presented as an interactive HTML/CSS diagram instead of a static image. Hovering reveals details. Justification: More engaging and avoids external assets. Method: Tailwind CSS, JS for hover.
+        2. Database Schema: (Goal: Organize) An interactive accordion list. Clicking a table name expands to show columns. Justification: Reduces cognitive load by hiding details until needed. Method: HTML/Tailwind, JS for toggle.
+        3. Features & APIs: (Goal: Explore) A filterable list of features. Justification: Allows users to quickly find relevant endpoints, a primary use case. Method: HTML/Tailwind, JS for filtering.
+        4. Roadmap: (Goal: Change/Sequence) A visual, vertical timeline. Justification: More intuitive and engaging for understanding project flow than a text list. Method: HTML/Tailwind, JS for interaction.
+        5. Analytics Charts: (Goal: Analyze) Bar and Donut charts created with Chart.js to visualize data *derived* from the plan itself (tasks per phase, APIs per module). Justification: Provides a new analytical layer and "at-a-glance" insights not present in the original report. Library: Chart.js (Canvas).
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700">Kế hoạch Phát triển Hệ thống Chấm công</h1>
+            <p class="text-stone-600 mt-2">Bảng điều khiển tương tác để theo dõi và tra cứu dự án</p>
+        </header>
+
+        <nav class="mb-8 border-b border-stone-200">
+            <ul class="flex flex-wrap justify-center -mb-px">
+                <li><a href="#overview" class="nav-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300">Tổng quan</a></li>
+                <li><a href="#database" class="nav-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300">Cơ sở dữ liệu</a></li>
+                <li><a href="#features" class="nav-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300">Tính năng & API</a></li>
+                <li><a href="#roadmap" class="nav-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300">Lộ trình</a></li>
+                <li><a href="#analytics" class="nav-link inline-block p-4 border-b-2 border-transparent rounded-t-lg hover:text-blue-600 hover:border-blue-300">Phân tích</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section id="overview" class="content-section">
+                <h2 class="text-2xl font-semibold mb-6 text-center">Tổng quan Kiến trúc</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h3 class="font-bold text-xl text-blue-600">Frontend</h3>
+                        <p class="text-3xl font-bold my-2">Vue.js 3+</p>
+                        <p class="text-stone-500">SPA & Tương tác cao</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h3 class="font-bold text-xl text-green-600">Backend</h3>
+                        <p class="text-3xl font-bold my-2">Laravel 11+</p>
+                        <p class="text-stone-500">API RESTful & Logic</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h3 class="font-bold text-xl text-orange-500">Database</h3>
+                        <p class="text-3xl font-bold my-2">MySQL 8</p>
+                        <p class="text-stone-500">Lưu trữ & Truy vấn</p>
+                    </div>
+                </div>
+                 <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                    <h3 class="text-xl font-semibold mb-4 text-center">Luồng Dữ liệu & Tương tác</h3>
+                    <div class="flex items-center justify-center space-x-4 md:space-x-8">
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto"><span class="text-blue-700 font-bold">Người dùng</span></div>
+                        </div>
+                        <div class="font-mono text-blue-500 text-2xl">&rarr;</div>
+                        <div class="text-center">
+                             <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto"><span class="text-blue-700 font-bold">Vue.js</span></div>
+                             <p class="text-sm mt-2 text-stone-500">Giao diện</p>
+                        </div>
+                        <div class="font-mono text-gray-400 text-2xl">&harr;</div>
+                        <div class="text-center">
+                            <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto"><span class="text-green-700 font-bold">Laravel</span></div>
+                            <p class="text-sm mt-2 text-stone-500">API</p>
+                        </div>
+                         <div class="font-mono text-gray-400 text-2xl">&harr;</div>
+                         <div class="text-center">
+                            <div class="w-24 h-24 bg-orange-100 rounded-full flex items-center justify-center mx-auto"><span class="text-orange-700 font-bold">MySQL</span></div>
+                            <p class="text-sm mt-2 text-stone-500">Dữ liệu</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="database" class="content-section hidden">
+                 <h2 class="text-2xl font-semibold mb-6 text-center">Cấu trúc Cơ sở dữ liệu</h2>
+                 <div id="db-schema-container" class="space-y-3"></div>
+            </section>
+
+            <section id="features" class="content-section hidden">
+                 <h2 class="text-2xl font-semibold mb-6 text-center">Tính năng và API Endpoints</h2>
+                 <div id="feature-list-container" class="bg-white p-6 rounded-xl shadow-md border border-stone-200"></div>
+            </section>
+
+            <section id="roadmap" class="content-section hidden">
+                 <h2 class="text-2xl font-semibold mb-6 text-center">Lộ trình Phát triển</h2>
+                 <div class="relative border-l-2 border-blue-300 ml-3 py-4 space-y-8" id="roadmap-container"></div>
+            </section>
+            
+            <section id="analytics" class="content-section hidden">
+                 <h2 class="text-2xl font-semibold mb-6 text-center">Phân tích Kế hoạch</h2>
+                 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h3 class="text-xl font-semibold text-center mb-4">Phân bổ API theo Tính năng</h3>
+                        <div class="chart-container">
+                            <canvas id="featuresChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-stone-200">
+                        <h3 class="text-xl font-semibold text-center mb-4">Phân bổ Công việc theo Giai đoạn</h3>
+                        <div class="chart-container">
+                            <canvas id="roadmapChart"></canvas>
+                        </div>
+                    </div>
+                 </div>
+            </section>
+        </main>
+    </div>
+
+<script>
+    const dbSchemaData = [
+        { name: 'users', description: 'Lưu thông tin người dùng.', columns: '`id`, `name`, `email`, `password`, `avatar`, `role` (\'admin\', \'manager\', \'employee\'), `team_id` (FK), `created_at`, `updated_at`'},
+        { name: 'teams', description: 'Lưu thông tin các phòng ban/đội nhóm.', columns: '`id`, `name`, `manager_id` (FK to users), `description`, `created_at`, `updated_at`'},
+        { name: 'attendances', description: 'Ghi lại lịch sử chấm công hàng ngày.', columns: '`id`, `user_id` (FK), `check_in_time`, `check_out_time`, `check_in_ip_address`, `check_out_ip_address`, `duration_in_minutes`, `status` (\'present\', \'late\', \'absent\')'},
+        { name: 'leave_applications', description: 'Lưu đơn xin nghỉ phép của nhân viên.', columns: '`id`, `user_id` (FK), `leave_type_id` (FK), `start_date`, `end_date`, `reason`, `status` (\'pending\', \'approved\', \'rejected\'), `approved_by` (FK to users)'},
+        { name: 'leave_types', description: 'Các loại nghỉ phép (phép năm, nghỉ ốm...).', columns: '`id`, `name`, `is_paid` (boolean)'},
+        { name: 'overtime_applications', description: 'Lưu đơn xin làm thêm giờ.', columns: '`id`, `user_id` (FK), `date`, `start_time`, `end_time`, `reason`, `status` (\'pending\', \'approved\', \'rejected\'), `approved_by` (FK to users)'},
+        { name: 'annual_leaves', description: 'Quản lý số ngày phép năm của từng nhân viên.', columns: '`id`, `user_id` (FK), `year`, `total_days_allowed`, `days_taken`, `days_remaining`'},
+        { name: 'holidays', description: 'Danh sách các ngày nghỉ lễ trong năm.', columns: '`id`, `name`, `date`, `description`'},
+        { name: 'payrolls', description: 'Lưu thông tin bảng lương hàng tháng.', columns: '`id`, `user_id` (FK), `month`, `year`, `base_salary`, `overtime_hours`, `overtime_pay`, `deductions`, `net_pay`, `status` (\'draft\', \'paid\')'},
+        { name: 'settings', description: 'Lưu các cài đặt chung cho hệ thống.', columns: '`key`, `value` (VD: `working_hours_start`, `working_hours_end`)'}
+    ];
+
+    const featureData = [
+        { name: 'Home (Trang chủ)', apis: '`POST /api/attendance/checkin`<br>`PUT /api/attendance/checkout`<br>`GET /api/attendance/today-status`', components: '`HomePage.vue`<br>`CheckinButton.vue`<br>`WelcomeMessage.vue`'},
+        { name: 'Quản lý Users', apis: '`GET /api/users`<br>`GET /api/users/{id}`<br>`POST /api/users`<br>`PUT /api/users/{id}`<br>`DELETE /api/users/{id}`', components: '`UserList.vue`<br>`UserForm.vue`<br>`UserDetails.vue`'},
+        { name: 'Quản lý Teams', apis: '`GET /api/teams`<br>`POST /api/teams`<br>`PUT /api/teams/{id}`<br>`DELETE /api/teams/{id}`', components: '`TeamList.vue`<br>`TeamForm.vue`'},
+        { name: 'Xin nghỉ phép', apis: '`GET /api/leave-types`<br>`POST /api/leave-applications`<br>`GET /api/my-leave-applications`', components: '`LeaveApplicationForm.vue`<br>`MyLeaveHistory.vue`'},
+        { name: 'Xin làm thêm giờ (OT)', apis: '`POST /api/overtime-applications`<br>`GET /api/my-overtime-applications`', components: '`OvertimeApplicationForm.vue`<br>`MyOvertimeHistory.vue`'},
+        { name: 'Quản lý Phép năm', apis: '`GET /api/annual-leaves`<br>`GET /api/annual-leaves/{userId}`<br>`PUT /api/annual-leaves/{id}`', components: '`AnnualLeaveDashboard.vue`<br>`AnnualLeaveManagement.vue`'},
+        { name: 'Bảng chấm công', apis: '`GET /api/attendance?user_id=&month=&year=`<br>`GET /api/team-attendance?team_id=`', components: '`AttendanceRecord.vue`<br>`TeamAttendanceView.vue`'},
+        { name: 'Bảng lương (Payroll)', apis: '`POST /api/payroll/generate?month=&year=`<br>`GET /api/payrolls`<br>`GET /api/payrolls/{id}`<br>`PUT /api/payrolls/{id}/status`', components: '`PayrollList.vue`<br>`PayrollDetails.vue`<br>`MyPayslip.vue`'},
+        { name: 'Quản lý Ngày lễ', apis: '`GET /api/holidays`<br>`POST /api/holidays`<br>`PUT /api/holidays/{id}`<br>`DELETE /api/holidays/{id}`', components: '`HolidayList.vue`<br>`HolidayForm.vue`'},
+        { name: 'Quản lý Đơn từ', apis: '`GET /api/applications?type=leave/overtime`<br>`PUT /api/applications/{type}/{id}/approve`<br>`PUT /api/applications/{type}/{id}/reject`', components: '`ApplicationManagement.vue`<br>`LeaveRequestList.vue`<br>`OvertimeRequestList.vue`'},
+        { name: 'Authentication', apis: '`/login`, `/logout`, `/user`', components: '`LoginPage.vue`, `AuthStore.js`'}
+    ];
+    
+    const roadmapData = [
+        { name: 'Giai đoạn 1: Nền tảng (Foundation)', tasks: ['Cài đặt môi trường Laravel & VueJS', 'Tạo migrations cho DB Schema', 'Thiết lập Laravel Sanctum', 'Xây dựng CRUD cho Users & Teams', 'Tạo layout cơ bản cho VueJS'] },
+        { name: 'Giai đoạn 2: Chức năng Chấm công Cốt lõi', tasks: ['Xây dựng API & UI cho Check-in/Check-out', 'Tự động tính thời gian làm việc', 'Hiển thị lịch sử chấm công cá nhân', 'Hiển thị lịch sử chấm công của team'] },
+        { name: 'Giai đoạn 3: Quản lý Đơn từ (Applications)', tasks: ['Xây dựng form xin nghỉ phép & OT', 'Xây dựng trang quản lý duyệt đơn từ', 'Tự động cập nhật dữ liệu khi đơn được duyệt', 'Gửi email thông báo'] },
+        { name: 'Giai đoạn 4: Quản lý Nâng cao và Báo cáo', tasks: ['Xây dựng module quản lý phép năm', 'Xây dựng module quản lý ngày lễ', 'Xây dựng chức năng tính lương (Payroll)', 'Xuất báo cáo ra Excel/PDF'] },
+        { name: 'Giai đoạn 5: Hoàn thiện và Triển khai', tasks: ['Viết Unit Test & Feature Test', 'Tối ưu hóa hiệu năng', 'Thiết lập CI/CD', 'Triển khai lên server'] }
+    ];
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const navLinks = document.querySelectorAll('.nav-link');
+        const contentSections = document.querySelectorAll('.content-section');
+        let featuresChart, roadmapChart;
+
+        function navigateTo(hash) {
+            navLinks.forEach(link => {
+                link.classList.toggle('active', link.getAttribute('href') === hash);
+            });
+            contentSections.forEach(section => {
+                section.classList.toggle('hidden', section.id !== hash.substring(1));
+            });
+            if (hash === '#analytics' && !featuresChart) {
+                renderCharts();
+            }
+        }
+
+        navLinks.forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const hash = e.target.getAttribute('href');
+                window.location.hash = hash;
+            });
+        });
+        
+        window.addEventListener('hashchange', () => {
+            navigateTo(window.location.hash || '#overview');
+        });
+
+        function renderDbSchema() {
+            const container = document.getElementById('db-schema-container');
+            container.innerHTML = dbSchemaData.map(table => `
+                <div class="bg-white rounded-lg shadow-sm border border-stone-200 overflow-hidden">
+                    <button class="w-full text-left p-4 flex justify-between items-center bg-stone-50 hover:bg-stone-100 focus:outline-none" onclick="toggleAccordion(this)">
+                        <div>
+                            <p class="font-mono text-blue-600 font-semibold">${table.name}</p>
+                            <p class="text-sm text-stone-500">${table.description}</p>
+                        </div>
+                        <span class="transform transition-transform duration-300">&#9662;</span>
+                    </button>
+                    <div class="hidden p-4 border-t border-stone-200">
+                        <h4 class="font-semibold mb-2">Các cột chính:</h4>
+                        <p class="font-mono text-sm text-stone-700 bg-stone-100 p-3 rounded">${table.columns}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function renderFeatures() {
+            const container = document.getElementById('feature-list-container');
+            container.innerHTML = `
+                <div class="overflow-x-auto">
+                    <table class="w-full text-sm text-left text-stone-600">
+                        <thead class="text-xs text-stone-700 uppercase bg-stone-100">
+                            <tr>
+                                <th scope="col" class="px-6 py-3">Tính năng</th>
+                                <th scope="col" class="px-6 py-3">API Endpoints</th>
+                                <th scope="col" class="px-6 py-3">Vue.js Components</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${featureData.map(feature => `
+                                <tr class="bg-white border-b hover:bg-stone-50">
+                                    <th scope="row" class="px-6 py-4 font-medium text-stone-900 whitespace-nowrap">${feature.name}</th>
+                                    <td class="px-6 py-4 font-mono text-xs">${feature.apis}</td>
+                                    <td class="px-6 py-4 font-mono text-xs">${feature.components}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `;
+        }
+
+        function renderRoadmap() {
+            const container = document.getElementById('roadmap-container');
+            container.innerHTML = roadmapData.map(phase => `
+                <div class="relative timeline-item pl-8">
+                    <h3 class="text-lg font-semibold text-blue-700">${phase.name}</h3>
+                    <ul class="mt-2 list-disc list-inside text-stone-600 space-y-1">
+                        ${phase.tasks.map(task => `<li>${task}</li>`).join('')}
+                    </ul>
+                </div>
+            `).join('');
+        }
+
+        function renderCharts() {
+            const featuresCtx = document.getElementById('featuresChart').getContext('2d');
+            featuresChart = new Chart(featuresCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: featureData.map(f => f.name),
+                    datasets: [{
+                        label: 'Số lượng API',
+                        data: featureData.map(f => (f.apis.match(/\//g) || []).length),
+                        backgroundColor: ['#3b82f6', '#10b981', '#f97316', '#8b5cf6', '#ec4899', '#6366f1', '#f59e0b', '#14b8a6', '#ef4444', '#d946ef', '#0ea5e9'],
+                        hoverOffset: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            const roadmapCtx = document.getElementById('roadmapChart').getContext('2d');
+            roadmapChart = new Chart(roadmapCtx, {
+                type: 'bar',
+                data: {
+                    labels: roadmapData.map(p => p.name.split(':')[0]),
+                    datasets: [{
+                        label: 'Số lượng công việc',
+                        data: roadmapData.map(p => p.tasks.length),
+                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                        borderColor: 'rgba(59, 130, 246, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            });
+        }
+        
+        window.toggleAccordion = function(button) {
+            const content = button.nextElementSibling;
+            const icon = button.querySelector('span');
+            content.classList.toggle('hidden');
+            icon.classList.toggle('rotate-180');
+        }
+
+        renderDbSchema();
+        renderFeatures();
+        renderRoadmap();
+        navigateTo(window.location.hash || '#overview');
+    });
+</script>
+
+</body>
+</html>
