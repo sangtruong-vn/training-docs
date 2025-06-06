@@ -1,0 +1,403 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kế Hoạch Dự Án Tương Tác - Hệ Thống Chấm Công</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral (Background: stone-100, Text: slate-800, Primary: slate-600, Accent: sky-500) -->
+    <!-- Application Structure Plan: The application uses a tabbed navigation structure to separate the project plan into logical, digestible sections: Tổng quan, Kiến trúc, Cơ sở dữ liệu, Lộ trình Backend, Lộ trình Frontend, and Tính năng chính. This non-linear approach allows users to directly access the information they're interested in, rather than scrolling through a long document. This task-oriented design enhances usability and makes the complex plan easier to understand and explore. User flow is driven by clicking tabs to switch between these focused views. -->
+    <!-- Visualization & Content Choices: 
+    - Report Info: Overall Architecture -> Goal: Inform -> Viz: Diagram using styled HTML/CSS divs -> Interaction: Static visual -> Justification: Clearly represents the three main components (Frontend, Backend, DB) and their relationship without complex graphics. -> Method: Tailwind Flexbox.
+    - Report Info: Database Schema -> Goal: Organize & Explore -> Viz: Interactive cards for each table & Bar Chart for column count -> Interaction: Hovering over a card provides visual feedback. Chart tooltips show details. -> Justification: A card-based layout is more modern and readable than a plain HTML table. The chart gives a quick visual comparison of table complexity. -> Method: HTML/CSS & Chart.js.
+    - Report Info: Implementation Roadmaps -> Goal: Show Change/Process -> Viz: Horizontal Bar Chart -> Interaction: Tooltips on bars show details of each step. -> Justification: A Gantt-like bar chart provides a clear, visual timeline of development phases, which is more engaging than a simple list. -> Library: Chart.js.
+    - Report Info: Key Features (Authorization, etc.) -> Goal: Inform -> Viz: Accordion-style list -> Interaction: Clicking a feature title expands to show details. -> Justification: An accordion saves space and allows the user to focus on one feature at a time. -> Method: HTML/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #f5f5f4; /* stone-100 */
+        }
+        .tab-button {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .tab-button.active {
+            border-bottom-color: #0ea5e9; /* sky-500 */
+            color: #0ea5e9; /* sky-500 */
+        }
+        .content-section {
+            display: none;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 400px;
+            max-height: 50vh;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-700">Kế Hoạch Dự Án Tương Tác</h1>
+            <p class="text-lg text-slate-500 mt-2">Hệ Thống Chấm Công (Laravel & Vue.js)</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-slate-200 mb-8 flex-wrap">
+            <button data-tab="overview" class="tab-button active text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Tổng Quan</button>
+            <button data-tab="architecture" class="tab-button text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Kiến Trúc</button>
+            <button data-tab="database" class="tab-button text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Cơ Sở Dữ Liệu</button>
+            <button data-tab="backend" class="tab-button text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Lộ Trình Backend</button>
+            <button data-tab="frontend" class="tab-button text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Lộ Trình Frontend</button>
+            <button data-tab="features" class="tab-button text-sm md:text-base font-semibold py-4 px-3 md:px-6 text-slate-600 hover:text-sky-500">Tính Năng Chính</button>
+        </nav>
+
+        <main>
+            <!-- Section: Overview -->
+            <section id="overview" class="content-section active animate-fade-in">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Tổng Quan Dự Án</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Phần này cung cấp một cái nhìn tổng thể về dự án xây dựng hệ thống chấm công. Chúng ta sẽ áp dụng kiến trúc hiện đại, phân tách rõ ràng giữa backend và frontend để đảm bảo tính linh hoạt, dễ bảo trì và mở rộng trong tương lai. Mục tiêu là tạo ra một sản phẩm mạnh mẽ, đáp ứng đầy đủ các nghiệp vụ quản lý nhân sự cốt lõi.
+                    </p>
+                    
+                    <div class="text-center">
+                        <h3 class="text-xl font-semibold mb-4 text-slate-700">Kiến Trúc Hệ Thống</h3>
+                        <div class="flex flex-col md:flex-row justify-center items-center gap-4 md:gap-8">
+                            <div class="flex-1 w-full md:w-auto bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+                                <div class="text-4xl mb-2">🖥️</div>
+                                <h4 class="font-bold text-lg text-sky-600">Frontend</h4>
+                                <p class="text-slate-500">Vue.js (SPA)</p>
+                            </div>
+                            <div class="text-2xl text-slate-400 font-light hidden md:block">↔️</div>
+                             <div class="text-2xl text-slate-400 font-light md:hidden">↕️</div>
+                            <div class="flex-1 w-full md:w-auto bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+                                 <div class="text-4xl mb-2">⚙️</div>
+                                <h4 class="font-bold text-lg text-sky-600">Backend</h4>
+                                <p class="text-slate-500">Laravel (API)</p>
+                            </div>
+                             <div class="text-2xl text-slate-400 font-light hidden md:block">↔️</div>
+                              <div class="text-2xl text-slate-400 font-light md:hidden">↕️</div>
+                            <div class="flex-1 w-full md:w-auto bg-slate-50 p-6 rounded-lg border border-slate-200 text-center">
+                                 <div class="text-4xl mb-2">🗃️</div>
+                                <h4 class="font-bold text-lg text-sky-600">Database</h4>
+                                <p class="text-slate-500">MySQL 8</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Architecture -->
+            <section id="architecture" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Kiến Trúc & Cấu Trúc Thư Mục</h2>
+                     <p class="text-slate-600 mb-6 leading-relaxed">
+                        Cấu trúc dự án được tổ chức một cách khoa học, phân chia rõ ràng giữa hai phần backend và frontend. Cách tiếp cận này không chỉ giúp các nhóm phát triển độc lập mà còn tuân thủ các chuẩn mực tốt nhất trong phát triển phần mềm hiện đại, tạo nền tảng vững chắc cho việc quản lý mã nguồn.
+                    </p>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4 text-slate-700">Backend (Dự án Laravel)</h3>
+                            <div class="bg-slate-800 text-white p-4 rounded-lg text-sm font-mono whitespace-pre-wrap overflow-x-auto">
+he-thong-cham-cong/
+└── backend/
+    ├── app/
+    │   ├── Http/
+    │   │   ├── Controllers/Api/
+    │   ├── Models/
+    ├── database/
+    │   ├── migrations/
+    ├── routes/
+    │   └── api.php
+    └── ...
+                            </div>
+                        </div>
+                        <div>
+                             <h3 class="text-xl font-semibold mb-4 text-slate-700">Frontend (Dự án Vue.js)</h3>
+                             <div class="bg-slate-800 text-white p-4 rounded-lg text-sm font-mono whitespace-pre-wrap overflow-x-auto">
+he-thong-cham-cong/
+└── frontend/
+    ├── src/
+    │   ├── assets/
+    │   ├── components/
+    │   ├── views/
+    │   ├── services/
+    │   ├── router/
+    │   ├── store/
+    │   └── main.js
+    └── ...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Database -->
+            <section id="database" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Thiết Kế Cơ Sở Dữ Liệu</h2>
+                     <p class="text-slate-600 mb-6 leading-relaxed">
+                        Nền tảng dữ liệu của hệ thống được thiết kế để lưu trữ một cách có cấu trúc tất cả các thông tin quan trọng, từ người dùng, phòng ban cho đến các bản ghi chấm công và đơn từ. Sơ đồ bên dưới minh họa các bảng chính và mối quan hệ giữa chúng, là xương sống cho toàn bộ logic nghiệp vụ của ứng dụng.
+                    </p>
+
+                    <div class="chart-container mb-12">
+                         <canvas id="dbSchemaChart"></canvas>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <!-- JS will populate this -->
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: Backend Roadmap -->
+            <section id="backend" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Lộ Trình Triển Khai Backend (Laravel)</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Việc phát triển backend sẽ được chia thành hai giai đoạn chính. Giai đoạn đầu tập trung vào việc thiết lập nền tảng vững chắc cho dự án, bao gồm cấu trúc, cơ sở dữ liệu và hệ thống xác thực. Giai đoạn hai sẽ xây dựng các API cốt lõi, cung cấp dữ liệu và logic cho phía frontend.
+                    </p>
+                     <div class="chart-container">
+                         <canvas id="backendRoadmapChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Frontend Roadmap -->
+            <section id="frontend" class="content-section">
+                 <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Lộ Trình Triển Khai Frontend (Vue.js)</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Tương tự backend, frontend cũng được phát triển qua hai giai đoạn. Chúng ta sẽ bắt đầu bằng việc dựng khung cho ứng dụng, thiết lập các thư viện và cấu trúc. Sau đó, từng màn hình và tính năng sẽ được xây dựng và tích hợp với API từ backend để tạo ra một trải nghiệm người dùng hoàn chỉnh.
+                    </p>
+                    <div class="chart-container">
+                         <canvas id="frontendRoadmapChart"></canvas>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: Key Features -->
+            <section id="features" class="content-section">
+                <div class="bg-white p-6 md:p-8 rounded-xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-slate-700">Các Tính Năng Quan Trọng Cần Lưu Ý</h2>
+                    <p class="text-slate-600 mb-6 leading-relaxed">
+                        Để đảm bảo hệ thống hoạt động một cách an toàn, chính xác và hiệu quả, có ba khía cạnh quan trọng cần được chú trọng đặc biệt trong quá trình phát triển. Đây là những yếu tố then chốt quyết định đến sự thành công và độ tin cậy của sản phẩm cuối cùng.
+                    </p>
+                    <div id="accordion-container" class="space-y-4">
+                        <!-- Accordion items will be inserted here by JS -->
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabs = document.querySelectorAll('.tab-button');
+            const sections = document.querySelectorAll('.content-section');
+            const accordionContainer = document.getElementById('accordion-container');
+
+            const dbData = [
+                { name: 'users', desc: 'Lưu thông tin người dùng và nhân viên.', fields: ['id', 'name', 'email', 'password', 'role', 'team_id', 'join_date', 'avatar', 'position'] },
+                { name: 'teams', desc: 'Lưu thông tin các phòng ban/đội nhóm.', fields: ['id', 'name', 'description', 'manager_id'] },
+                { name: 'attendances', desc: 'Ghi nhận lịch sử chấm công.', fields: ['id', 'user_id', 'check_in_time', 'check_out_time', 'check_in_ip', 'check_out_ip', 'status', 'work_hours'] },
+                { name: 'leave_applications', desc: 'Đơn xin nghỉ phép.', fields: ['id', 'user_id', 'leave_type', 'start_date', 'end_date', 'reason', 'status', 'approved_by'] },
+                { name: 'overtime_requests', desc: 'Đơn xin làm thêm giờ.', fields: ['id', 'user_id', 'date', 'start_time', 'end_time', 'reason', 'status', 'approved_by'] },
+                { name: 'annual_leaves', desc: 'Quản lý ngày nghỉ phép năm.', fields: ['id', 'user_id', 'year', 'total_days_allowed', 'days_taken', 'days_remaining'] },
+                { name: 'payrolls', desc: 'Lịch sử bảng lương.', fields: ['id', 'user_id', 'month', 'year', 'base_salary', 'overtime_pay', 'deductions', 'net_salary', 'status'] },
+                { name: 'holidays', desc: 'Danh sách các ngày nghỉ lễ.', fields: ['id', 'name', 'date', 'description'] }
+            ];
+
+            const accordionData = [
+                { title: 'Phân Quyền (Authorization)', content: '<strong>Backend:</strong> Sử dụng Policies hoặc Gates của Laravel để kiểm soát quyền hạn. Ví dụ: Chỉ `admin` hoặc `manager` mới được tạo team.<br><strong>Frontend:</strong> Ẩn/hiện các nút hoặc menu dựa trên `role` của người dùng được lưu trong state management (Pinia/Vuex).' },
+                { title: 'Kiểm Tra Dữ Liệu (Validation)', content: '<strong>Backend:</strong> Sử dụng `FormRequest` của Laravel để validate tất cả dữ liệu đầu vào từ API, đảm bảo tính toàn vẹn dữ liệu.<br><strong>Frontend:</strong> Cung cấp phản hồi tức thì cho người dùng nếu họ nhập liệu sai (ví dụ: email không hợp lệ, mật khẩu quá ngắn).' },
+                { title: 'Tính Lương (Payroll)', content: 'Đây là một module phức tạp, yêu cầu độ chính xác cao. Logic sẽ được thực thi ở backend thông qua một job hoặc câu lệnh, tổng hợp dữ liệu từ các bảng `attendances`, `overtime_requests` và các khoản trừ khác để tạo ra bảng lương cuối cùng.' }
+            ];
+            
+            // Tab functionality
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    tabs.forEach(item => item.classList.remove('active'));
+                    tab.classList.add('active');
+
+                    const target = tab.getAttribute('data-tab');
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === target) {
+                            section.classList.add('active');
+                        }
+                    });
+                });
+            });
+
+            // Populate Database section
+            const dbContainer = document.querySelector('#database .grid');
+            dbData.forEach(table => {
+                const card = document.createElement('div');
+                card.className = 'bg-slate-50 border border-slate-200 p-4 rounded-lg hover:shadow-md hover:border-sky-300 transition-shadow duration-300';
+                card.innerHTML = `
+                    <h4 class="font-bold text-slate-700 capitalize">${table.name.replace('_', ' ')}</h4>
+                    <p class="text-sm text-slate-500 mb-2">${table.desc}</p>
+                    <div class="text-xs text-slate-400">
+                        ${table.fields.length} trường: ${table.fields.slice(0,3).join(', ')}...
+                    </div>
+                `;
+                dbContainer.appendChild(card);
+            });
+
+            // Populate Accordion
+            accordionData.forEach((item, index) => {
+                const accordionItem = document.createElement('div');
+                accordionItem.className = 'border border-slate-200 rounded-lg overflow-hidden';
+                accordionItem.innerHTML = `
+                    <button class="w-full text-left p-4 bg-slate-100 hover:bg-slate-200 flex justify-between items-center transition-colors">
+                        <span class="font-semibold text-slate-700">${item.title}</span>
+                        <span class="transform transition-transform duration-300">▼</span>
+                    </button>
+                    <div class="max-h-0 overflow-hidden transition-all duration-500 ease-in-out">
+                        <div class="p-4 text-slate-600 bg-white text-sm leading-relaxed">${item.content}</div>
+                    </div>
+                `;
+                accordionContainer.appendChild(accordionItem);
+            });
+            
+            accordionContainer.addEventListener('click', function(e) {
+                const button = e.target.closest('button');
+                if (!button) return;
+                
+                const content = button.nextElementSibling;
+                const arrow = button.querySelector('span:last-child');
+                
+                if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                    content.style.maxHeight = '0px';
+                    arrow.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.maxHeight = content.scrollHeight + 'px';
+                    arrow.style.transform = 'rotate(180deg)';
+                }
+            });
+
+            // Chart Config
+            const chartOptions = {
+                maintainAspectRatio: false,
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    tooltip: {
+                        bodyFont: {
+                            family: 'Be Vietnam Pro'
+                        },
+                        titleFont: {
+                             family: 'Be Vietnam Pro'
+                        }
+                    }
+                },
+                 scales: {
+                    x: {
+                        ticks: {
+                            font: { family: 'Be Vietnam Pro' }
+                        },
+                        grid: { display: false }
+                    },
+                    y: {
+                        ticks: {
+                            font: { family: 'Be Vietnam Pro' }
+                        },
+                        grid: { color: '#e2e8f0' } // slate-200
+                    }
+                }
+            };
+            
+            // Database Schema Chart
+            new Chart(document.getElementById('dbSchemaChart'), {
+                type: 'bar',
+                data: {
+                    labels: dbData.map(t => t.name),
+                    datasets: [{
+                        label: 'Số Lượng Cột Mỗi Bảng',
+                        data: dbData.map(t => t.fields.length),
+                        backgroundColor: 'rgba(14, 165, 233, 0.6)', // sky-500
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { ...chartOptions }
+            });
+
+            // Roadmap Chart general options
+            const roadmapChartOptions = {
+                ...chartOptions,
+                indexAxis: 'y',
+                scales: {
+                    x: { ...chartOptions.scales.x, grid: { color: '#e2e8f0' }},
+                    y: { ...chartOptions.scales.y, grid: { display: false }}
+                }
+            };
+
+            // Backend Roadmap Chart
+            new Chart(document.getElementById('backendRoadmapChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['API Core (CRUD)', 'Quản lý Đơn từ', 'Chức năng Chấm công', 'Tạo API Xác thực', 'Tạo Migrations & Models', 'Cài đặt & Cấu hình'],
+                    datasets: [{
+                        label: 'Giai Đoạn',
+                        data: [6, 5, 4, 3, 2, 1],
+                        backgroundColor: [
+                            'rgba(51, 65, 85, 0.7)',
+                            'rgba(51, 65, 85, 0.7)',
+                            'rgba(51, 65, 85, 0.6)',
+                            'rgba(71, 85, 105, 0.7)',
+                            'rgba(71, 85, 105, 0.6)',
+                            'rgba(71, 85, 105, 0.5)',
+                        ],
+                        borderColor: 'rgba(51, 65, 85, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { ...roadmapChartOptions, plugins: { legend: { display: false }}}
+            });
+
+            // Frontend Roadmap Chart
+            new Chart(document.getElementById('frontendRoadmapChart'), {
+                type: 'bar',
+                data: {
+                    labels: ['Hoàn thiện các màn hình', 'Xây dựng Modules CRUD', 'Xây dựng Trang Home', 'Layout & Trang Login', 'Cấu trúc & Cài đặt'],
+                    datasets: [{
+                        label: 'Giai Đoạn',
+                        data: [5, 4, 3, 2, 1],
+                        backgroundColor: [
+                            'rgba(14, 165, 233, 0.7)',
+                            'rgba(14, 165, 233, 0.7)',
+                            'rgba(14, 165, 233, 0.6)',
+                            'rgba(56, 189, 248, 0.6)',
+                            'rgba(56, 189, 248, 0.5)',
+                        ],
+                        borderColor: 'rgba(14, 165, 233, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: { ...roadmapChartOptions, plugins: { legend: { display: false }}}
+            });
+        });
+    </script>
+
+</body>
+</html>
