@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>4 Nguyên Tắc Vàng Trong Phong Cách Làm Việc Của Người Nhật</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Zen Garden -->
+    <!-- Application Structure Plan: Ứng dụng được thiết kế theo cấu trúc điều hướng dạng thẻ (tab-based navigation). Màn hình chính bao gồm một tiêu đề, một khu vực điều hướng với 4 "thẻ" trực quan cho mỗi nguyên tắc, và một vùng nội dung để hiển thị chi tiết của nguyên tắc được chọn. Cấu trúc này được chọn vì nó chia nhỏ thông tin phức tạp thành các phần dễ quản lý, cho phép người dùng tập trung vào từng khái niệm một. Thay vì cuộn qua một tài liệu dài, người dùng có thể chủ động chọn chủ đề họ quan tâm, tạo ra một luồng tương tác và khám phá, giúp tăng cường khả năng ghi nhớ và hiểu sâu hơn về nội dung. -->
+    <!-- Visualization & Content Choices: 
+        1. Hō-Ren-Sō: Mục tiêu: Diễn tả một quy trình giao tiếp. Phương pháp: Sử dụng sơ đồ luồng (flowchart) được tạo bằng HTML/Tailwind. Tương tác: Người dùng có thể thấy rõ các bước tuần tự. Lý do: Sơ đồ trực quan hóa luồng thông tin hiệu quả hơn văn bản thuần túy.
+        2. Hinshitsu Daiichi: Mục tiêu: Nhấn mạnh một triết lý cốt lõi. Phương pháp: Sử dụng biểu tượng trung tâm (🏆) với các khái niệm vệ tinh được bố trí xung quanh bằng HTML/Flexbox. Tương tác: Cấu trúc trực quan làm nổi bật "Chất lượng" là trung tâm. Lý do: Bố cục này củng cố ý tưởng "Chất lượng là số 1" một cách mạnh mẽ.
+        3. Nōki Genshu: Mục tiêu: Làm nổi bật tầm quan trọng của việc đúng hạn. Phương pháp: Kết hợp biểu tượng (📅, ✓) với danh sách các hành động then chốt. Tương tác: Trình bày rõ ràng và trực tiếp. Lý do: Biểu tượng giúp truyền tải ngay lập tức chủ đề về thời gian và sự tin cậy.
+        4. Documentation: Mục tiêu: Giải thích lợi ích của một thông lệ. Phương pháp: Sử dụng biểu tượng (📄) và một danh sách được cấu trúc rõ ràng. Tương tác: Dễ đọc và dễ hiểu. Lý do: Một danh sách có cấu trúc tốt là cách hiệu quả nhất để trình bày các lợi ích một cách ngắn gọn.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .tab-active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+        .content-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .text-gold {
+            color: rgb(218 151 0) !important;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-5xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-4xl font-bold text-teal-800 text-gold">4 Nguyên Tắc Vàng Trong Phong Cách Làm Việc Của Người Nhật</h1>
+            <p class="mt-2 text-slate-600 max-w-2xl mx-auto">Khám phá những triết lý cốt lõi tạo nên sự hiệu quả và chất lượng vượt trội trong văn hóa doanh nghiệp Nhật Bản.</p>
+        </header>
+
+        <nav id="tab-nav" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+            <button data-tab="horenso" class="tab-button p-4 rounded-lg bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out text-center cursor-pointer">
+                <span class="text-2xl block mb-2">🤝</span>
+                <h2 class="font-bold text-lg">Hō-Ren-Sō</h2>
+                <p class="text-sm text-slate-500">Giao tiếp hiệu quả</p>
+            </button>
+            <button data-tab="hinshitsu" class="tab-button p-4 rounded-lg bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out text-center cursor-pointer">
+                <span class="text-2xl block mb-2">🏆</span>
+                <h2 class="font-bold text-lg">Hinshitsu Daiichi</h2>
+                <p class="text-sm text-slate-500">Chất lượng là số 1</p>
+            </button>
+            <button data-tab="noki" class="tab-button p-4 rounded-lg bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out text-center cursor-pointer">
+                <span class="text-2xl block mb-2">📅</span>
+                <h2 class="font-bold text-lg">Nōki Genshu</h2>
+                <p class="text-sm text-slate-500">Tuân thủ Deadline</p>
+            </button>
+            <button data-tab="document" class="tab-button p-4 rounded-lg bg-white shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ease-in-out text-center cursor-pointer">
+                <span class="text-2xl block mb-2">📄</span>
+                <h2 class="font-bold text-lg">Documentation</h2>
+                <p class="text-sm text-slate-500">Tài liệu hóa</p>
+            </button>
+        </nav>
+
+        <main id="tab-content" class="bg-white p-6 md:p-8 rounded-xl shadow-lg min-h-[400px]">
+            <div id="horenso" class="tab-panel">
+                <h3 class="text-2xl font-bold text-teal-700 mb-4">報・連・相 (Hō-Ren-Sō): Báo cáo - Liên lạc - Thảo luận</h3>
+                <p class="mb-6 text-slate-600">Hōrensō là quy tắc giao tiếp nền tảng, đảm bảo thông tin được lưu chuyển thông suốt, minh bạch và kịp thời trong tổ chức, giúp ngăn ngừa các vấn đề nhỏ trở thành khủng hoảng.</p>
+                
+                <div class="flex flex-col md:flex-row items-center justify-around space-y-4 md:space-y-0 md:space-x-4">
+                    <div class="text-center p-4 border border-slate-200 rounded-lg w-full md:w-1/3">
+                        <h4 class="font-bold text-lg">報 (Hōkoku)</h4>
+                        <p class="text-sm text-slate-500">Báo cáo tiến độ, kết quả, sự cố cho cấp trên một cách chủ động.</p>
+                    </div>
+                    <div class="text-2xl text-teal-500 transform md:-rotate-0 rotate-90">→</div>
+                    <div class="text-center p-4 border border-slate-200 rounded-lg w-full md:w-1/3">
+                        <h4 class="font-bold text-lg">連 (Renraku)</h4>
+                        <p class="text-sm text-slate-500">Liên lạc, chia sẻ thông tin khách quan đến những người liên quan.</p>
+                    </div>
+                    <div class="text-2xl text-teal-500 transform md:-rotate-0 rotate-90">→</div>
+                     <div class="text-center p-4 border border-slate-200 rounded-lg w-full md:w-1/3">
+                        <h4 class="font-bold text-lg">相 (Sōdan)</h4>
+                        <p class="text-sm text-slate-500">Thảo luận với cấp trên, đồng nghiệp khi gặp khó khăn để tìm giải pháp.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="hinshitsu" class="tab-panel hidden">
+                <h3 class="text-2xl font-bold text-teal-700 mb-4">品質第一 (Hinshitsu Daiichi): Chất lượng là số 1</h3>
+                <p class="mb-6 text-slate-600">Đây là triết lý được thấm nhuần trong từng nhân viên và mọi quy trình. Chất lượng sản phẩm/dịch vụ là ưu tiên hàng đầu, quan trọng hơn cả chi phí hay tốc độ.</p>
+                <div class="flex items-center justify-center p-6 bg-teal-50 rounded-lg">
+                    <div class="text-center">
+                        <span class="text-6xl">🏆</span>
+                        <h4 class="text-xl font-bold mt-2">Chất lượng</h4>
+                        <div class="flex flex-col md:flex-row gap-4 mt-4">
+                            <span class="py-1 px-3 bg-teal-100 text-teal-800 rounded-full text-sm">Trách nhiệm cá nhân</span>
+                            <span class="py-1 px-3 bg-teal-100 text-teal-800 rounded-full text-sm">Cải tiến liên tục (Kaizen)</span>
+                            <span class="py-1 px-3 bg-teal-100 text-teal-800 rounded-full text-sm">Tạo dựng uy tín</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="noki" class="tab-panel hidden">
+                <h3 class="text-2xl font-bold text-teal-700 mb-4">納期厳守 (Nōki Genshu): Tuân thủ nghiêm ngặt Deadline</h3>
+                <p class="mb-6 text-slate-600">Trong văn hóa kinh doanh Nhật Bản, thời gian được xem là một lời hứa. Trễ deadline bị xem là một lỗi nghiêm trọng, ảnh hưởng trực tiếp đến uy tín của cá nhân và cả công ty.</p>
+                <div class="bg-slate-100 p-6 rounded-lg">
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <span class="text-green-600 text-xl mr-3">✓</span>
+                            <div>
+                                <h4 class="font-semibold">Deadline là tuyệt đối</h4>
+                                <p class="text-sm text-slate-600">"Nōki" (deadline) được coi là một cam kết không thể phá vỡ.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                           <span class="text-green-600 text-xl mr-3">✓</span>
+                            <div>
+                                <h4 class="font-semibold">Lập kế hoạch và phòng ngừa rủi ro</h4>
+                                <p class="text-sm text-slate-600">Chú trọng lập kế hoạch chi tiết và lường trước các vấn đề có thể xảy ra.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-green-600 text-xl mr-3">✓</span>
+                            <div>
+                                <h4 class="font-semibold">Giao tiếp khi có nguy cơ trễ</h4>
+                                <p class="text-sm text-slate-600">Áp dụng Hōrensō để thông báo sớm và cùng tìm giải pháp.</p>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="document" class="tab-panel hidden">
+                <h3 class="text-2xl font-bold text-teal-700 mb-4">ドキュメント (Documentation): Tài liệu hóa mọi thứ</h3>
+                <p class="mb-6 text-slate-600">Tài liệu hóa là một phần không thể thiếu, giúp hệ thống hóa tri thức, đảm bảo tính nhất quán và là cơ sở cho việc cải tiến trong tương lai.</p>
+                 <div class="grid md:grid-cols-2 gap-4">
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-semibold">Chia sẻ tri thức</h4>
+                        <p class="text-sm text-slate-600">Giúp nhân viên mới dễ dàng nắm bắt công việc, tránh thất truyền kiến thức.</p>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-semibold">Đảm bảo tính nhất quán</h4>
+                        <p class="text-sm text-slate-600">Mọi người làm việc dựa trên một tiêu chuẩn và quy trình chung.</p>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-semibold">Phân tích và cải tiến</h4>
+                        <p class="text-sm text-slate-600">Là cơ sở dữ liệu để phân tích vấn đề và rút kinh nghiệm.</p>
+                    </div>
+                    <div class="bg-slate-100 p-4 rounded-lg">
+                        <h4 class="font-semibold">Minh bạch hóa</h4>
+                        <p class="text-sm text-slate-600">Làm rõ trách nhiệm và cơ sở của các quyết định đã được đưa ra.</p>
+                    </div>
+                </div>
+            </div>
+        </main>
+        
+        <footer class="bg-white mt-16 border-t">
+            <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+                <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+                <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const tabNav = document.getElementById('tab-nav');
+        const tabButtons = tabNav.querySelectorAll('.tab-button');
+        const tabPanels = document.getElementById('tab-content').querySelectorAll('.tab-panel');
+
+        function switchTab(targetTabId) {
+            tabPanels.forEach(panel => {
+                if (panel.id === targetTabId) {
+                    panel.classList.remove('hidden');
+                    panel.classList.add('content-fade-in');
+                } else {
+                    panel.classList.add('hidden');
+                }
+            });
+
+            tabButtons.forEach(button => {
+                if (button.dataset.tab === targetTabId) {
+                    button.classList.add('tab-active');
+                } else {
+                    button.classList.remove('tab-active');
+                }
+            });
+        }
+        
+        tabNav.addEventListener('click', (e) => {
+            const clickedButton = e.target.closest('.tab-button');
+            if (!clickedButton) return;
+            
+            const targetTabId = clickedButton.dataset.tab;
+            switchTab(targetTabId);
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            switchTab('horenso');
+        });
+    </script>
+</body>
+</html>
