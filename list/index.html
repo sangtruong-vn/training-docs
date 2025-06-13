@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&copy; 2025 ST - Đào Tạo Nội Bộ Tương Tác</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #FDFBF8;
+            color: #383838;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 380px;
+            max-height: 380px;
+            margin: auto;
+        }
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: green;
+            color: #FFFFFF;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .filter-btn:hover {
+            background-color: green !important;
+            color: #FFFFFF;
+        }
+        .filter-btn.active:hover {
+            background-color: green;
+        }
+        .course-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .course-ready {
+            color: green;
+            font-weight: bold;
+        }
+        .undefined {
+            color: #cccccc;
+        }
+
+        .st-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            box-shadow: 4px 2px 6px #4d4d4d;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <header class="text-center mb-12">
+            <img src="./../images/st.jpg" alt="ST" class="mx-auto st-logo">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-2">Đào Tạo Nội Bộ</h1>
+            <p class="text-lg text-gray-600">Khám phá các khóa học để phát triển kỹ năng và sự nghiệp của bạn.</p>
+        </header>
+
+        <main>
+            <section id="overview" class="mb-16">
+                <h2 class="text-2xl font-bold text-center text-gray-700 mb-4">Tổng Quan Chương Trình Đào Tạo</h2>
+                </p>
+            </section>
+
+            <section id="courses">
+                <div id="filters" class="flex flex-wrap justify-center gap-3 mb-10">
+                    <button class="filter-btn active font-semibold py-2 px-6 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100" data-filter="all">Tất cả</button>
+                    <button class="filter-btn font-semibold py-2 px-6 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100" data-filter="soft-skills">Kỹ Năng Mềm</button>
+                    <button class="filter-btn font-semibold py-2 px-6 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100" data-filter="hard-skills">Kỹ Năng Chuyên Môn</button>
+                    <button class="filter-btn font-semibold py-2 px-6 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100" data-filter="mindset">Tư Duy & Phương Pháp</button>
+                </div>
+
+                <div id="course-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                </div>
+            </section>
+        </main>
+
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const courseData = {
+                'soft-skills': {
+                    name: 'Kỹ Năng Mềm',
+                    color: 'rgba(59, 130, 246, 0.7)',
+                    borderColor: 'rgba(59, 130, 246, 1)',
+                    subCategories: [
+                        { title: 'Giao tiếp & Ứng xử chuyên nghiệp', courses: [
+                            { name: 'Kỹ năng lắng nghe và phản hồi tích cực', slug: 'ky-nang-lang-nghe' },
+                            { name: 'Nghệ thuật trình bày và thuyết phục', slug: 'nghe-thuat-trinh-bay' },
+                            { name: 'Giao tiếp phi ngôn ngữ', slug: 'giao-tiep-phi-ngon-ngu' },
+                            { name: 'Viết email và báo cáo chuyên nghiệp', slug: 'viet-email-chuyen-nghiep' }
+                        ]},
+                        { title: 'Lãnh đạo & Quản lý', courses: [
+                            { name: 'Kỹ năng lãnh đạo truyền cảm hứng', slug: 'lanh-dao-truyen-cam-hung' },
+                            { name: 'Phân công, ủy quyền và giám sát công việc', slug: 'phan-cong-uy-quyen' },
+                            { name: 'Xây dựng và phát triển đội nhóm', slug: 'xay-dung-doi-nhom' },
+                            { name: 'Kèm cặp và đào tạo nhân viên (Coaching & Mentoring)', slug: 'coaching-mentoring' }
+                        ]},
+                        { title: 'Làm việc nhóm & Hợp tác', courses: [
+                            { name: 'Kỹ năng hợp tác hiệu quả', slug: 'hop-tac-hieu-qua' },
+                            { name: 'Xây dựng lòng tin và sự gắn kết trong nhóm', slug: 'xay-dung-long-tin' },
+                            { name: 'Giải quyết xung đột nhóm', slug: 'giai-quyet-xung-dot' }
+                        ]},
+                        { title: 'Tư duy & Giải quyết vấn đề', courses: [
+                            { name: 'Mindset', slug: 'mindset', status: 'course-ready' },
+                            { name: 'Poka-Yoke', slug: 'poka-yoke', status: 'course-ready' },
+                            { name: 'Kỹ năng giải quyết vấn đề và ra quyết định', slug: 'giai-quyet-van-de' },
+                            { name: 'Tư duy phản biện (Critical Thinking)', slug: 'tu-duy-phan-bien' },
+                            { name: 'Kỹ năng sáng tạo và đổi mới', slug: 'sang-tao-doi-moi' }
+                        ]},
+                        { title: 'Quản lý bản thân & Hiệu suất', courses: [
+                            { name: 'Kỹ năng quản lý thời gian và sắp xếp ưu tiên', slug: 'quan-ly-thoi-gian' },
+                            { name: 'Trí tuệ cảm xúc (Emotional Intelligence)', slug: 'tri-tue-cam-xuc' },
+                            { name: 'Kỹ năng đàm phán và thương lượng', slug: 'dam-phan-thuong-luong' },
+                            { name: 'Quản lý căng thẳng (Stress Management)', slug: 'quan-ly-cang-thang' }
+                        ]},
+                    ]
+                },
+                'hard-skills': {
+                    name: 'Kỹ Năng Chuyên Môn',
+                    color: 'rgba(239, 68, 68, 0.7)',
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    subCategories: [
+                        { title: 'Kinh doanh & Bán hàng', courses: [
+                            { name: 'Quy trình bán hàng chuyên nghiệp B2B/B2C', slug: 'quy-trinh-ban-hang' },
+                            { name: 'Kỹ năng tìm kiếm và tiếp cận khách hàng', slug: 'tim-kiem-khach-hang' },
+                            { name: 'Chăm sóc khách hàng và xây dựng mối quan hệ', slug: 'cham-soc-khach-hang' },
+                            { name: 'Xử lý từ chối và chốt đơn hàng', slug: 'xu-ly-tu-choi' }
+                        ]},
+                        { title: 'Marketing & Truyền thông', courses: [
+                            { name: 'Digital Marketing tổng thể (SEO, SEM, Social Media)', slug: 'digital-marketing' },
+                            { name: 'Sáng tạo nội dung và Content Marketing', slug: 'content-marketing' },
+                            { name: 'Phân tích dữ liệu Marketing', slug: 'phan-tich-du-lieu-marketing' },
+                            { name: 'Xây dựng thương hiệu', slug: 'xay-dung-thuong-hieu' }
+                        ]},
+                        { title: 'Công nghệ & Phân tích dữ liệu', courses: [
+                            { name: 'Cẩm Nang Prompting', slug: 'prompting', status: 'course-ready' },
+                            { name: 'Cẩm Nang Tương Tác AI', slug: 'ai-practitioner', status: 'course-ready' },
+                            { name: 'Sử dụng thành thạo công cụ văn phòng (Excel, Power BI)', slug: 'cong-cu-van-phong' },
+                            { name: 'An ninh mạng cơ bản cho người dùng', slug: 'an-ninh-mang' },
+                            { name: 'Nhập môn Phân tích dữ liệu (Data Analysis)', slug: 'nhap-mon-phan-tich' }
+                        ]},
+                        { title: 'Nhân sự', courses: [
+                            { name: 'Kỹ năng phỏng vấn và tuyển dụng', slug: 'ky-nang-phong-van' },
+                            { name: 'Xây dựng văn hóa doanh nghiệp', slug: 'van-hoa-doanh-nghiep' },
+                            { name: 'Luật lao động cơ bản cho quản lý', slug: 'luat-lao-dong' }
+                        ]},
+                    ]
+                },
+                'mindset': {
+                    name: 'Tư Duy & Phương Pháp Làm Việc',
+                    color: 'rgba(245, 158, 11, 0.7)',
+                    borderColor: 'rgba(245, 158, 11, 1)',
+                    subCategories: [
+                        { title: 'Tư duy tăng trưởng (Growth Mindset)', courses: [
+                            { name: 'Chấp nhận thử thách và học hỏi từ thất bại', slug: 'hoc-hoi-tu-that-bai' },
+                            { name: 'Xây dựng thái độ cầu tiến và không ngừng phát triển', slug: 'thai-do-cau-tien' }
+                        ]},
+                        { title: 'Phương pháp làm việc linh hoạt', courses: [
+                            { name: 'Giới thiệu về Agile và các giá trị cốt lõi', slug: 'agile-scrum' },
+                            { name: 'Thực hành Scrum cơ bản cho đội nhóm', slug: 'thuc-hanh-scrum' }
+                        ]},
+                        { title: 'Tư duy thiết kế (Design Thinking)', courses: [
+                            { name: 'Phương pháp lấy người dùng làm trung tâm để giải quyết vấn đề', slug: 'design-thinking' }
+                        ]},
+                        { title: 'Văn hóa doanh nghiệp', courses: [
+                            { name: 'Hòa nhập văn hóa và giá trị cốt lõi', slug: 'hoa-nhap-van-hoa' },
+                            { name: 'Đạo đức trong kinh doanh', slug: 'dao-duc-kinh-doanh' }
+                        ]},
+                    ]
+                }
+            };
+
+            const courseGrid = document.getElementById('course-grid');
+            if (courseGrid) {
+                for (const categoryKey in courseData) {
+                    const category = courseData[categoryKey];
+                    category.subCategories.forEach(subCat => {
+                        const card = document.createElement('div');
+                        card.className = 'course-card bg-white rounded-lg shadow-md p-6 border-t-4';
+                        card.style.borderColor = category.borderColor;
+                        card.setAttribute('data-category', categoryKey);
+
+                        let coursesHtml = subCat.courses.map(course => 
+                            `<li class="flex items-start mb-2">
+                                <span class="text-blue-500 mr-2 mt-1 shrink-0">✓</span>
+                                <a href="/course/${course.slug}" class="transition-colors duration-200 hover:text-blue-600 hover:underline ${course.status}">${course.name}</a>
+                            </li>`
+                        ).join('');
+
+                        card.innerHTML = `
+                            <h3 class="text-xl font-bold text-gray-800 mb-4">${subCat.title}</h3>
+                            <ul class="text-gray-600">${coursesHtml}</ul>
+                        `;
+                        courseGrid.appendChild(card);
+                    });
+                }
+            }
+            
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            const courseCards = document.querySelectorAll('.course-card');
+
+            filterButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const filter = button.getAttribute('data-filter');
+                    
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+
+                    courseCards.forEach(card => {
+                        if (filter === 'all' || card.getAttribute('data-category') === filter) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                });
+            });
+
+        });
+    </script>
+
+</body>
+</html>
