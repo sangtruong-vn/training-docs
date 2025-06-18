@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Storytelling – Chìa khóa Nâng tầm Sức ảnh hưởng</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Harmony -->
+    <!-- Application Structure Plan: Ứng dụng được thiết kế theo cấu trúc chuyên đề, không theo tuyến tính của slide, nhằm tối ưu hóa trải nghiệm học tập. Cấu trúc bao gồm: 1. Trang chủ giới thiệu vấn đề và giải pháp. 2. "Tại Sao Kể Chuyện?": Trực quan hóa vấn đề cốt lõi (ví dụ: 65% thời gian giao tiếp). 3. "Thấu Hiểu Khán Giả": Công cụ tương tác để khám phá các nhóm đối tượng (CEO, CFO, v.v.). 4. "Học Viện Kể Chuyện": Giới thiệu các mô hình (PAR, BAB, SCR) dưới dạng thẻ lật tương tác. 5. "Phòng Tình Huống": Khu vực thực hành, nơi người dùng áp dụng các mô hình vào các kịch bản thực tế. Cấu trúc này giúp người dùng học theo nhu cầu, từ hiểu vấn đề, học công cụ, đến thực hành, tạo ra một lộ trình linh hoạt và hiệu quả hơn. -->
+    <!-- Visualization & Content Choices: 1. Thống kê "65% thời gian": Goal-Inform -> Chart.js Donut Chart -> Tương tác khi hover -> Trực quan hóa con số quan trọng nhất, tạo ấn tượng mạnh. 2. Phân tích đối tượng: Goal-Compare -> Tabs tương tác (HTML/JS) -> Click để xem chi tiết -> Giúp người dùng so sánh nhanh và tìm thông tin cần thiết cho tình huống cụ thể. 3. Các mô hình kể chuyện: Goal-Organize -> Thẻ lật (HTML/CSS/JS) -> Click để xem giải thích -> Trình bày thông tin phức tạp một cách gọn gàng, khuyến khích khám phá. 4. Thực hành tình huống: Goal-Apply -> Wizard/quiz tương tác (HTML/JS) -> Chọn kịch bản, chọn mô hình -> Biến kiến thức thụ động thành kỹ năng chủ động. Tất cả đều tuân thủ nguyên tắc không dùng SVG/Mermaid. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Lexend', sans-serif; scroll-behavior: smooth; }
+        .active-nav { color: #D9534F; border-bottom: 2px solid #D9534F; }
+        .inactive-nav { border-bottom: 2px solid transparent; }
+        .section { display: none; }
+        .section.active { display: block; }
+        .chart-container { position: relative; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
+        @media (min-width: 768px) { .chart-container { height: 350px; } }
+        .model-card {
+            perspective: 1000px;
+        }
+        .model-card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .model-card.is-flipped .model-card-inner {
+            transform: rotateY(180deg);
+        }
+        .model-card-front, .model-card-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 0.75rem;
+            padding: 1rem;
+        }
+        .model-card-back {
+            transform: rotateY(180deg);
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F7F4] text-[#333333]">
+
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex-shrink-0">
+                    <a href="#home" class="text-xl font-bold text-[#D9534F]">
+                        Path to C-Suite
+                    </a>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#why" class="nav-link px-3 py-2 rounded-md text-sm font-medium inactive-nav">Tại Sao?</a>
+                        <a href="#audience" class="nav-link px-3 py-2 rounded-md text-sm font-medium inactive-nav">Thấu Hiểu</a>
+                        <a href="#academy" class="nav-link px-3 py-2 rounded-md text-sm font-medium inactive-nav">Học Viện</a>
+                        <a href="#practice" class="nav-link px-3 py-2 rounded-md text-sm font-medium inactive-nav">Thực Hành</a>
+                    </div>
+                </div>
+                 <div class="md:hidden">
+                    <button id="mobile-menu-button" class="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-800 focus:ring-white">
+                        <span class="sr-only">Mở menu</span>
+                        <svg class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </nav>
+        <div class="md:hidden hidden" id="mobile-menu">
+            <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
+                <a href="#why" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium">Tại Sao?</a>
+                <a href="#audience" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium">Thấu Hiểu</a>
+                <a href="#academy" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium">Học Viện</a>
+                <a href="#practice" class="nav-link-mobile block px-3 py-2 rounded-md text-base font-medium">Thực Hành</a>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        
+        <section id="home" class="section active">
+            <div class="text-center py-16 md:py-24">
+                <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight">
+                    <span class="block">Storytelling For Influence</span>
+                    <span class="block text-[#D9534F] mt-2">
+                        Mở rộng tầm ảnh hưởng và định hình bản sắc lãnh đạo
+                    </span>
+                </h1>
+                <p class="mt-6 max-w-2xl mx-auto text-lg md:text-xl text-gray-500">
+                    Trên hành trình tới C-Suite, năng lực kỹ thuật là chưa đủ. Hãy khám phá cách biến những ý tưởng công nghệ phức tạp thành những câu chuyện đầy sức ảnh hưởng, thuyết phục và truyền cảm hứng.
+                </p>
+                <div class="mt-8">
+                    <a href="#why" class="nav-link inline-block bg-[#D9534F] text-white font-bold py-3 px-8 rounded-full text-lg hover:bg-opacity-90 transition-transform transform hover:scale-105">Bắt đầu hành trình</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="why" class="section">
+            <div class="py-12">
+                <h2 class="text-3xl font-bold text-center mb-2">Tại Sao Giao Tiếp Lại Quan Trọng?</h2>
+                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Trong vai trò lãnh đạo công nghệ, giao tiếp không chỉ là một kỹ năng mềm—nó là yếu tố quyết định sự thành công. Khả năng truyền đạt giá trị của công nghệ một cách rõ ràng sẽ định hình tầm ảnh hưởng của bạn trong tổ chức.</p>
+                <div class="grid md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <h3 class="text-2xl font-semibold mb-4 text-center md:text-left">Giao Tiếp Chiếm Đến 65% Thời Gian</h3>
+                        <p class="text-gray-700 mb-6">Đây không chỉ là các cuộc họp. Nó bao gồm việc thuyết trình chiến lược, đàm phán ngân sách, giải thích các vấn đề kỹ thuật và truyền cảm hứng cho đội ngũ. Kỹ năng giao tiếp xuất sắc sẽ giúp bạn điều hướng hiệu quả mọi tình huống.</p>
+                        <div class="bg-white p-6 rounded-lg shadow-md">
+                            <h4 class="font-bold mb-3 text-lg">Những thách thức chính bạn phải đối mặt:</h4>
+                            <ul class="space-y-3">
+                                <li class="flex items-start"><span class="text-[#D9534F] mr-3 mt-1">●</span><span><strong>Khác biệt góc nhìn:</strong> Kỹ thuật vs. Kinh doanh, Tài chính, Vận hành.</span></li>
+                                <li class="flex items-start"><span class="text-[#D9534F] mr-3 mt-1">●</span><span><strong>Rào cản ngôn ngữ:</strong> Thuật ngữ chuyên ngành gây khó hiểu.</span></li>
+                                <li class="flex items-start"><span class="text-[#D9534F] mr-3 mt-1">●</span><span><strong>Tập trung vào "Cái gì" thay vì "Tại sao":</strong> Sa đà vào chi tiết kỹ thuật mà quên mất giá trị kinh doanh.</span></li>
+                                <li class="flex items-start"><span class="text-[#D9534F] mr-3 mt-1">●</span><span><strong>Thiếu sự đồng cảm:</strong> Chưa thực sự hiểu mối quan tâm và "nỗi đau" của người nghe.</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="communicationChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="audience" class="section">
+            <div class="py-12">
+                 <h2 class="text-3xl font-bold text-center mb-2">Thấu Hiểu Khán Giả Của Bạn</h2>
+                 <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Mỗi lãnh đạo bạn gặp đều có một lăng kính riêng. Giao tiếp hiệu quả bắt đầu từ việc hiểu rõ họ quan tâm điều gì, họ nói ngôn ngữ gì và làm thế nào để "chạm" đến họ. Hãy chọn một đối tượng để khám phá chiến lược tiếp cận phù hợp.</p>
+                <div class="bg-white rounded-lg shadow-md p-4">
+                    <div id="audience-tabs" class="flex flex-wrap justify-center border-b border-gray-200 mb-6">
+                    </div>
+                    <div id="audience-content" class="transition-opacity duration-500 ease-in-out">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="academy" class="section">
+             <div class="py-12">
+                <h2 class="text-3xl font-bold text-center mb-2">Học Viện Kể Chuyện</h2>
+                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Storytelling không phải là tài năng thiên bẩm, đó là một kỹ năng có thể học hỏi. Dưới đây là những nguyên lý và mô hình đã được chứng minh giúp bạn cấu trúc thông điệp một cách rõ ràng, logic và đầy sức thuyết phục. Hãy lật thẻ để khám phá.</p>
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8" id="models-grid">
+                </div>
+            </div>
+        </section>
+        
+        <section id="practice" class="section">
+            <div class="py-12">
+                <h2 class="text-3xl font-bold text-center mb-2">Phòng Tình Huống: Thực Hành & Áp Dụng</h2>
+                <p class="text-center max-w-3xl mx-auto text-gray-600 mb-12">Lý thuyết sẽ trở nên vô nghĩa nếu không được thực hành. Hãy thử sức với các tình huống thực tế mà bất kỳ lãnh đạo công nghệ nào cũng sẽ gặp phải. Vận dụng kiến thức đã học để xây dựng câu chuyện của riêng bạn.</p>
+                
+                <div class="bg-white rounded-lg shadow-lg p-6 md:p-8 max-w-4xl mx-auto">
+                    <div id="practice-step-1">
+                        <h3 class="text-xl font-semibold mb-4">Bước 1: Chọn một tình huống</h3>
+                        <select id="scenario-select" class="w-full p-3 border rounded-md bg-gray-50 focus:ring-2 focus:ring-[#D9534F]">
+                            <option value="">-- Vui lòng chọn --</option>
+                        </select>
+                    </div>
+
+                    <div id="practice-step-2" class="hidden mt-6">
+                        <h3 class="text-xl font-semibold mb-4">Bước 2: Chọn mô hình kể chuyện phù hợp nhất</h3>
+                        <p class="text-gray-600 mb-4">Dựa trên tình huống và đối tượng, bạn nghĩ mô hình nào sẽ hiệu quả nhất?</p>
+                        <div id="model-choices" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        </div>
+                    </div>
+                    
+                    <div id="practice-result" class="hidden mt-8 p-6 bg-blue-50 rounded-lg border border-blue-200">
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-gray-800 text-white mt-12">
+        <div class="container mx-auto py-6 px-4 text-center">
+            <p>&copy; 2025 CIO Vietnam | Path to C-Suite Program. </p>
+            <p class="text-sm text-gray-400 mt-1">Một sản phẩm được tạo ra để nâng tầm lãnh đạo công nghệ Việt Nam.</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            const audienceData = {
+                'ceo': {
+                    name: 'Ban lãnh đạo (CEO/BoD)',
+                    icon: '👑',
+                    concerns: 'Giá trị kinh doanh, ROI, chiến lược, rủi ro, lợi thế cạnh tranh.',
+                    language: 'Tập trung vào kết quả, tác động đến doanh thu và thị phần. Tránh thuật ngữ kỹ thuật.',
+                    approach: 'Sử dụng mô hình tập trung vào tầm nhìn (Vision-Based) hoặc Lợi ích (BAB). Bắt đầu bằng việc trả lời câu hỏi: "Điều này giúp công ty chiến thắng như thế nào?"'
+                },
+                'cfo': {
+                    name: 'Giám đốc Tài chính (CFO)',
+                    icon: '💰',
+                    concerns: 'ROI, Tổng chi phí sở hữu (TCO), quản lý chi phí, rủi ro tài chính.',
+                    language: 'Ngôn ngữ của những con số: Bảng tính, dữ liệu tài chính, phân tích chi phí-lợi ích.',
+                    approach: 'Sử dụng mô hình dựa trên Dữ liệu (Data-Driven) hoặc PAR. "Chúng ta đang đối mặt với vấn đề chi phí X (Problem), chúng ta sẽ đầu tư Y để giải quyết (Action), và sẽ tiết kiệm/tạo ra Z (Result)."'
+                },
+                'cmo': {
+                    name: 'Giám đốc Marketing (CMO)',
+                    icon: '📈',
+                    concerns: 'Trải nghiệm khách hàng (CX), tốc độ ra thị trường, dữ liệu khách hàng, thương hiệu.',
+                    language: 'Nói về khách hàng, hành trình khách hàng và các điểm chạm. Dùng ví dụ về đối thủ cạnh tranh.',
+                    approach: 'Sử dụng mô hình SCR hoặc Case Study. "Thị trường đang có xu hướng X (Situation), đối thủ đang làm Y (Complication), chúng ta sẽ dùng công nghệ Z để tạo ra trải nghiệm vượt trội (Resolution)."'
+                },
+                'it': {
+                    name: 'Đội ngũ IT & Kỹ thuật',
+                    icon: '👩‍💻',
+                    concerns: 'Chi tiết kỹ thuật, kiến trúc hệ thống, công nghệ mới, phát triển sự nghiệp.',
+                    language: 'Có thể dùng thuật ngữ kỹ thuật, nhưng phải kết nối với mục tiêu lớn hơn.',
+                    approach: 'Sử dụng mô hình Hành trình người hùng (Hero\'s Journey) hoặc Vision-Based. "Chúng ta không chỉ xây dựng một tính năng, chúng ta đang tạo ra một sản phẩm sẽ thay đổi cách khách hàng tương tác với công ty."'
+                }
+            };
+            
+            const modelsData = [
+                { id: 'par', name: 'P-A-R', fullName: 'Problem - Action - Result', description: 'Mô tả vấn đề (Problem), hành động đã thực hiện (Action), và kết quả đạt được (Result). Rất hiệu quả để báo cáo tiến độ hoặc chứng minh giá trị.', example: 'VD: Năng suất thấp (P) -> Triển khai công cụ tự động hóa (A) -> Tiết kiệm 100 giờ công/tháng (R).' },
+                { id: 'bab', name: 'B-A-B', fullName: 'Before - After - Bridge', description: 'Vẽ ra bức tranh trước (Before) và sau (After) khi có giải pháp, và giải pháp chính là cây cầu (Bridge) kết nối. Tuyệt vời để thuyết phục và tạo cảm hứng.', example: 'VD: Trước đây quy trình thủ công (B) -> Tương lai tự động, nhanh chóng (A) -> Hệ thống CRM mới là cầu nối (B).' },
+                { id: 'scr', name: 'S-C-R', fullName: 'Situation - Complication - Resolution', description: 'Thiết lập bối cảnh (Situation), giới thiệu vấn đề phát sinh (Complication), và trình bày giải pháp (Resolution). Cấu trúc kể chuyện kinh điển, lôi cuốn.', example: 'VD: Thị trường ổn định (S) -> Đối thủ mới ra mắt sản phẩm đột phá (C) -> Chúng ta ra mắt sản phẩm mới với công nghệ vượt trội (R).' },
+                { id: 'data', name: 'Data-Driven', fullName: 'Trình bày bằng Dữ liệu', description: 'Sử dụng dữ liệu, biểu đồ để chứng minh quan điểm một cách khách quan. Rất hiệu quả với các đối tượng tư duy logic như CFO.', example: 'VD: Trình bày biểu đồ tăng trưởng chi phí và đề xuất giải pháp để tối ưu hóa.' },
+                { id: 'vision', name: 'Vision-Based', fullName: 'Truyền đạt Tầm nhìn', description: 'Tạo cảm hứng bằng cách vẽ ra một bức tranh tương lai tươi sáng. Dùng để truyền lửa cho đội ngũ hoặc thuyết phục ban lãnh đạo về một chiến lược dài hạn.', example: 'VD: "Hãy tưởng tượng một ngày nhân viên của chúng ta có thể phục vụ khách hàng chỉ bằng một cú nhấp chuột..."' },
+                { id: 'case', name: 'Case Study', fullName: 'Nghiên cứu Tình huống', description: 'Sử dụng một ví dụ thành công của công ty khác để chứng minh tính khả thi và lợi ích của đề xuất. Giảm thiểu rủi ro cảm nhận và tăng sự tin tưởng.', example: 'VD: "Công ty X trong cùng ngành đã áp dụng AI và tăng 20% doanh thu. Chúng ta cũng có thể làm được."' }
+            ];
+
+            const scenariosData = [
+                { id: 'sec', text: 'Thuyết phục CEO đầu tư tăng cường an toàn thông tin', audience: 'CEO & CFO', bestModels: ['bab', 'data'] },
+                { id: 'crm', text: 'Đề xuất triển khai hệ thống CRM mới với nhiều phòng ban', audience: 'CEO, CFO, CMO', bestModels: ['bab', 'case'] },
+                { id: 'inspire', text: 'Truyền cảm hứng cho đội ngũ IT về một dự án nhiều thách thức', audience: 'Đội ngũ IT', bestModels: ['vision', 'par'] }
+            ];
+
+            const navLinks = document.querySelectorAll('.nav-link, .nav-link-mobile');
+            const sections = document.querySelectorAll('.section');
+            const mobileMenu = document.getElementById('mobile-menu');
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+
+            function updateActiveNav(targetId) {
+                document.querySelectorAll('.nav-link').forEach(link => {
+                    link.classList.remove('active-nav');
+                    link.classList.add('inactive-nav');
+                    if(link.getAttribute('href') === `#${targetId}`) {
+                        link.classList.add('active-nav');
+                        link.classList.remove('inactive-nav');
+                    }
+                });
+            }
+
+            function navigateToSection(e) {
+                if (e.target.tagName === 'A') {
+                    e.preventDefault();
+                    const targetId = e.target.getAttribute('href').substring(1);
+                    
+                    sections.forEach(section => {
+                        section.classList.remove('active');
+                        if (section.id === targetId) {
+                            section.classList.add('active');
+                        }
+                    });
+                    
+                    document.getElementById(targetId).scrollIntoView();
+                    updateActiveNav(targetId);
+                    
+                    if(mobileMenu.classList.contains('hidden') === false) {
+                       mobileMenu.classList.add('hidden');
+                    }
+                }
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', navigateToSection);
+            });
+            
+            mobileMenuButton.addEventListener('click', () => {
+                mobileMenu.classList.toggle('hidden');
+            });
+
+
+            const communicationChartCtx = document.getElementById('communicationChart').getContext('2d');
+            new Chart(communicationChartCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Giao tiếp, truyền thông, họp', 'Công việc chuyên môn khác'],
+                    datasets: [{
+                        label: 'Phân bổ thời gian',
+                        data: [65, 35],
+                        backgroundColor: [ '#D9534F', '#E9ECEF' ],
+                        borderColor: [ '#F8F7F4' ],
+                        borderWidth: 4,
+                        hoverOffset: 10
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                font: { size: 14, family: 'Lexend' }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Phân bổ thời gian của Lãnh đạo Công nghệ',
+                            font: { size: 16, weight: 'bold', family: 'Lexend' }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            const audienceTabsContainer = document.getElementById('audience-tabs');
+            const audienceContentContainer = document.getElementById('audience-content');
+            Object.keys(audienceData).forEach((key, index) => {
+                const audience = audienceData[key];
+                const button = document.createElement('button');
+                button.dataset.key = key;
+                button.innerHTML = `<span class="mr-2">${audience.icon}</span> ${audience.name}`;
+                button.className = `audience-tab px-4 py-2 -mb-px text-sm font-semibold border-b-2 rounded-t-lg transition-colors duration-200 ${index === 0 ? 'border-[#D9534F] text-[#D9534F]' : 'border-transparent text-gray-500 hover:text-[#D9534F]'}`;
+                audienceTabsContainer.appendChild(button);
+            });
+            
+            function updateAudienceContent(key) {
+                const audience = audienceData[key];
+                audienceContentContainer.innerHTML = `
+                    <div class="p-6">
+                        <h3 class="text-2xl font-bold mb-4 flex items-center"><span class="text-3xl mr-3">${audience.icon}</span> ${audience.name}</h3>
+                        <div class="space-y-4 text-gray-700">
+                           <div><strong class="font-semibold text-gray-800">Mối quan tâm chính:</strong> ${audience.concerns}</div>
+                           <div><strong class="font-semibold text-gray-800">Ngôn ngữ ưa thích:</strong> ${audience.language}</div>
+                           <div><strong class="font-semibold text-gray-800">Gợi ý tiếp cận:</strong> ${audience.approach}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            audienceTabsContainer.addEventListener('click', e => {
+                if (e.target.closest('.audience-tab')) {
+                    const button = e.target.closest('.audience-tab');
+                    document.querySelectorAll('.audience-tab').forEach(btn => {
+                        btn.className = 'audience-tab px-4 py-2 -mb-px text-sm font-semibold border-b-2 rounded-t-lg transition-colors duration-200 border-transparent text-gray-500 hover:text-[#D9534F]';
+                    });
+                    button.className = 'audience-tab px-4 py-2 -mb-px text-sm font-semibold border-b-2 rounded-t-lg transition-colors duration-200 border-[#D9534F] text-[#D9534F]';
+                    updateAudienceContent(button.dataset.key);
+                }
+            });
+            updateAudienceContent('ceo'); 
+
+            const modelsGrid = document.getElementById('models-grid');
+            modelsData.forEach(model => {
+                const card = document.createElement('div');
+                card.className = 'model-card h-52 bg-transparent cursor-pointer';
+                card.innerHTML = `
+                    <div class="model-card-inner shadow-md rounded-lg">
+                        <div class="model-card-front bg-white">
+                            <h3 class="text-2xl font-bold text-[#D9534F]">${model.name}</h3>
+                            <p class="text-gray-500">${model.fullName}</p>
+                        </div>
+                        <div class="model-card-back bg-gray-800 text-white text-left text-sm">
+                            <p class="font-semibold mb-2">${model.description}</p>
+                            <p class="text-gray-300 italic">${model.example}</p>
+                        </div>
+                    </div>
+                `;
+                card.addEventListener('click', () => {
+                    card.classList.toggle('is-flipped');
+                });
+                modelsGrid.appendChild(card);
+            });
+            
+            const scenarioSelect = document.getElementById('scenario-select');
+            const step2 = document.getElementById('practice-step-2');
+            const modelChoicesContainer = document.getElementById('model-choices');
+            const resultContainer = document.getElementById('practice-result');
+            
+            scenariosData.forEach(scenario => {
+                const option = document.createElement('option');
+                option.value = scenario.id;
+                option.textContent = scenario.text;
+                scenarioSelect.appendChild(option);
+            });
+
+            modelsData.forEach(model => {
+                const button = document.createElement('button');
+                button.dataset.modelId = model.id;
+                button.className = 'model-choice-btn w-full text-left p-4 border rounded-md hover:bg-gray-100 hover:border-[#D9534F] transition';
+                button.innerHTML = `<h4 class="font-bold">${model.name}</h4><p class="text-sm text-gray-500">${model.fullName}</p>`;
+                modelChoicesContainer.appendChild(button);
+            });
+            
+            scenarioSelect.addEventListener('change', (e) => {
+                const selectedScenarioId = e.target.value;
+                if (selectedScenarioId) {
+                    step2.classList.remove('hidden');
+                    resultContainer.classList.add('hidden');
+                    const scenario = scenariosData.find(s => s.id === selectedScenarioId);
+                    document.querySelector('#practice-step-2 p').textContent = `Tình huống này có đối tượng chính là ${scenario.audience}. Bạn nghĩ mô hình nào sẽ hiệu quả nhất?`;
+                } else {
+                    step2.classList.add('hidden');
+                    resultContainer.classList.add('hidden');
+                }
+            });
+
+            modelChoicesContainer.addEventListener('click', (e) => {
+                if (e.target.closest('.model-choice-btn')) {
+                    const selectedModelId = e.target.closest('.model-choice-btn').dataset.modelId;
+                    const selectedScenarioId = scenarioSelect.value;
+                    const scenario = scenariosData.find(s => s.id === selectedScenarioId);
+
+                    let resultHTML = '';
+                    if (scenario.bestModels.includes(selectedModelId)) {
+                        resultHTML = `<h4 class="font-bold text-lg text-green-700">Lựa chọn xuất sắc! ✅</h4>
+                        <p class="text-green-600">Mô hình <strong>${modelsData.find(m => m.id === selectedModelId).name}</strong> rất phù hợp. Nó giúp bạn tập trung vào đúng mối quan tâm của khán giả.</p>
+                        <p class="mt-2 text-sm text-gray-700"><strong>Cách áp dụng:</strong> ${getExampleStory(selectedScenarioId, selectedModelId)}</p>`;
+                    } else {
+                        const suggestedModel = modelsData.find(m => m.id === scenario.bestModels[0]);
+                         resultHTML = `<h4 class="font-bold text-lg text-orange-700">Một lựa chọn thú vị! 🤔</h4>
+                        <p class="text-orange-600">Mô hình này có thể hoạt động, nhưng hãy cân nhắc dùng <strong>${suggestedModel.name} (${suggestedModel.fullName})</strong>. Nó thường hiệu quả hơn trong tình huống này vì nó trực tiếp giải quyết vấn đề khán giả quan tâm.</p>`;
+                    }
+                    resultContainer.innerHTML = resultHTML;
+                    resultContainer.classList.remove('hidden');
+                    resultContainer.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+            
+            function getExampleStory(scenarioId, modelId) {
+                if(scenarioId === 'sec' && modelId === 'bab') {
+                    return 'Bắt đầu bằng viễn cảnh rủi ro hiện tại (Before), vẽ ra một tương lai an toàn, tuân thủ (After), và trình bày gói đầu tư an ninh thông tin chính là cầu nối (Bridge).';
+                }
+                if(scenarioId === 'crm' && modelId === 'bab') {
+                    return 'Mô tả sự rời rạc, thiếu hiệu quả của việc quản lý khách hàng hiện tại (Before), phác họa một viễn cảnh 360 độ về khách hàng (After), và hệ thống CRM là cầu nối (Bridge) để đạt được điều đó.';
+                }
+                 if(scenarioId === 'inspire' && modelId === 'vision') {
+                    return 'Vẽ ra một bức tranh về tác động to lớn của dự án sau khi hoàn thành đối với công ty và khách hàng, khơi gợi niềm tự hào và mục đích cho từng thành viên.';
+                }
+                return 'Hãy thử áp dụng cấu trúc của mô hình này để xây dựng các luận điểm chính cho câu chuyện của bạn.';
+            }
+
+            // Set initial state based on hash
+            const initialHash = window.location.hash.substring(1);
+            if (initialHash && document.getElementById(initialHash)) {
+                sections.forEach(s => s.classList.remove('active'));
+                document.getElementById(initialHash).classList.add('active');
+                updateActiveNav(initialHash);
+            } else {
+                 updateActiveNav('home');
+            }
+        });
+    </script>
+</body>
+</html>
