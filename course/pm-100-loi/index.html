@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&copy; 2025 ST - 100 Lỗi Quản Lý Dự Án IT</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Professional Teal & Neutral -->
+    <!-- Application Structure Plan: Thiết kế dạng bảng điều khiển (dashboard) một trang. Cấu trúc bao gồm: (1) Thanh điều hướng trực quan sử dụng biểu đồ tròn Chart.js và các nút lọc tương ứng với 10 danh mục cốt lõi, cung cấp hai cách tiếp cận nội dung. (2) Khu vực hiển thị chính dưới dạng lưới các thẻ (card) tương tác. Mỗi thẻ ban đầu chỉ hiển thị "Lỗi", khi người dùng nhấp vào, thẻ sẽ mở rộng để hiển thị "Cách khắc phục". (3) Một thanh tìm kiếm động để lọc toàn bộ 100 lỗi theo từ khóa. Lý do chọn cấu trúc này: Nó biến một danh sách văn bản dài thành một công cụ khám phá chủ động, cho phép người dùng nhanh chóng đến được phần họ quan tâm, khuyến khích sự tương tác (nhấp để xem giải pháp) và cung cấp khả năng tìm kiếm mạnh mẽ, giúp việc tiêu thụ thông tin hiệu quả và hấp dẫn hơn nhiều so với việc đọc tài liệu tuyến tính. -->
+    <!-- Visualization & Content Choices: 
+        1. Report Info: 10 danh mục, mỗi danh mục 10 lỗi. Goal: Tạo một menu điều hướng tổng quan, trực quan. Viz/Presentation Method: Biểu đồ tròn (Donut Chart) từ Chart.js. Interaction: Nhấp vào một lát cắt của biểu đồ sẽ lọc danh sách các thẻ lỗi theo danh mục tương ứng. Justification: Biểu đồ tròn đóng vai trò như một bảng điều khiển trung tâm, trực quan hóa sự phân bổ các lỗi (mặc dù ở đây là đều nhau) và cung cấp một cách điều hướng hấp dẫn hơn so với các liên kết văn bản đơn thuần. Library/Method: Chart.js (trên Canvas).
+        2. Report Info: Các cặp Lỗi/Cách khắc phục. Goal: Trình bày thông tin một cách cô đọng, khuyến khích người dùng tương tác để học hỏi. Viz/Presentation Method: Các thẻ lật/mở rộng (Accordion/Card) bằng HTML/CSS/JS. Interaction: Người dùng nhấp vào thẻ Lỗi để xem Cách khắc phục. Justification: Mô hình tương tác này bắt chước thẻ học (flashcard), giúp người dùng suy ngẫm về vấn đề trước khi xem giải pháp, qua đó tăng cường khả năng ghi nhớ và sự tham gia tích cực. Library/Method: Vanilla JS và Tailwind CSS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            max-height: 450px;
+            margin: auto;
+        }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease-in-out;
+            border: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .card-header {
+            cursor: pointer;
+            padding: 1rem 1.5rem;
+        }
+        .card-body {
+            display: none;
+            padding: 1.5rem 1.5rem 1.5rem 1.5rem;
+            border-top: 1px solid #e2e8f0; /* slate-200 */
+        }
+        .card.active .card-body {
+            display: block;
+        }
+        .card.active {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -2px rgb(0 0 0 / 0.1);
+        }
+        .card-header .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+        .card.active .card-header .icon {
+            transform: rotate(180deg);
+        }
+        .filter-btn {
+            transition: all 0.2s ease-in-out;
+        }
+        .filter-btn.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            font-weight: 600;
+        }
+        .highlight {
+            background-color: #a7f3d0; /* emerald-200 */
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+
+    <div class="container mx-auto px-4 py-8 md:px-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-3xl md:text-5xl font-bold text-teal-700 mb-2">Cẩm Nang Quản Lý Dự Án IT</h1>
+            <p class="text-lg text-slate-600 max-w-3xl mx-auto">Một công cụ tương tác giúp khám phá 100 lỗi thường gặp và cách khắc phục hiệu quả, được xây dựng dựa trên kinh nghiệm thực tiễn.</p>
+        </header>
+
+        <main>
+            <section id="dashboard" class="mb-12">
+                <h2 class="text-2xl font-bold text-center mb-2">Bảng Điều Khiển Tương Tác</h2>
+                <p class="text-slate-500 text-center mb-6">Nhấp vào một danh mục trong biểu đồ hoặc chọn nút bên dưới để lọc các lỗi sai.</p>
+                <div class="flex flex-col lg:flex-row gap-8 items-center">
+                    <div class="w-full lg:w-1/3">
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="w-full lg:w-2/3">
+                        <div class="flex flex-wrap justify-center gap-2 md:gap-3" id="filter-buttons">
+                            <button data-category="Tất cả" class="filter-btn active text-sm md:text-base bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium py-2 px-4 rounded-full">Tất cả (100)</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="explorer">
+                <div class="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
+                    <h2 class="text-2xl font-bold" id="results-title">Tất cả 100 Lỗi</h2>
+                    <div class="relative w-full md:w-1/3">
+                         <input type="search" id="search-box" placeholder="Tìm kiếm lỗi hoặc giải pháp..." class="w-full pl-10 pr-4 py-2 border border-slate-300 rounded-full focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                         <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                             <svg class="h-5 w-5 text-slate-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd" />
+                            </svg>
+                         </div>
+                    </div>
+                </div>
+                <div id="mistakes-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                </div>
+                <p id="no-results" class="text-center text-slate-500 py-12 hidden">Không tìm thấy kết quả phù hợp.</p>
+            </section>
+        </main>
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const mistakesData = [
+                { category: 'Lập Kế Hoạch', mistake: 'Mục tiêu dự án không rõ ràng, mơ hồ.', solution: 'Sử dụng phương pháp SMART (Cụ thể, Đo lường được, Khả thi, Liên quan, Có thời hạn) để xác định mục tiêu ngay từ đầu.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Không xác định đầy đủ các bên liên quan (stakeholders).', solution: 'Lập bản đồ các bên liên quan, phân tích mức độ ảnh hưởng và sự quan tâm của họ để có chiến lược giao tiếp phù hợp.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Đánh giá thấp sự phức tạp của dự án.', solution: 'Tổ chức các buổi họp với chuyên gia kỹ thuật và nghiệp vụ để phân tích sâu, chia nhỏ dự án thành các phần dễ quản lý hơn.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Kế hoạch dự án quá lạc quan, không thực tế.', solution: 'Sử dụng dữ liệu từ các dự án tương tự, áp dụng kỹ thuật ước tính 3 điểm (lạc quan, bi quan, thực tế nhất).' },
+                { category: 'Lập Kế Hoạch', mistake: 'Bỏ qua việc lập một bản tuyên bố dự án (Project Charter) chính thức.', solution: 'Luôn tạo Project Charter và nhận được sự phê duyệt từ nhà tài trợ trước khi bắt đầu.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Không có một quy trình quản lý thay đổi rõ ràng.', solution: 'Thiết lập một quy trình kiểm soát thay đổi (Change Control Process) ngay từ giai đoạn lập kế hoạch.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Lựa chọn sai phương pháp luận quản lý dự án (Agile, Waterfall,...).', solution: 'Phân tích kỹ bản chất dự án, yêu cầu và văn hóa tổ chức để chọn phương pháp phù hợp nhất.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Không phân tích lợi ích và chi phí (Cost-Benefit Analysis) một cách cẩn thận.', solution: 'Thực hiện phân tích tài chính chi tiết để đảm bảo dự án đáng để đầu tư.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Kế hoạch không có các cột mốc (milestones) quan trọng.', solution: 'Xác định các cột mốc rõ ràng để theo dõi tiến độ và tạo động lực cho đội nhóm.' },
+                { category: 'Lập Kế Hoạch', mistake: 'Bỏ qua việc học hỏi từ các dự án đã thất bại trước đó.', solution: 'Tổ chức các buổi "lessons learned" (bài học kinh nghiệm) và xây dựng một kho lưu trữ kiến thức.' },
+                { category: 'Phạm Vi', mistake: '"Scope Creep" - phạm vi dự án liên tục bị phình to không kiểm soát.', solution: 'Tuân thủ chặt chẽ quy trình quản lý thay đổi. Mọi yêu cầu mới phải được đánh giá tác động về chi phí, thời gian.' },
+                { category: 'Phạm Vi', mistake: 'Thu thập yêu cầu không đầy đủ hoặc sai.', solution: 'Sử dụng nhiều kỹ thuật khác nhau (phỏng vấn, workshop, khảo sát), tạo mẫu thử (prototype) để xác nhận lại với người dùng.' },
+                { category: 'Phạm Vi', mistake: 'Yêu cầu được ghi lại một cách mơ hồ, đa nghĩa.', solution: 'Viết tài liệu yêu cầu một cách chi tiết, có thể kiểm chứng được và được tất cả các bên liên quan thông qua.' },
+                { category: 'Phạm Vi', mistake: 'Không phân cấp ưu tiên cho các yêu cầu.', solution: 'Sử dụng các kỹ thuật như MoSCoW (Must have, Should have, Could have, Won\'t have) để sắp xếp thứ tự ưu tiên.' },
+                { category: 'Phạm Vi', mistake: '"Gold Plating" - Tự ý thêm các tính năng không cần thiết mà khách hàng không yêu cầu.', solution: 'Giáo dục đội nhóm chỉ tập trung vào việc đáp ứng các yêu cầu đã được phê duyệt trong phạm vi dự án.' },
+                { category: 'Phạm Vi', mistake: 'Không có một tài liệu WBS (Work Breakdown Structure - Cấu trúc phân rã công việc).', solution: 'Luôn tạo WBS để chia nhỏ dự án thành các gói công việc cụ thể, dễ quản lý và ước tính.' },
+                { category: 'Phạm Vi', mistake: 'Không có sự xác nhận chính thức về phạm vi từ khách hàng/nhà tài trợ.', solution: 'Yêu cầu chữ ký hoặc email xác nhận cho tài liệu phạm vi (Scope Statement) trước khi thực hiện.' },
+                { category: 'Phạm Vi', mistake: 'Không quản lý được các yêu cầu phi chức năng (bảo mật, hiệu năng).', solution: 'Xác định và lập tài liệu cho các yêu cầu phi chức năng ngay từ đầu như một phần của phạm vi.' },
+                { category: 'Phạm Vi', mistake: 'Thay đổi yêu cầu bằng lời nói, không có văn bản.', solution: 'Yêu cầu tất cả các thay đổi phải được gửi qua một kênh chính thức (email, hệ thống quản lý) và tuân theo quy trình.' },
+                { category: 'Phạm Vi', mistake: 'Đánh giá sai tác động của một thay đổi nhỏ.', solution: 'Luôn phân tích tác động toàn diện của bất kỳ thay đổi nào lên toàn bộ dự án.' },
+                { category: 'Nguồn Lực', mistake: 'Thiếu nguồn lực cần thiết (nhân sự, thiết bị).', solution: 'Lập kế hoạch quản lý nguồn lực chi tiết và đảm bảo có được cam kết từ các cấp quản lý.' },
+                { category: 'Nguồn Lực', mistake: 'Phân công công việc không đúng người, đúng việc.', solution: 'Hiểu rõ kỹ năng, kinh nghiệm và nguyện vọng của từng thành viên để giao việc phù hợp.' },
+                { category: 'Nguồn Lực', mistake: 'Xung đột trong đội nhóm không được giải quyết.', solution: 'Can thiệp sớm, áp dụng các kỹ thuật giải quyết xung đột, và xây dựng một môi trường làm việc cởi mở.' },
+                { category: 'Nguồn Lực', mistake: 'Thiếu sự gắn kết và tinh thần đồng đội.', solution: 'Tổ chức các hoạt động team building, khuyến khích giao tiếp và hợp tác.' },
+                { category: 'Nguồn Lực', mistake: 'Quản lý vi mô (micromanagement), không trao quyền cho đội nhóm.', solution: 'Tin tưởng và trao quyền cho các thành viên. Tập trung vào kết quả cuối cùng thay vì giám sát từng bước.' },
+                { category: 'Nguồn Lực', mistake: 'Thành viên chủ chốt rời dự án đột ngột.', solution: 'Lập kế hoạch dự phòng nhân sự, chia sẻ kiến thức trong nhóm để không ai là không thể thay thế.' },
+                { category: 'Nguồn Lực', mistake: 'Đội nhóm làm việc quá sức, dẫn đến kiệt sức (burnout).', solution: 'Theo dõi khối lượng công việc, cân bằng và phân bổ lại nếu cần, đảm bảo thời gian nghỉ ngơi hợp lý.' },
+                { category: 'Nguồn Lực', mistake: 'Vai trò và trách nhiệm của từng thành viên không rõ ràng.', solution: 'Sử dụng ma trận RACI (Responsible, Accountable, Consulted, Informed) để định nghĩa rõ ràng vai trò.' },
+                { category: 'Nguồn Lực', mistake: 'Không công nhận và khen thưởng những nỗ lực của đội nhóm.', solution: 'Thường xuyên ghi nhận những đóng góp tích cực, dù lớn hay nhỏ, để duy trì động lực.' },
+                { category: 'Nguồn Lực', mistake: 'Tuyển dụng nhân sự không phù hợp với văn hóa dự án/công ty.', solution: 'Chú trọng đến cả kỹ năng mềm và sự phù hợp văn hóa trong quá trình phỏng vấn.' },
+                { category: 'Thời Gian', mistake: 'Ước tính thời gian thực hiện công việc không chính xác.', solution: 'Dựa vào dữ liệu lịch sử, tham khảo ý kiến của người trực tiếp thực hiện công việc, sử dụng các kỹ thuật ước tính chuyên nghiệp.' },
+                { category: 'Thời Gian', mistake: 'Không xác định đúng các công việc phụ thuộc lẫn nhau.', solution: 'Sử dụng biểu đồ mạng (network diagram) để trực quan hóa các mối quan hệ phụ thuộc và xác định đường găng (critical path).' },
+                { category: 'Thời Gian', mistake: 'Bỏ qua đường găng (Critical Path) của dự án.', solution: 'Luôn xác định và theo dõi chặt chẽ các công việc trên đường găng vì bất kỳ sự chậm trễ nào ở đây đều ảnh hưởng đến toàn bộ dự án.' },
+                { category: 'Thời Gian', mistake: 'Lịch trình quá cứng nhắc, không có bộ đệm (buffer).', solution: 'Thêm thời gian dự phòng vào lịch trình cho những công việc có độ bất định cao.' },
+                { category: 'Thời Gian', mistake: 'Cập nhật tiến độ không thường xuyên.', solution: 'Yêu cầu báo cáo tiến độ hàng ngày hoặc hàng tuần và cập nhật lịch trình dự án một cách đều đặn.' },
+                { category: 'Thời Gian', mistake: 'Bỏ qua các ngày nghỉ lễ, nghỉ phép của nhân viên khi lập kế hoạch.', solution: 'Sử dụng lịch tài nguyên (resource calendar) để tính toán chính xác thời gian làm việc thực tế.' },
+                { category: 'Thời Gian', mistake: 'Cố gắng rút ngắn tiến độ một cách phi thực tế (crashing/fast-tracking) mà không lường trước hậu quả.', solution: 'Phân tích kỹ lưỡng chi phí và rủi ro trước khi quyết định áp dụng các kỹ thuật rút ngắn tiến độ.' },
+                { category: 'Thời Gian', mistake: 'Hiệu ứng "Student Syndrome" - Nước đến chân mới nhảy.', solution: 'Chia nhỏ các công việc lớn và đặt ra các deadline nhỏ, cụ thể hơn.' },
+                { category: 'Thời Gian', mistake: 'Không theo dõi sự chênh lệch giữa kế hoạch và thực tế.', solution: 'Sử dụng các công cụ như biểu đồ Gantt để so sánh tiến độ thực tế với đường cơ sở (baseline) đã lập.' },
+                { category: 'Thời Gian', mistake: 'Báo cáo tiến độ không trung thực để "làm đẹp" tình hình.', solution: 'Xây dựng một văn hóa minh bạch, nơi mọi người không ngại báo cáo các tin xấu hoặc sự chậm trễ.' },
+                { category: 'Chi Phí', mistake: 'Ước tính chi phí ban đầu quá thấp.', solution: 'Thực hiện ước tính chi phí từ dưới lên (bottom-up), xem xét tất cả các hạng mục từ nhân công, thiết bị đến chi phí quản lý.' },
+                { category: 'Chi Phí', mistake: 'Không có quỹ dự phòng cho các rủi ro.', solution: 'Luôn dành một khoản ngân sách dự phòng (contingency reserve) cho các rủi ro đã biết và một khoản dự phòng quản lý (management reserve) cho các rủi ro chưa lường trước.' },
+                { category: 'Chi Phí', mistake: 'Theo dõi chi phí không nhất quán.', solution: 'Thiết lập một hệ thống theo dõi chi phí rõ ràng và yêu cầu tất cả các chi tiêu phải được ghi nhận kịp thời.' },
+                { category: 'Chi Phí', mistake: 'Bỏ qua các chi phí gián tiếp (overhead costs).', solution: 'Tính toán cả các chi phí gián tiếp như văn phòng, điện, nước vào tổng ngân sách dự án.' },
+                { category: 'Chi Phí', mistake: 'Không quản lý được các thay đổi về chi phí.', solution: 'Mọi thay đổi dẫn đến tăng chi phí đều phải qua quy trình kiểm soát thay đổi và được phê duyệt.' },
+                { category: 'Chi Phí', mistake: 'Phê duyệt các hạng mục vượt ngân sách mà không có lý do chính đáng.', solution: 'Tuân thủ nghiêm ngặt ngân sách đã được phê duyệt. Yêu cầu justification (sự biện minh) rõ ràng cho mọi chi phí phát sinh.' },
+                { category: 'Chi Phí', mistake: 'Không sử dụng các kỹ thuật quản lý giá trị thu được (EVM - Earned Value Management).', solution: 'Áp dụng EVM để đo lường hiệu suất dự án một cách khách quan thông qua các chỉ số SPI (chỉ số hiệu suất tiến độ) và CPI (chỉ số hiệu suất chi phí).' },
+                { category: 'Chi Phí', mistake: 'Cắt giảm chi phí sai chỗ, ảnh hưởng đến chất lượng.', solution: 'Đánh giá cẩn thận tác động của việc cắt giảm chi phí. Không hy sinh chất lượng và các yêu cầu cốt lõi để tiết kiệm tiền.' },
+                { category: 'Chi Phí', mistake: 'Báo cáo tài chính không minh bạch.', solution: 'Cung cấp các báo cáo tài chính định kỳ, rõ ràng và trung thực cho các bên liên quan.' },
+                { category: 'Chi Phí', mistake: 'Không có kế hoạch quản lý chi phí.', solution: 'Luôn lập một kế hoạch quản lý chi phí chi tiết, mô tả cách thức ngân sách sẽ được lập, quản lý và kiểm soát.' },
+                { category: 'Rủi Ro', mistake: 'Không xác định rủi ro một cách hệ thống.', solution: 'Tổ chức các buổi họp brainstorming, sử dụng checklist, phỏng vấn chuyên gia để xác định rủi ro một cách toàn diện.' },
+                { category: 'Rủi Ro', mistake: 'Chỉ xác định rủi ro một lần vào đầu dự án.', solution: 'Quản lý rủi ro là một quá trình liên tục. Thường xuyên rà soát và xác định các rủi ro mới trong suốt vòng đời dự án.' },
+                { category: 'Rủi Ro', mistake: 'Không phân tích định tính và định lượng rủi ro.', solution: 'Đánh giá xác suất xảy ra và mức độ tác động của từng rủi ro để ưu tiên xử lý những rủi ro nghiêm trọng nhất.' },
+                { category: 'Rủi Ro', mistake: 'Không có kế hoạch ứng phó rủi ro.', solution: 'Với mỗi rủi ro lớn, cần xây dựng một kế hoạch ứng phó cụ thể (né tránh, giảm thiểu, chấp nhận, hoặc chuyển giao).' },
+                { category: 'Rủi Ro', mistake: 'Không phân công người chịu trách nhiệm cho từng rủi ro.', solution: 'Gán một "chủ sở hữu rủi ro" (risk owner) cho mỗi rủi ro để đảm bảo có người theo dõi và thực hiện kế hoạch ứng phó.' },
+                { category: 'Rủi Ro', mistake: 'Nhầm lẫn giữa rủi ro (có thể xảy ra) và vấn đề (đã xảy ra).', solution: 'Sử dụng một sổ theo dõi rủi ro (risk register) và một sổ theo dõi vấn đề (issue log) riêng biệt.' },
+                { category: 'Rủi Ro', mistake: 'Phản ứng thụ động với các vấn đề thay vì chủ động phòng ngừa.', solution: 'Tập trung vào việc xác định và xử lý rủi ro trước khi chúng trở thành vấn đề.' },
+                { category: 'Rủi Ro', mistake: 'Che giấu các vấn đề và hy vọng chúng tự biến mất.', solution: 'Khuyến khích một môi trường nơi mọi người có thể báo cáo vấn đề sớm mà không sợ bị đổ lỗi.' },
+                { category: 'Rủi Ro', mistake: 'Đổ lỗi cho người khác khi có vấn đề xảy ra.', solution: 'Tập trung vào việc tìm ra nguyên nhân gốc rễ và giải pháp, thay vì tìm người để đổ lỗi.' },
+                { category: 'Rủi Ro', mistake: 'Không ghi lại các vấn đề và cách giải quyết chúng.', solution: 'Duy trì một issue log chi tiết để theo dõi và học hỏi kinh nghiệm cho các dự án sau này.' },
+                { category: 'Giao Tiếp', mistake: 'Kế hoạch giao tiếp không đầy đủ hoặc không tồn tại.', solution: 'Lập kế hoạch giao tiếp rõ ràng: Ai cần thông tin gì? Khi nào? Bằng hình thức nào?' },
+                { category: 'Giao Tiếp', mistake: 'Giao tiếp không hiệu quả với các bên liên quan.', solution: 'Tùy chỉnh thông điệp và phương thức giao tiếp cho từng nhóm đối tượng khác nhau.' },
+                { category: 'Giao Tiếp', mistake: 'Không quản lý được kỳ vọng của các bên liên quan.', solution: 'Giao tiếp thường xuyên, minh bạch và chủ động để đảm bảo kỳ vọng của mọi người luôn thực tế.' },
+                { category: 'Giao Tiếp', mistake: 'Thiếu các cuộc họp báo cáo tiến độ định kỳ.', solution: 'Lên lịch và duy trì các cuộc họp trạng thái (status meeting) đều đặn để mọi người cùng nắm bắt thông tin.' },
+                { category: 'Giao Tiếp', mistake: 'Biên bản họp (Meeting Minutes) không được ghi lại hoặc gửi đi.', solution: 'Luôn ghi lại các quyết định chính, các mục hành động và người chịu trách nhiệm sau mỗi cuộc họp, sau đó gửi cho tất cả người tham dự.' },
+                { category: 'Giao Tiếp', mistake: 'Thông tin bị "tam sao thất bản" khi đi qua nhiều cấp.', solution: 'Cố gắng tạo các kênh giao tiếp trực tiếp, sử dụng các công cụ cộng tác chung.' },
+                { category: 'Giao Tiếp', mistake: 'Không lắng nghe phản hồi từ đội nhóm và các bên liên quan.', solution: 'Tạo ra các kênh để mọi người có thể đưa ra phản hồi một cách cởi mở và an toàn.' },
+                { category: 'Giao Tiếp', mistake: 'Báo cáo quá nhiều chi tiết không cần thiết hoặc quá ít thông tin quan trọng.', solution: 'Hiểu rõ đối tượng nhận báo cáo cần gì và cung cấp thông tin ở mức độ phù hợp.' },
+                { category: 'Giao Tiếp', mistake: 'Giả định rằng "im lặng là đồng ý".', solution: 'Luôn tìm kiếm sự xác nhận rõ ràng thay vì đưa ra các giả định.' },
+                { category: 'Giao Tiếp', mistake: 'Không thông báo về các thay đổi quan trọng của dự án.', solution: 'Sử dụng các kênh thông báo chính thức để đảm bảo mọi bên liên quan đều nhận được thông tin về các thay đổi.' },
+                { category: 'Chất Lượng', mistake: 'Không có định nghĩa rõ ràng về "chất lượng" cho dự án.', solution: 'Thống nhất các tiêu chí chất lượng và các chỉ số đo lường (metrics) cụ thể ngay từ đầu.' },
+                { category: 'Chất Lượng', mistake: 'Bỏ qua việc lập kế hoạch quản lý chất lượng.', solution: 'Lập một kế hoạch chi tiết mô tả cách thức đảm bảo và kiểm soát chất lượng trong suốt dự án.' },
+                { category: 'Chất Lượng', mistake: 'Kiểm thử bị đẩy về cuối dự án.', solution: 'Áp dụng phương pháp kiểm thử sớm và liên tục (ví dụ: trong các sprint của Agile) để phát hiện lỗi sớm.' },
+                { category: 'Chất Lượng', mistake: 'Kế hoạch kiểm thử (Test Plan) không đầy đủ.', solution: 'Viết test plan chi tiết, bao gồm các kịch bản kiểm thử (test case) cho cả các trường hợp thông thường và các trường hợp biên.' },
+                { category: 'Chất Lượng', mistake: 'Không thực hiện kiểm thử chấp nhận người dùng (UAT - User Acceptance Testing).', solution: 'Luôn dành thời gian để người dùng cuối kiểm thử và xác nhận sản phẩm đáp ứng nhu cầu của họ.' },
+                { category: 'Chất Lượng', mistake: 'Bỏ qua các loại kiểm thử quan trọng (hiệu năng, bảo mật).', solution: 'Xác định và lên kế hoạch cho tất cả các loại kiểm thử cần thiết dựa trên bản chất của sản phẩm.' },
+                { category: 'Chất Lượng', mistake: 'Sửa lỗi tạo ra lỗi mới (regression).', solution: 'Thực hiện kiểm thử hồi quy (regression testing) sau mỗi lần sửa lỗi hoặc thêm tính năng mới.' },
+                { category: 'Chất Lượng', mistake: 'Môi trường kiểm thử không giống với môi trường thực tế (production).', solution: 'Cố gắng thiết lập môi trường staging/testing tương đồng nhất có thể với môi trường production.' },
+                { category: 'Chất Lượng', mistake: 'Không theo dõi và quản lý lỗi một cách hệ thống.', solution: 'Sử dụng một hệ thống quản lý lỗi (bug tracking system) để ghi nhận, phân công và theo dõi trạng thái của các lỗi.' },
+                { category: 'Chất Lượng', mistake: 'Coi chất lượng là trách nhiệm của riêng đội kiểm thử (QA).', solution: 'Xây dựng văn hóa "chất lượng là trách nhiệm của mọi người", từ lập trình viên đến quản lý dự án.' },
+                { category: 'Thực Thi', mistake: 'Không theo dõi tiến độ so với kế hoạch ban đầu (baseline).', solution: 'Thường xuyên so sánh hiệu suất thực tế với đường cơ sở về phạm vi, thời gian và chi phí.' },
+                { category: 'Thực Thi', mistake: 'Phớt lờ những dấu hiệu cảnh báo sớm.', solution: 'Chú ý đến các chỉ số hiệu suất (KPIs) và các "red flag" (dấu hiệu nguy hiểm) để hành động kịp thời.' },
+                { category: 'Thực Thi', mistake: 'Các cuộc họp không hiệu quả, tốn thời gian.', solution: 'Đặt ra mục tiêu rõ ràng, có chương trình nghị sự (agenda) và chỉ mời những người thực sự cần thiết tham gia.' },
+                { category: 'Thực Thi', mistake: 'Quá trình ra quyết định chậm chạp.', solution: 'Trao quyền ra quyết định ở các cấp phù hợp, xác định rõ ai là người có thẩm quyền cuối cùng.' },
+                { category: 'Thực Thi', mistake: 'Không có quy trình bàn giao giữa các giai đoạn hoặc các nhóm.', solution: 'Định nghĩa rõ ràng các tiêu chí đầu vào/đầu ra (entry/exit criteria) cho mỗi giai đoạn.' },
+                { category: 'Thực Thi', mistake: 'Tài liệu dự án lộn xộn, khó tìm.', solution: 'Thiết lập một cấu trúc thư mục rõ ràng và sử dụng một hệ thống quản lý tài liệu tập trung.' },
+                { category: 'Thực Thi', mistake: 'Không quản lý các nhà cung cấp hoặc đối tác bên ngoài.', solution: 'Thường xuyên họp và theo dõi hiệu suất của nhà cung cấp dựa trên các điều khoản trong hợp đồng.' },
+                { category: 'Thực Thi', mistake: 'Không ăn mừng các thành công nhỏ.', solution: 'Ghi nhận và ăn mừng khi hoàn thành các cột mốc quan trọng để duy trì động lực.' },
+                { category: 'Thực Thi', mistake: 'Quản lý dự án chỉ dựa vào công cụ mà bỏ qua con người.', solution: 'Nhớ rằng công cụ chỉ hỗ trợ, sự tương tác và giao tiếp giữa con người mới là yếu tố quyết định.' },
+                { category: 'Thực Thi', mistake: 'Không có quy trình nghiệm thu và đóng dự án chính thức.', solution: 'Xây dựng checklist các công việc cần làm để đóng dự án, bao gồm nghiệm thu cuối cùng, bàn giao sản phẩm và giải thể đội nhóm.' },
+                { category: 'Lãnh Đạo', mistake: 'Thiếu sự hỗ trợ từ cấp quản lý cao hơn.', solution: 'Chủ động báo cáo, trình bày rõ giá trị của dự án và tìm kiếm một nhà tài trợ (sponsor) mạnh mẽ.' },
+                { category: 'Lãnh Đạo', mistake: 'Người quản lý dự án thiếu kỹ năng lãnh đạo.', solution: 'Liên tục học hỏi, trau dồi các kỹ năng mềm như giao tiếp, đàm phán, tạo động lực và giải quyết vấn đề.' },
+                { category: 'Lãnh Đạo', mistake: 'Văn hóa đổ lỗi thay vì văn hóa giải quyết vấn đề.', solution: 'Làm gương bằng cách tập trung vào giải pháp, khuyến khích sự minh bạch và tinh thần trách nhiệm tập thể.' },
+                { category: 'Lãnh Đạo', mistake: 'Người quản lý dự án không phải là người bảo vệ cho đội nhóm.', solution: 'Đứng ra bảo vệ đội nhóm khỏi những yêu cầu vô lý hoặc áp lực không cần thiết từ bên ngoài.' },
+                { category: 'Lãnh Đạo', mistake: 'Không linh hoạt và không sẵn sàng thích ứng với thay đổi.', solution: 'Chấp nhận rằng thay đổi là không thể tránh khỏi và xây dựng sự linh hoạt vào trong quy trình quản lý.' },
+                { category: 'Lãnh Đạo', mistake: 'Thiếu tầm nhìn và không thể truyền cảm hứng cho đội nhóm.', solution: 'Luôn nhắc nhở đội nhóm về mục tiêu lớn và ý nghĩa công việc họ đang làm.' },
+                { category: 'Lãnh Đạo', mistake: 'Không trung thực và minh bạch với đội nhóm và các bên liên quan.', solution: 'Xây dựng niềm tin bằng cách luôn giao tiếp một cách cởi mở và trung thực, ngay cả khi có tin xấu.' },
+                { category: 'Lãnh Đạo', mistake: 'Không hiểu về kỹ thuật hoặc nghiệp vụ của dự án.', solution: 'Dành thời gian để học hỏi những kiến thức cơ bản, đủ để giao tiếp hiệu quả với đội kỹ thuật và hiểu các thách thức của họ.' },
+                { category: 'Lãnh Đạo', mistake: 'Bỏ qua việc thu thập bài học kinh nghiệm (lessons learned) khi kết thúc dự án.', solution: 'Luôn tổ chức một buổi họp tổng kết để ghi lại những gì đã làm tốt và những gì cần cải thiện cho lần sau.' },
+                { category: 'Lãnh Đạo', mistake: 'Cho rằng việc quản lý dự án chỉ là làm theo một bộ quy tắc cứng nhắc.', solution: 'Hiểu rằng quản lý dự án là sự kết hợp giữa khoa học (quy trình, công cụ) và nghệ thuật (kỹ năng con người, sự linh hoạt). Luôn điều chỉnh cách tiếp cận cho phù hợp với từng dự án cụ thể.' }
+            ];
+
+            const categories = [...new Set(mistakesData.map(item => item.category))];
+            const categoryCounts = categories.map(cat => ({
+                category: cat,
+                count: mistakesData.filter(item => item.category === cat).length
+            }));
+            
+            const grid = document.getElementById('mistakes-grid');
+            const searchBox = document.getElementById('search-box');
+            const filterButtonsContainer = document.getElementById('filter-buttons');
+            const resultsTitle = document.getElementById('results-title');
+            const noResultsMessage = document.getElementById('no-results');
+            let chart;
+
+            function renderCards(data, searchTerm = '') {
+                grid.innerHTML = '';
+                if (data.length === 0) {
+                    noResultsMessage.style.display = 'block';
+                } else {
+                    noResultsMessage.style.display = 'none';
+                }
+
+                data.forEach((item, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'card';
+                    card.setAttribute('data-index', index);
+                    
+                    let mistakeHTML = item.mistake;
+                    let solutionHTML = item.solution;
+
+                    if (searchTerm) {
+                        const regex = new RegExp(searchTerm.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&'), 'gi');
+                        mistakeHTML = item.mistake.replace(regex, `<span class="highlight">$&</span>`);
+                        solutionHTML = item.solution.replace(regex, `<span class="highlight">$&</span>`);
+                    }
+
+                    card.innerHTML = `
+                        <div class="card-header flex justify-between items-center">
+                            <h3 class="text-base font-semibold text-slate-800 pr-4">${mistakeHTML}</h3>
+                             <span class="icon text-teal-600">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                  <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </span>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-slate-600"><strong class="text-teal-700">Giải pháp:</strong> ${solutionHTML}</p>
+                        </div>
+                    `;
+                    grid.appendChild(card);
+                });
+            }
+
+            function updateActiveButton(category) {
+                document.querySelectorAll('.filter-btn').forEach(btn => {
+                    if (btn.dataset.category === category) {
+                        btn.classList.add('active');
+                    } else {
+                        btn.classList.remove('active');
+                    }
+                });
+            }
+
+            function filterAndRender(category, searchTerm = '') {
+                let filteredData = mistakesData;
+
+                if (category !== 'Tất cả') {
+                    filteredData = filteredData.filter(item => item.category === category);
+                }
+
+                if (searchTerm) {
+                    const lowerCaseSearchTerm = searchTerm.toLowerCase();
+                    filteredData = filteredData.filter(item =>
+                        item.mistake.toLowerCase().includes(lowerCaseSearchTerm) ||
+                        item.solution.toLowerCase().includes(lowerCaseSearchTerm)
+                    );
+                }
+                
+                renderCards(filteredData, searchTerm);
+                
+                let title = category === 'Tất cả' ? 'Tất cả 100 Lỗi' : `Lỗi thuộc danh mục: ${category}`;
+                if (searchTerm) {
+                    title = `Kết quả tìm kiếm cho "${searchTerm}"`;
+                }
+                resultsTitle.textContent = title;
+            }
+            
+            function setupFilterButtons() {
+                categoryCounts.forEach(cat => {
+                    const button = document.createElement('button');
+                    button.className = 'filter-btn text-sm md:text-base bg-white border border-slate-300 hover:bg-slate-100 text-slate-700 font-medium py-2 px-4 rounded-full';
+                    button.textContent = `${cat.category} (${cat.count})`;
+                    button.dataset.category = cat.category;
+                    filterButtonsContainer.appendChild(button);
+                });
+
+                filterButtonsContainer.addEventListener('click', (e) => {
+                    if (e.target.tagName === 'BUTTON') {
+                        const category = e.target.dataset.category;
+                        searchBox.value = '';
+                        updateActiveButton(category);
+                        filterAndRender(category);
+                        
+                        const categoryIndex = categories.indexOf(category);
+                        if (chart && categoryIndex > -1) {
+                            chart.toggleDataVisibility(categoryIndex);
+                            chart.update();
+                        }
+                    }
+                });
+            }
+            
+            function setupChart() {
+                const ctx = document.getElementById('categoryChart').getContext('2d');
+                const chartColors = [
+                    '#14b8a6', '#0d9488', '#0f766e', '#115e59', '#042f2e',
+                    '#2dd4bf', '#5eead4', '#99f6e4', '#ccfbf1', '#f0fdfa'
+                ].reverse();
+
+                chart = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: categories,
+                        datasets: [{
+                            label: 'Số lỗi',
+                            data: categoryCounts.map(c => c.count),
+                            backgroundColor: chartColors,
+                            borderColor: '#f8fafc',
+                            borderWidth: 3,
+                            hoverOffset: 8
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '60%',
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    boxWidth: 15,
+                                    padding: 15,
+                                    font: {
+                                        size: 12
+                                    },
+                                    // Custom label generation to wrap long text
+                                    generateLabels: function(chart) {
+                                        const data = chart.data;
+                                        if (data.labels.length && data.datasets.length) {
+                                            return data.labels.map(function(label, i) {
+                                                const meta = chart.getDatasetMeta(0);
+                                                const style = meta.controller.getStyle(i);
+
+                                                return {
+                                                    text: label.length > 16 ? label.substring(0, 16) + '...' : label,
+                                                    fillStyle: style.backgroundColor,
+                                                    strokeStyle: style.borderColor,
+                                                    lineWidth: style.borderWidth,
+                                                    hidden: !chart.isDatasetVisible(0) || isNaN(data.datasets[0].data[i]),
+                                                    index: i
+                                                };
+                                            });
+                                        }
+                                        return [];
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed !== null) {
+                                            label += context.parsed;
+                                        }
+                                        return `${context.label}: ${label}`;
+                                    }
+                                }
+                            }
+                        },
+                        onClick: (event, elements) => {
+                            if (elements.length > 0) {
+                                const chartElement = elements[0];
+                                const index = chartElement.index;
+                                const category = categories[index];
+                                searchBox.value = '';
+                                updateActiveButton(category);
+                                filterAndRender(category);
+                            }
+                        }
+                    }
+                });
+            }
+
+            searchBox.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.trim();
+                updateActiveButton('Tất cả');
+                filterAndRender('Tất cả', searchTerm);
+            });
+
+            grid.addEventListener('click', (e) => {
+                const cardHeader = e.target.closest('.card-header');
+                if (cardHeader) {
+                    cardHeader.parentElement.classList.toggle('active');
+                }
+            });
+            
+            setupFilterButtons();
+            setupChart();
+            renderCards(mistakesData);
+        });
+    </script>
+</body>
+</html>
