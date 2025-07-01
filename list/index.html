@@ -221,7 +221,7 @@
                         let coursesHtml = subCat.courses.map(course => 
                             `<li class="flex items-start mb-2">
                                 <span class="text-blue-500 mr-2 mt-1 shrink-0">✓</span>
-                                <a href="course/${course.slug}" class="transition-colors duration-200 hover:text-blue-600 hover:underline ${course.status}">${course.name}</a>
+                                <a href="../course/${course.slug}" class="transition-colors duration-200 hover:text-blue-600 hover:underline ${course.status}">${course.name}</a>
                             </li>`
                         ).join('');
 
