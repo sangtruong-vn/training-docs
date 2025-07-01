@@ -243,19 +243,19 @@
         </section>
 
         <div class="text-center mb-12">
-            <a href="./ai-practitioner/exam" 
+            <a href="javascript:void(0)" onclick="openUrl('exam', '_ai-practitioner-exam');"
                target="_ai-practitioner-exam" 
                class="inline-block bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors text-lg shadow-md"
                data-lang="aws_quiz_link">
                Tìm hiểu thêm và làm trắc nghiệm 24 câu
             </a>
-            <a href="./ai-practitioner/aif-c01-8" 
+            <a href="javascript:void(0)" onclick="openUrl('aif-c01-8', '_ai-practitioner-exam-2');"
                target="_ai-practitioner-exam-2" 
                class="inline-block bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors text-lg shadow-md"
                data-lang="aws_quiz_link_2">
                Trắc nghiệm cơ bản (8 câu)
             </a>
-            <a href="./ai-practitioner/aif-c01-67" 
+            <a href="javascript:void(0)" onclick="openUrl('aif-c01-67', '_ai-practitioner-exam-3');"
                target="_ai-practitioner-exam-3" 
                class="inline-block bg-green-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-700 transition-colors text-lg shadow-md"
                data-lang="aws_quiz_link_3">
@@ -622,6 +622,10 @@
 
             switchLanguage('vi');
         });
+
+        function openUrl(slug, target) {
+            return window.open(window.location.origin + window.location.pathname.replace('/index.html','') + '/' + slug, target);
+        }
     </script>
 </body>
 </html>
