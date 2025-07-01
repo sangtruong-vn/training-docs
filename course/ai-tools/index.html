@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&copy; 2025 ST - AI Trong Phát Triển Phần Mềm</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Be Vietnam Pro', sans-serif;
+            background-color: #f8fafc; /* slate-50 */
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 450px;
+            max-height: 60vh;
+        }
+        .nav-button {
+            transition: all 0.3s ease;
+        }
+        .nav-button.active {
+            background-color: #0891b2; /* cyan-600 */
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(8, 145, 178, 0.3);
+        }
+        .nav-button:not(.active):hover {
+            background-color: #67e8f9; /* cyan-300 */
+            transform: translateY(-1px);
+        }
+        .table-container {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        /* Custom scrollbar */
+        .table-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        .table-container::-webkit-scrollbar-track {
+            background: #e2e8f0; /* slate-200 */
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb {
+            background: #94a3b8; /* slate-400 */
+            border-radius: 10px;
+        }
+        .table-container::-webkit-scrollbar-thumb:hover {
+            background: #64748b; /* slate-500 */
+        }
+    </style>
+</head>
+<body class="text-slate-700">
+
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-800">Nâng Cao Chất Lượng Phát Triển Phần Mềm với AI</h1>
+            <p class="mt-2 text-lg text-slate-600">Khám phá các công cụ AI và ứng dụng trong từng giai đoạn của dự án.</p>
+        </header>
+
+        <nav class="mb-8">
+            <div id="navigation" class="flex flex-wrap justify-center gap-2 md:gap-4">
+            </div>
+        </nav>
+
+        <main id="main-content" class="bg-white p-6 rounded-2xl shadow-lg min-h-[60vh]">
+            <section id="content-display" class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+                <div id="description-pane" class="lg:col-span-2"></div>
+                <div id="tools-pane" class="lg:col-span-3"></div>
+            </section>
+        </main>
+
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+    
+    <script>
+        const appData = {
+            'requirements': {
+                title: 'Định Nghĩa Yêu Cầu & Thiết Kế',
+                introduction: 'Trong giai đoạn khởi đầu này, AI đóng vai trò là một trợ lý đắc lực, giúp định hình và làm rõ các yêu cầu của dự án. Bằng cách tự động hóa việc tạo tài liệu và phát hiện các mâu thuẫn, AI giúp tiết kiệm thời gian và đảm bảo các yêu cầu được xác định một cách đầy đủ và nhất quán.',
+                applications: [
+                    { name: 'Tạo Yêu Cầu Chức Năng & Phi Chức Năng', icon: '📝' },
+                    { name: 'Phát Hiện Mâu Thuẫn, Thiếu Sót', icon: '🔍' },
+                    { name: 'Tạo Wireframe và Sơ Đồ', icon: '🎨' },
+                    { name: 'Hỗ Trợ Ước Tính Dự Án', icon: '⏱️' }
+                ],
+                tools: [
+                    { name: 'ChatGPT', price: 0, priceString: '$0 (Free) / $20 (Plus)' },
+                    { name: 'Gemini', price: 19.99, priceString: '$19.99 (Advanced)' },
+                    { name: 'CoBrain', price: 0, priceString: '$0 (Free) / $19 (Advanced)' },
+                    { name: 'Figma Wireframe Designer', price: 0, priceString: '$0 (Free) / $5' },
+                    { name: 'Midjourney', price: 10, priceString: '$10 (Basic Plan)' },
+                    { name: 'DALL-E', price: 0.04, priceString: '$0.04/ảnh (Standard)' },
+                    { name: 'Miro AI', price: 0, priceString: '$0 (Free)' },
+                    { name: 'Engineerforce', price: -1, priceString: 'Liên hệ' },
+                ]
+            },
+            'translation': {
+                title: 'Dịch Thuật Tài Liệu',
+                introduction: 'AI, đặc biệt là các mô hình ngôn ngữ lớn, đã cách mạng hóa việc dịch thuật tài liệu kỹ thuật. Chúng có khả năng hiểu ngữ cảnh, đảm bảo tính nhất quán của thuật ngữ và cung cấp các bản dịch tự nhiên, giúp phá vỡ rào cản ngôn ngữ trong các dự án toàn cầu.',
+                applications: [
+                    { name: 'Dịch Văn Bản Theo Ngữ Cảnh', icon: '🌐' },
+                    { name: 'Đảm Bảo Tính Nhất Quán Thuật Ngữ', icon: '📖' },
+                    { name: 'Tối Ưu Hóa Bản Dịch', icon: '✨' },
+                ],
+                tools: [
+                    { name: 'DeepL', price: 0, priceString: '$0 (Free) / $8.74 (Starter)' },
+                    { name: 'Google Translate API', price: 20, priceString: '$20/1 triệu ký tự (NMT)' },
+                ]
+            },
+            'implementation': {
+                title: 'Triển Khai (Lập Trình)',
+                introduction: 'Ở giai đoạn cốt lõi này, AI trở thành người đồng hành của lập trình viên. Các công cụ AI tích hợp trực tiếp vào IDE, giúp tăng tốc độ viết mã, tự động phát hiện lỗi, gợi ý các giải pháp tối ưu và đảm bảo mã nguồn tuân thủ các tiêu chuẩn chất lượng và bảo mật cao nhất.',
+                applications: [
+                    { name: 'Gợi Ý & Hoàn Thiện Mã', icon: '💡' },
+                    { name: 'Tự Động Tạo Kiểm Thử Đơn Vị', icon: '🧪' },
+                    { name: 'Phân Tích Tĩnh & Phát Hiện Lỗi', icon: '🐞' },
+                    { name: 'Quét Lỗ Hổng Bảo Mật', icon: '🛡️' },
+                    { name: 'Tự Động Tạo Commit Message & Mô Tả PR', icon: '📄' }
+                ],
+                tools: [
+                    { name: 'Tabnine', price: 0, priceString: '$0 (Basic) / $9 (Dev)' },
+                    { name: 'GitHub Copilot', price: 10, priceString: '$10 (Pro)' },
+                    { name: 'Gemini Code Assist', price: 19, priceString: '$19 (Standard)' },
+                    { name: 'Diffblue Cover', price: 0, priceString: '$0 (Community) / $30 (Developer)' },
+                    { name: 'SonarQube', price: 0, priceString: '$0 (Free) / Từ $32 (Team)' },
+                    { name: 'Snyk', price: 0, priceString: '$0 (Free) / $25 (Team)' },
+                    { name: 'Cursor', price: 0, priceString: '$0 (Hobby) / $20 (Pro)' },
+                    { name: 'GitHub Advanced Security', price: 19, priceString: '$19/người đóng góp' },
+                ]
+            },
+            'testing': {
+                title: 'Tạo & Thực Hiện Kiểm Thử',
+                introduction: 'AI đang thay đổi bộ mặt của ngành kiểm thử phần mềm bằng cách tự động hóa các tác vụ lặp đi lặp lại và tốn nhiều thời gian. Từ việc tạo ra hàng ngàn trường hợp kiểm thử dựa trên yêu cầu đến việc phân tích kết quả và tự động sửa lỗi, AI giúp tăng độ bao phủ và hiệu quả của quá trình đảm bảo chất lượng.',
+                applications: [
+                    { name: 'Tự Động Tạo Trường Hợp Kiểm Thử E2E', icon: '⚙️' },
+                    { name: 'Tạo Dữ Liệu Kiểm Thử Giả', icon: '📊' },
+                    { name: 'Phân Tích Kết Quả & Phát Hiện Bất Thường', icon: '📈' },
+                    { name: 'Tự Phục Hồi (Self-Healing) Khi UI Thay Đổi', icon: '❤️‍🩹' },
+                    { name: 'Tạo Báo Cáo Lỗi Tự Động', icon: ' BUG ' }
+                ],
+                tools: [
+                    { name: 'SmartTestPro-AI', price: -1, priceString: 'Liên hệ' },
+                    { name: 'Autify', price: 149, priceString: '$149 (Standard, yıllık)' },
+                    { name: 'UiPath Test Suite', price: 420, priceString: '$420 (Developer)' },
+                    { name: 'Katalon Studio', price: 0, priceString: '$0 (Free) / $175 (Enterprise)' },
+                    { name: 'Selenium', price: 0, priceString: 'Miễn phí (Mã nguồn mở)' },
+                    { name: 'Testim', price: -1, priceString: 'Trung bình $30,000/năm' },
+                    { name: 'Ranorex', price: -1, priceString: '$2,990 (License)' },
+                ]
+            },
+            'infrastructure': {
+                title: 'Xây Dựng Hạ Tầng',
+                introduction: 'Quản lý hạ tầng dưới dạng mã (IaC) trở nên an toàn và hiệu quả hơn với sự trợ giúp của AI. Các công cụ AI có thể tự động quét các tệp cấu hình để tìm ra các lỗi bảo mật, các thiết lập không tuân thủ tiêu chuẩn và các rủi ro tiềm ẩn, đảm bảo một nền tảng vững chắc và an toàn cho ứng dụng.',
+                applications: [
+                    { name: 'Quét Lỗi Cấu Hình & Bảo Mật IaC', icon: '🛡️' },
+                    { name: 'Phân Tích & Đề Xuất Cải Thiện Cấu Hình', icon: '🔧' },
+                    { name: 'Kiểm Tra Tách Biệt Môi Trường', icon: '🔗' },
+                    { name: 'Tự Động Hóa Quy Trình Xây Dựng Hạ Tầng', icon: '🤖' }
+                ],
+                tools: [
+                    { name: 'Checkov', price: 0, priceString: 'Miễn phí (Mã nguồn mở)' },
+                    { name: 'Terrascan', price: -1, priceString: '570€/năm (Lite)' },
+                    { name: 'AWS A2I', price: 0, priceString: '$0 (Free Tier)' },
+                    { name: 'Gitleaks', price: 0, priceString: 'Miễn phí (Mã nguồn mở)' },
+                ]
+            }
+        };
+
+        let currentChart = null;
+        const navigationContainer = document.getElementById('navigation');
+        const descriptionPane = document.getElementById('description-pane');
+        const toolsPane = document.getElementById('tools-pane');
+
+        function renderStage(stageKey) {
+            const stageData = appData[stageKey];
+            if (!stageData) return;
+
+            // Update active button state
+            document.querySelectorAll('.nav-button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.key === stageKey);
+            });
+
+            // Render description pane
+            let descriptionHtml = `<h2 class="text-2xl font-bold text-slate-800 mb-4">${stageData.title}</h2>`;
+            descriptionHtml += `<p class="text-slate-600 mb-6">${stageData.introduction}</p>`;
+            descriptionHtml += `<h3 class="text-xl font-semibold text-slate-700 mb-3">Ứng dụng chính:</h3>`;
+            descriptionHtml += `<ul class="space-y-2">`;
+            stageData.applications.forEach(app => {
+                descriptionHtml += `<li class="flex items-center"><span class="text-xl mr-3">${app.icon}</span><span>${app.name}</span></li>`;
+            });
+            descriptionHtml += `</ul>`;
+            descriptionPane.innerHTML = descriptionHtml;
+            
+            // Render tools pane (chart and table)
+            let toolsHtml = `<h2 class="text-2xl font-bold text-slate-800 mb-4">Công cụ & Chi phí</h2>`;
+            toolsHtml += `<p class="text-sm text-slate-500 mb-4">Biểu đồ so sánh chi phí hàng tháng ước tính cho các gói cơ bản. Nhấp vào các mục chú giải để ẩn/hiện.</p>`;
+            toolsHtml += `<div class="chart-container mb-6"><canvas id="toolsChart"></canvas></div>`;
+            toolsHtml += `<h3 class="text-xl font-semibold text-slate-700 mb-3">Danh sách công cụ chi tiết:</h3>`;
+            toolsHtml += `<div class="table-container border border-slate-200 rounded-lg"><table class="min-w-full divide-y divide-slate-200">
+                <thead class="bg-slate-50">
+                    <tr>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Tên Công Cụ</th>
+                        <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Chi Phí (Ước tính)</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-slate-200">`;
+            stageData.tools.forEach(tool => {
+                toolsHtml += `<tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">${tool.name}</td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">${tool.priceString}</td>
+                </tr>`;
+            });
+            toolsHtml += `</tbody></table></div>`;
+            toolsPane.innerHTML = toolsHtml;
+
+            // Render Chart
+            renderChart(stageData.tools);
+        }
+
+        function renderChart(toolsData) {
+            const ctx = document.getElementById('toolsChart').getContext('2d');
+            
+            if (currentChart) {
+                currentChart.destroy();
+            }
+
+            const chartData = toolsData.filter(tool => tool.price >= 0);
+            const labels = chartData.map(tool => tool.name);
+            const prices = chartData.map(tool => tool.price);
+            
+            const backgroundColors = [
+                'rgba(14, 165, 233, 0.6)', // sky-500
+                'rgba(20, 184, 166, 0.6)', // teal-500
+                'rgba(249, 115, 22, 0.6)',  // orange-500
+                'rgba(139, 92, 246, 0.6)', // violet-500
+                'rgba(236, 72, 153, 0.6)', // pink-500
+                'rgba(16, 185, 129, 0.6)', // emerald-500
+                'rgba(99, 102, 241, 0.6)', // indigo-500
+            ];
+            const borderColors = [
+                'rgba(14, 165, 233, 1)',
+                'rgba(20, 184, 166, 1)',
+                'rgba(249, 115, 22, 1)',
+                'rgba(139, 92, 246, 1)',
+                'rgba(236, 72, 153, 1)',
+                'rgba(16, 185, 129, 1)',
+                'rgba(99, 102, 241, 1)',
+            ];
+            
+            currentChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chi phí hàng tháng ($)',
+                        data: prices,
+                        backgroundColor: backgroundColors,
+                        borderColor: borderColors,
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Chi phí ước tính ($/tháng)'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                           display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.parsed.x !== null) {
+                                        label += new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(context.parsed.x);
+                                    }
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function init() {
+            Object.keys(appData).forEach(key => {
+                const button = document.createElement('button');
+                button.textContent = appData[key].title;
+                button.dataset.key = key;
+                button.className = 'nav-button bg-white text-cyan-700 font-semibold py-2 px-4 rounded-full shadow-sm border border-slate-200';
+                button.addEventListener('click', () => renderStage(key));
+                navigationContainer.appendChild(button);
+            });
+            
+            // Render initial stage
+            renderStage('requirements');
+        }
+
+        window.onload = init;
+    </script>
+
+</body>
+</html>

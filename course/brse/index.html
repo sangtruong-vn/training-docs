@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&copy; 2025 ST - Cẩm Nang Phỏng Vấn BrSE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8F7F4;
+            color: #434242;
+        }
+
+        #tab-content {
+            min-height: 100vh;
+        }
+
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-bottom: 4px solid transparent;
+        }
+        .tab-btn.active {
+            color: #A87C7C;
+            border-bottom-color: #A87C7C;
+        }
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease;
+            padding: 0 1.5rem;
+        }
+        .accordion-button.open .accordion-arrow {
+            transform: rotate(180deg);
+        }
+        .quiz-option {
+            transition: all 0.2s ease-in-out;
+            cursor: pointer;
+        }
+        .quiz-option.correct {
+            background-color: #D1FAE5; /* green-100 */
+            border-color: #10B981; /* green-500 */
+        }
+        .quiz-option.incorrect {
+            background-color: #FEE2E2; /* red-100 */
+            border-color: #EF4444; /* red-500 */
+        }
+        .feedback {
+            display: none;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 350px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        <header class="text-center mb-8">
+            <h1 class="text-3xl md:text-4xl font-bold text-[#434242]">Cẩm Nang Phỏng Vấn BrSE</h1>
+            <p class="mt-2 text-lg text-[#7D7C7A]">Công cụ hỗ trợ toàn diện để đánh giá năng lực Kỹ sư cầu nối</p>
+        </header>
+
+        <nav class="flex justify-center border-b border-gray-300 mb-8 overflow-x-auto">
+            <button class="tab-btn active py-4 px-6 text-base md:text-lg font-semibold flex-shrink-0" data-tab="overview">Tổng Quan</button>
+            <button class="tab-btn py-4 px-6 text-base md:text-lg font-semibold flex-shrink-0" data-tab="interview">Phỏng Vấn Trực Tiếp</button>
+            <button class="tab-btn py-4 px-6 text-base md:text-lg font-semibold flex-shrink-0" data-tab="test">Bài Test Năng Lực</button>
+            <button class="tab-btn py-4 px-6 text-base md:text-lg font-semibold flex-shrink-0" data-tab="criteria">Tiêu Chí Đánh Giá</button>
+        </nav>
+
+        <main id="tab-content">
+            <section id="overview" class="tab-pane active">
+                 <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A87C7C]">Chào mừng đến với Cẩm nang Phỏng vấn BrSE</h2>
+                    <p class="mb-4 text-base leading-relaxed">
+                        Ứng dụng này được thiết kế để chuyển đổi bộ câu hỏi phỏng vấn và bài kiểm tra BrSE từ một tài liệu tĩnh thành một trải nghiệm tương tác, linh hoạt. Mục tiêu là cung cấp cho hội đồng phỏng vấn một công cụ mạnh mẽ để điều hướng, đánh giá và ghi chú trong suốt quá trình tuyển dụng.
+                    </p>
+                     <p class="mb-4 text-base leading-relaxed">
+                        Thay vì cuộn qua một văn bản dài, bạn có thể dễ dàng chuyển đổi giữa các phần chính: các câu hỏi phỏng vấn theo chủ đề, bài kiểm tra năng lực với phản hồi tức thì, và các tiêu chí đánh giá chi tiết.
+                    </p>
+                    <div class="grid md:grid-cols-3 gap-6 mt-6">
+                        <div class="bg-stone-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-lg mb-2">Phỏng Vấn Trực Tiếp</h3>
+                            <p class="text-sm">Truy cập nhanh các câu hỏi được phân loại theo kỹ năng: nền tảng, phân tích yêu cầu, và giao tiếp.</p>
+                        </div>
+                        <div class="bg-stone-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-lg mb-2">Bài Test Toàn Diện</h3>
+                            <p class="text-sm">Trải nghiệm bài test gồm trắc nghiệm, phân tích tình huống và các câu hỏi kỹ thuật chuyên sâu.</p>
+                        </div>
+                        <div class="bg-stone-50 p-5 rounded-xl">
+                            <h3 class="font-bold text-lg mb-2">Đánh Giá Trực Quan</h3>
+                            <p class="text-sm">Xem phân bổ điểm số qua biểu đồ và tham khảo các gợi ý chấm điểm chi tiết cho từng phần.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="interview" class="tab-pane hidden">
+                <div class="space-y-4">
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                        <button class="accordion-button w-full flex justify-between items-center p-6 text-left">
+                            <h2 class="text-xl font-bold text-[#A87C7C]">A. Tìm hiểu chung & Nền tảng kỹ thuật</h2>
+                            <span class="accordion-arrow transition-transform duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="list-decimal list-inside space-y-4 pb-6">
+                                <li>Bạn vui lòng giới thiệu về bản thân, quá trình học tập và kinh nghiệm làm việc liên quan đến vị trí BrSE được không?</li>
+                                <li>Hãy chia sẻ về một dự án mà bạn cảm thấy tự hào nhất khi làm ở vai trò BrSE. Vai trò cụ thể của bạn là gì? Khó khăn lớn nhất bạn gặp phải trong dự án đó là gì và bạn đã làm thế nào để vượt qua nó?</li>
+                                <li>Bạn đã có kinh nghiệm làm việc với những mô hình phát triển phần mềm nào (Agile/Scrum, Waterfall,...)? Bạn cảm thấy mô hình nào phù hợp nhất với vai trò của BrSE và tại sao?</li>
+                                <li>Bạn tự đánh giá khả năng đọc hiểu source code của mình ở mức nào (trên thang 10)? Bạn có thể review code của lập trình viên không?</li>
+                                <li>Hãy giải thích sự khác nhau cơ bản giữa API và Webhook? Khi nào thì nên sử dụng cái nào?</li>
+                                <li>Hãy giải thích sự khác biệt giữa database SQL (ví dụ: MySQL) và NoSQL (ví dụ: MongoDB)? Theo bạn, khi nào nên chọn loại nào cho dự án?</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                         <button class="accordion-button w-full flex justify-between items-center p-6 text-left">
+                            <h2 class="text-xl font-bold text-[#A87C7C]">B. Phân tích & Quản lý yêu cầu</h2>
+                            <span class="accordion-arrow transition-transform duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="list-decimal list-inside space-y-3 pb-6">
+                                <li>Khi nhận được một yêu cầu rất mơ hồ, không rõ ràng từ khách hàng (ví dụ: "Tôi muốn thêm chức năng báo cáo cho quản lý"), quy trình làm việc của bạn sẽ như thế nào để làm rõ yêu cầu đó?</li>
+                                <li>Bạn thường sử dụng những công cụ hay loại tài liệu nào để viết đặc tả yêu cầu (Requirement Specification Document)? (Ví dụ: Use Case, User Story, Basic Design, Detail Design). Theo bạn, một tài liệu đặc tả yêu cầu tốt cần có những yếu tố nào?</li>
+                                <li>Dự án đang trong giai đoạn phát triển, khách hàng đột ngột yêu cầu một thay đổi lớn (change request) ảnh hưởng đến scope và timeline. Bạn sẽ xử lý tình huống này như thế nào? (Các bước thực hiện, trao đổi với ai, v.v.).</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+                        <button class="accordion-button w-full flex justify-between items-center p-6 text-left">
+                            <h2 class="text-xl font-bold text-[#A87C7C]">C. Kỹ năng Giao tiếp & Giải quyết vấn đề</h2>
+                            <span class="accordion-arrow transition-transform duration-300">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            </span>
+                        </button>
+                        <div class="accordion-content">
+                            <ul class="list-decimal list-inside space-y-3 pb-6">
+                                <li><b>Tình huống 1:</b> Developer team nói rằng yêu cầu của khách hàng là bất khả thi về mặt kỹ thuật trong thời gian cho phép. Bạn sẽ làm gì?</li>
+                                <li><b>Tình huống 2:</b> Khách hàng phàn nàn về chất lượng sản phẩm không như họ mong đợi, dù team Việt Nam đã làm đúng theo đặc tả. Hướng giải quyết của bạn là gì?</li>
+                                <li>Làm thế nào để bạn đảm bảo rằng team phát triển ở Việt Nam hiểu chính xác 100% yêu cầu của khách hàng, đặc biệt là những yêu cầu mang tính "cảm tính" hoặc liên quan đến trải nghiệm người dùng (UX)?</li>
+                                <li>Bạn thường báo cáo tiến độ dự án cho khách hàng như thế nào? Nội dung một buổi họp báo cáo tiến độ (定例会 - teireikai) với khách hàng Nhật thường gồm những gì?</li>
+                                <li>Bạn nhận thấy sự khác biệt nào lớn nhất trong văn hóa làm việc giữa Việt Nam và Nhật Bản? Điều này ảnh hưởng đến công việc của BrSE như thế nào và bạn thích ứng ra sao?</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="test" class="tab-pane hidden">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A87C7C]">Phần A: Trắc nghiệm kiến thức tổng quan (20 điểm)</h2>
+                    <p class="mb-6">Chọn đáp án đúng nhất cho mỗi câu hỏi. Bạn sẽ nhận được phản hồi ngay lập tức.</p>
+                    <div id="quiz-container" class="space-y-6"></div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm mb-8">
+                    <h2 class="text-2xl font-bold mb-2 text-[#A87C7C]">Phần B: Phân tích và giải quyết vấn đề (80 điểm)</h2>
+                    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 rounded-r-lg my-4">
+                        <h3 class="font-bold text-lg">Tình huống</h3>
+                        <p class="mt-2">Team của bạn đang phát triển một hệ thống quản lý bán hàng (POS) cho một chuỗi cửa hàng tiện lợi. Khách hàng (người Nhật) vừa gửi một email với yêu cầu mới: Thêm "chức năng liên kết thẻ tích điểm" vào hệ thống POS. Chức năng cần cho phép quét thẻ của khách khi tính tiền, cộng điểm tương ứng với số tiền mua hàng, và cho phép khách hàng dùng điểm đã tích lũy để giảm giá cho lần mua sắm tiếp theo.</p>
+                    </div>
+                    <p class="mb-6">Với vai trò là một BrSE, ứng viên cần phân tích yêu cầu trên và thực hiện các công việc sau:</p>
+                    
+                    <div class="space-y-4">
+                        <div class="bg-stone-50 p-4 rounded-lg"><strong>1. Xác định các điểm chưa rõ ràng:</strong> Liệt kê ít nhất 5 câu hỏi quan trọng cần hỏi lại khách hàng.</div>
+                        <div class="bg-stone-50 p-4 rounded-lg"><strong>2. Đề xuất giải pháp ban đầu:</strong> Mô tả ngắn gọn các luồng chức năng chính.</div>
+                        <div class="bg-stone-50 p-4 rounded-lg"><strong>3. Xác định User Stories:</strong> Viết 3 User Stories cơ bản cho các vai trò (Thu ngân, Khách hàng, Quản lý).</div>
+                        <div class="bg-stone-50 p-4 rounded-lg"><strong>4. Phân tích rủi ro:</strong> Nêu ra 2 rủi ro tiềm ẩn (kỹ thuật/nghiệp vụ) và đề xuất phương án phòng ngừa.</div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-2 text-[#A87C7C]">Phần C: Câu hỏi Kỹ thuật Chuyên sâu (Tùy chọn)</h2>
+                    <p class="mb-6">Chọn bộ câu hỏi phù hợp với nền tảng kỹ thuật của ứng viên. Ứng viên sẽ trả lời dưới dạng bài viết hoặc trình bày miệng.</p>
+                    <div id="tech-questions-container" class="space-y-4">
+                         <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+                            <button class="accordion-button w-full flex justify-between items-center p-5 text-left bg-stone-50">
+                                <h3 class="text-lg font-semibold text-gray-800">🐘 Với PHP</h3>
+                                <span class="accordion-arrow transition-transform duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul class="list-decimal list-inside space-y-3 p-5 text-sm">
+                                    <li>Bạn hiểu thế nào về autoloading và vai trò của Composer?</li>
+                                    <li>Bạn đã làm việc với framework nào (ví dụ: Laravel, Symfony)?</li>
+                                    <li>Hãy giải thích sự khác biệt giữa `require`, `include`, `require_once`, và `include_once`.</li>
+                                    <li>Trait trong PHP là gì và khi nào bạn sẽ sử dụng nó?</li>
+                                    <li>Hãy mô tả khái niệm "Middleware" trong ngữ cảnh của một framework PHP như Laravel.</li>
+                                    <li>Sự khác biệt giữa `GET` và `POST` là gì? Khi nào một BrSE cần quan tâm đến việc này?</li>
+                                    <li>Bạn biết gì về chuẩn PSR (PHP Standards Recommendations)? Tại sao chúng lại quan trọng?</li>
+                                    <li>Trong Laravel, Eloquent ORM là gì và nó giúp ích gì cho việc tương tác với cơ sở dữ liệu?</li>
+                                    <li>Làm thế nào để xử lý lỗi và exception một cách hiệu quả trong một ứng dụng PHP?</li>
+                                    <li>Bạn có kinh nghiệm làm việc với caching (ví dụ: Redis, Memcached) trong các dự án PHP để cải thiện hiệu năng không?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+                            <button class="accordion-button w-full flex justify-between items-center p-5 text-left bg-stone-50">
+                                <h3 class="text-lg font-semibold text-gray-800">🐍 Với Python</h3>
+                                <span class="accordion-arrow transition-transform duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul class="list-decimal list-inside space-y-3 p-5 text-sm">
+                                    <li>Tại sao virtual environment lại quan trọng trong các dự án Python?</li>
+                                    <li>Bạn có thể giải thích sự khác biệt giữa `list` và `tuple` không?</li>
+                                    <li>GIL (Global Interpreter Lock) trong Python là gì và nó ảnh hưởng đến đa luồng (multi-threading) như thế nào?</li>
+                                    <li>Sự khác biệt giữa `==` và `is` trong Python là gì?</li>
+                                    <li>Decorators trong Python là gì? Hãy cho một ví dụ thực tế về việc sử dụng nó.</li>
+                                    <li>Bạn đã làm việc với framework web nào của Python (ví dụ: Django, Flask)? Hãy mô tả vai trò của ORM trong Django.</li>
+                                    <li>Mô tả sự khác biệt giữa `synchronous` và `asynchronous` programming trong Python (ví dụ với `asyncio`).</li>
+                                    <li>Generator trong Python là gì và nó khác với một hàm trả về một danh sách như thế nào?</li>
+                                    <li>Làm thế nào để quản lý các dependencies trong một dự án Python? (ví dụ: `requirements.txt`, `Pipenv`, `Poetry`).</li>
+                                    <li>List comprehensions là gì? Tại sao nó lại được ưa chuộng?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+                            <button class="accordion-button w-full flex justify-between items-center p-5 text-left bg-stone-50">
+                                <h3 class="text-lg font-semibold text-gray-800">☕ Với Java</h3>
+                                <span class="accordion-arrow transition-transform duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul class="list-decimal list-inside space-y-3 p-5 text-sm">
+                                    <li>Hãy giải thích về JVM, JDK và JRE.</li>
+                                    <li>Trong Spring Framework, Dependency Injection (DI) và Inversion of Control (IoC) có ý nghĩa gì?</li>
+                                    <li>Sự khác biệt giữa `interface` và `abstract class` trong Java là gì?</li>
+                                    <li>Hãy giải thích các access modifier trong Java (`public`, `private`, `protected`, `default`).</li>
+                                    <li>Collection Framework trong Java là gì? Kể tên một vài interface và class chính.</li>
+                                    <li>Sự khác biệt giữa `checked` và `unchecked exception` là gì?</li>
+                                    <li>Phương thức `equals()` và `hashCode()` được sử dụng để làm gì? Mối quan hệ giữa chúng là gì?</li>
+                                    <li>Stream API (từ Java 8) là gì và nó mang lại lợi ích gì?</li>
+                                    <li>Trong ngữ cảnh đa luồng, từ khóa `synchronized` và `volatile` có tác dụng gì?</li>
+                                    <li>Spring Boot là gì và nó khác với Spring Framework như thế nào?</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="bg-white rounded-2xl shadow-sm overflow-hidden border border-gray-200">
+                            <button class="accordion-button w-full flex justify-between items-center p-5 text-left bg-stone-50">
+                                <h3 class="text-lg font-semibold text-gray-800">🌐 Với .NET</h3>
+                                <span class="accordion-arrow transition-transform duration-300">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                </span>
+                            </button>
+                            <div class="accordion-content">
+                                <ul class="list-decimal list-inside space-y-3 p-5 text-sm">
+                                    <li>Bạn có thể mô tả sự khác biệt giữa .NET (Core) và .NET Framework không?</li>
+                                    <li>Khái niệm Middleware trong ASP.NET Core là gì?</li>
+                                    <li>LINQ (Language Integrated Query) là gì và nó được sử dụng để làm gì?</li>
+                                    <li>Sự khác biệt giữa `value type` và `reference type` trong C# là gì?</li>
+                                    <li>Entity Framework Core là gì? Nó đóng vai trò gì trong việc phát triển ứng dụng .NET?</li>
+                                    <li>Hãy giải thích khái niệm `async` và `await` trong C#.</li>
+                                    <li>Sự khác biệt giữa `class` và `struct` trong C# là gì?</li>
+                                    <li>Dependency Injection trong ASP.NET Core hoạt động như thế nào?</li>
+                                    <li>Bạn hiểu thế nào về Common Language Runtime (CLR) trong .NET?</li>
+                                    <li>Razor Pages và MVC trong ASP.NET Core khác nhau như thế nào? Khi nào nên chọn cái nào?</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="criteria" class="tab-pane hidden">
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm">
+                    <h2 class="text-2xl font-bold mb-4 text-[#A87C7C]">Tiêu Chí Đánh Giá Bài Test</h2>
+                    <div class="grid md:grid-cols-2 gap-8 items-center">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-4">Phân bổ điểm số (Gợi ý)</h3>
+                            <ul class="space-y-3">
+                                <li><span class="font-bold">Phần A - Trắc nghiệm:</span> 20 điểm (5 câu, 4 điểm/câu).</li>
+                                <li><span class="font-bold">Phần B - Phân tích vấn đề:</span> 80 điểm, được chia nhỏ như sau:
+                                    <ul class="list-disc list-inside mt-2 ml-4 space-y-1">
+                                        <li>Xác định điểm chưa rõ ràng: 25 điểm</li>
+                                        <li>Đề xuất giải pháp ban đầu: 25 điểm</li>
+                                        <li>Xác định User Stories: 15 điểm</li>
+                                        <li>Phân tích rủi ro: 15 điểm</li>
+                                    </ul>
+                                </li>
+                                <li><span class="font-bold">Phần C - Kỹ thuật chuyên sâu:</span> Đánh giá riêng, không tính vào tổng 100 điểm của Phần A & B.</li>
+                            </ul>
+                        </div>
+                        <div class="chart-container">
+                             <canvas id="pointsChart"></canvas>
+                        </div>
+                    </div>
+                    <hr class="my-8">
+                    <h3 class="text-xl font-semibold mb-4">Gợi ý chi tiết cho Phần B & C</h3>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p><strong class="font-semibold">Phần B - Câu 1 (Xác định điểm chưa rõ ràng):</strong> Đánh giá khả năng tư duy phản biện. Ứng viên có hỏi về các quy tắc nghiệp vụ cốt lõi không? (Ví dụ: Tỷ lệ quy đổi điểm? Quy tắc làm tròn? Chính sách hết hạn điểm? Xử lý khi mất kết nối internet?).</p>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p><strong class="font-semibold">Phần B - Câu 2 (Đề xuất giải pháp):</strong> Đánh giá khả năng hệ thống hóa vấn đề. Luồng chức năng có hợp lý, dễ hiểu, và bao quát các trường hợp cơ bản (cộng điểm, trừ điểm) và ngoại lệ (trả hàng, hủy đơn) không?</p>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p><strong class="font-semibold">Phần B - Câu 3 (User Stories):</strong> Đánh giá kỹ năng viết tài liệu Agile. User story có đúng format ("Là một..., tôi muốn..., để...") và thể hiện rõ giá trị mang lại cho từng vai trò người dùng không?</p>
+                        </div>
+                        <div class="p-4 bg-stone-50 rounded-lg">
+                            <p><strong class="font-semibold">Phần B - Câu 4 (Phân tích rủi ro):</strong> Đánh giá tầm nhìn và kinh nghiệm. Rủi ro có thực tế không? (Ví dụ: đồng bộ điểm khi offline, bảo mật thông tin khách hàng, sai sót trong logic tính toán). Giải pháp đề xuất có khả thi không?</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg border-l-4 border-blue-400">
+                             <p><strong class="font-semibold">Phần C - Kỹ thuật chuyên sâu:</strong> Không chấm điểm cụ thể. Mục tiêu là để đánh giá độ sâu kiến thức, sự chính xác trong các khái niệm, và khả năng giải thích vấn đề kỹ thuật một cách rõ ràng, mạch lạc. Đây là yếu tố quan trọng để xác định ứng viên có thể làm cầu nối hiệu quả với đội ngũ phát triển hay không.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.tab-btn');
+        const panes = document.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                panes.forEach(pane => {
+                    pane.classList.add('hidden');
+                });
+
+                const activePane = document.getElementById(this.dataset.tab);
+                activePane.classList.remove('hidden');
+                activePane.classList.add('active');
+            });
+        });
+
+        const accordions = document.querySelectorAll('.accordion-button');
+        accordions.forEach(accordion => {
+            accordion.addEventListener('click', function () {
+                const alreadyOpen = this.classList.contains('open');
+                
+                // Close all accordions in the same container if you want only one open at a time
+                const container = this.closest('.space-y-4');
+                if (container) {
+                    container.querySelectorAll('.accordion-button').forEach(btn => {
+                        btn.classList.remove('open');
+                        const content = btn.nextElementSibling;
+                        content.style.maxHeight = null;
+                        content.style.padding = '0 1.5rem';
+                    });
+                }
+
+                if (!alreadyOpen) {
+                    this.classList.add('open');
+                    const content = this.nextElementSibling;
+                    content.style.padding = '0 1.5rem 1.5rem 1.5rem';
+                    content.style.maxHeight = content.scrollHeight + "px";
+                }
+            });
+        });
+        
+        const quizData = [
+            {
+                question: 'Trong mô hình Scrum, ai là người chịu trách nhiệm chính trong việc làm rõ các yêu cầu và quyết định thứ tự ưu tiên các hạng mục trong Product Backlog?',
+                options: ['A. Scrum Master', 'B. Development Team', 'C. Product Owner', 'D. Project Manager'],
+                answer: 'C. Product Owner',
+                explanation: 'Product Owner là người đại diện cho các bên liên quan và khách hàng, chịu trách nhiệm tối đa hóa giá trị của sản phẩm bằng cách quản lý và ưu tiên hóa Product Backlog.'
+            },
+            {
+                question: 'Khi thiết kế API cho chức năng "cập nhật thông tin hồ sơ của một người dùng cụ thể", phương thức HTTP nào là phù hợp và an toàn nhất?',
+                options: ['A. POST /users/{userId}', 'B. GET /users/{userId}', 'C. DELETE /users/{userId}', 'D. PUT /users/{userId}'],
+                answer: 'D. PUT /users/{userId}',
+                explanation: 'PUT được sử dụng để cập nhật toàn bộ một tài nguyên đã tồn tại. POST thường dùng để tạo mới, GET để lấy dữ liệu, và DELETE để xóa.'
+            },
+            {
+                question: '"UML" (Unified Modeling Language) được sử dụng chủ yếu để làm gì trong phát triển phần mềm?',
+                options: ['A. Viết code cho ứng dụng.', 'B. Quản lý các task trên bảng công việc (Kanban board).', 'C. Trực quan hóa, đặc tả và tài liệu hóa các khía cạnh của hệ thống phần mềm (ví dụ: vẽ sequence diagram, use case diagram).', 'D. Kiểm thử tự động (automation test).'],
+                answer: 'C. Trực quan hóa, đặc tả và tài liệu hóa các khía cạnh của hệ thống phần mềm (ví dụ: vẽ sequence diagram, use case diagram).',
+                explanation: 'UML là một ngôn ngữ mô hình hóa đồ họa giúp các nhà phát triển hình dung, xác định, xây dựng và tài liệu hóa các hệ thống phần mềm.'
+            },
+             {
+                question: 'Khi khách hàng phàn nàn về một lỗi (bug), việc đầu tiên một BrSE nên làm là gì?',
+                options: ['A. Ngay lập tức xin lỗi khách hàng và hứa sẽ sửa trong thời gian sớm nhất.', 'B. Yêu cầu khách hàng cung cấp các bước tái hiện lỗi (steps to reproduce), ảnh chụp màn hình, môi trường xảy ra lỗi (OS, trình duyệt) để xác nhận và phân tích.', 'C. Tranh luận với khách hàng rằng đó là tính năng, không phải lỗi.', 'D. Giao ngay cho đội tester để kiểm tra lại.'],
+                answer: 'B. Yêu cầu khách hàng cung cấp các bước tái hiện lỗi (steps to reproduce), ảnh chụp màn hình, môi trường xảy ra lỗi (OS, trình duyệt) để xác nhận và phân tích.',
+                explanation: 'Thu thập đầy đủ thông tin là bước quan trọng nhất để xác định chính xác vấn đề trước khi đưa ra bất kỳ cam kết hay hành động nào.'
+            },
+            {
+                question: 'Đâu là rủi ro lớn nhất khi BrSE dịch "word-by-word" (dịch từng chữ) tài liệu yêu cầu từ khách hàng cho team phát triển mà không phân tích bối cảnh?',
+                options: ['A. Tài liệu sẽ bị dài hơn.', 'B. Team phát triển có thể hiểu sai bản chất vấn đề, mục đích của chức năng, dẫn đến sản phẩm làm ra không đáp ứng được mong đợi của khách hàng.', 'C. Tốn thời gian dịch thuật.', 'D. Khách hàng sẽ không hài lòng vì tài liệu bị thay đổi.'],
+                answer: 'B. Team phát triển có thể hiểu sai bản chất vấn đề, mục đích của chức năng, dẫn đến sản phẩm làm ra không đáp ứng được mong đợi của khách hàng.',
+                explanation: 'Vai trò của BrSE là "cầu nối", không chỉ dịch thuật mà còn phải truyền tải đúng ngữ cảnh, mục tiêu kinh doanh và những yêu cầu ẩn sau câu chữ.'
+            }
+        ];
+
+        const quizContainer = document.getElementById('quiz-container');
+        quizData.forEach((item, index) => {
+            const questionEl = document.createElement('div');
+            questionEl.classList.add('p-5', 'border', 'border-gray-200', 'rounded-lg');
+            
+            let optionsHtml = '';
+            item.options.forEach(option => {
+                optionsHtml += `<div class="quiz-option mt-2 p-3 border-2 border-gray-300 rounded-md hover:bg-stone-100" data-question="${index}" data-answer="${option === item.answer}">${option}</div>`;
+            });
+
+            questionEl.innerHTML = `
+                <p class="font-semibold">${index + 1}. ${item.question}</p>
+                <div class="options-container mt-3 space-y-2">${optionsHtml}</div>
+                <div class="feedback mt-3 p-3 rounded-md text-sm">
+                    <span class="font-bold">Giải thích:</span> ${item.explanation}
+                </div>
+            `;
+            quizContainer.appendChild(questionEl);
+        });
+
+        document.querySelectorAll('.quiz-option').forEach(option => {
+            option.addEventListener('click', function () {
+                const questionIndex = this.dataset.question;
+                const isCorrect = this.dataset.answer === 'true';
+                const parentContainer = this.closest('.options-container');
+
+                parentContainer.querySelectorAll('.quiz-option').forEach(opt => {
+                     opt.style.pointerEvents = 'none'; 
+                     opt.classList.remove('hover:bg-stone-100');
+                });
+
+                this.classList.add(isCorrect ? 'correct' : 'incorrect');
+                if (!isCorrect) {
+                     parentContainer.querySelector("[data-answer='true']").classList.add('correct');
+                }
+                
+                const feedbackEl = parentContainer.nextElementSibling;
+                feedbackEl.style.display = 'block';
+                feedbackEl.style.backgroundColor = isCorrect ? '#D1FAE5' : '#FEE2E2';
+            });
+        });
+        
+        const ctx = document.getElementById('pointsChart').getContext('2d');
+        const pointsChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Phần A: Trắc nghiệm', 'Phần B: Phân tích Vấn đề'],
+                datasets: [{
+                    label: 'Phân bổ điểm',
+                    data: [20, 80],
+                    backgroundColor: [
+                        '#D1C4E9',
+                        '#A87C7C'
+                    ],
+                    borderColor: [
+                        '#FFFFFF',
+                        '#FFFFFF'
+                    ],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                if (context.parsed !== null) {
+                                    label += context.parsed + ' điểm';
+                                }
+                                return label;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+
+</body>
+</html>
