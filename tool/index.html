@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Danh sách công cụ nội bộ</title>
+    <!-- Tải Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tải Font Inter từ Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Sử dụng font Inter làm font chữ mặc định */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .main-content {
+            min-height: 100vh;
+        }
+        .st-logo {
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            box-shadow: 4px 2px 6px #4d4d4d;
+            margin-bottom: 20px;
+        }
+
+        /* Hiệu ứng chuyển động mượt mà cho các card */
+        .tool-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .tool-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+
+    <div class="main-content container mx-auto px-4 py-8 md:py-12">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-gray-900">
+                <img src="./../images/st.jpg" alt="ST" class="mx-auto st-logo">
+                Công cụ nội bộ
+            </h1>
+            <p class="mt-3 text-lg text-gray-600">Cổng thông tin tập trung cho tất cả các công cụ của chúng ta.</p>
+        </header>
+
+        <main id="tool-list-container">
+            <!-- Danh sách công cụ sẽ được chèn vào đây bằng JavaScript -->
+        </main>
+    </div>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- DỮ LIỆU MẪU ---
+        // Trong thực tế, bạn có thể lấy dữ liệu này từ một API
+        const tools = [
+            {
+                name: 'QR -> Link',
+                category: 'Tiện ích',
+                url: './tool/qr-link',
+                description: 'Quét mã QR và convert thành link truy cập.',
+                status: 'active'
+            },
+            {
+                name: 'Snake',
+                category: 'Trò chơi',
+                url: './tool/game/snake',
+                description: 'Trò chơi rắn săn mồi cổ điển.',
+                status: 'active'
+            },
+            // {
+            //     name: 'Slack',
+            //     category: 'Công cụ chung',
+            //     url: 'https://app.slack.com/client/T0SFLJDRU/GS0ECLG2E',
+            //     description: 'Nền tảng giao tiếp và làm việc nhóm.',
+            //     status: 'active'
+            // },
+            // {
+            //     name: 'Google Drive',
+            //     category: 'Công cụ chung',
+            //     url: 'https://www.google.com/drive/',
+            //     description: 'Lưu trữ và chia sẻ tài liệu trực tuyến.',
+            //     status: 'active'
+            // },
+            // {
+            //     name: 'ClickUp',
+            //     category: 'Công cụ chung',
+            //     url: 'https://app.clickup.com/3756699/time?via=sidebar',
+            //     description: 'Quản ký dự án, công việc & quy trình.',
+            //     status: 'active'
+            // },
+            // {
+            //     name: 'Jira',
+            //     category: 'Dành cho Developer',
+            //     url: 'https://jira.atlassian.com/',
+            //     description: 'Hệ thống quản lý dự án và theo dõi lỗi.',
+            //     status: 'inactive' // 'active' hoặc 'inactive'
+            // },
+            // {
+            //     name: 'Confluence',
+            //     category: 'Dành cho Developer',
+            //     url: 'https://www.atlassian.com/software/confluence',
+            //     description: 'Không gian làm việc chung và quản lý tài liệu.',
+            //     status: 'active'
+            // },
+            // {
+            //     name: 'GitHub',
+            //     category: 'Dành cho Developer',
+            //     url: 'https://www.github.com/',
+            //     description: 'Quản lý mã nguồn và CI/CD.',
+            //     status: 'active' // Thêm trạng thái 'bảo trì'
+            // },
+            // {
+            //     name: 'Google Analytics',
+            //     category: 'Dành cho Marketing',
+            //     url: 'https://analytics.google.com/',
+            //     description: 'Phân tích lưu lượng truy cập và hành vi người dùng.',
+            //     status: 'maintenance'
+            // },
+            // {
+            //     name: 'HubSpot',
+            //     category: 'Dành cho Marketing',
+            //     url: 'https://www.hubspot.com/',
+            //     description: 'Nền tảng CRM, marketing, sales và dịch vụ khách hàng.',
+            //     status: 'inactive'
+            // },
+            // {
+            //     name: 'Figma',
+            //     category: 'Dành cho Designer',
+            //     url: 'https://www.figma.com/',
+            //     description: 'Thiết kế giao diện và trải nghiệm người dùng.',
+            //     status: 'active'
+            // },
+        ];
+
+        // --- HÀM RENDER GIAO DIỆN ---
+        document.addEventListener('DOMContentLoaded', function() {
+            const container = document.getElementById('tool-list-container');
+            if (!container) return;
+
+            // Gom nhóm các công cụ theo danh mục (category)
+            const groupedTools = tools.reduce((acc, tool) => {
+                // Nếu danh mục chưa tồn tại trong accumulator, tạo một mảng rỗng
+                if (!acc[tool.category]) {
+                    acc[tool.category] = [];
+                }
+                // Thêm công cụ vào danh mục tương ứng
+                acc[tool.category].push(tool);
+                return acc;
+            }, {});
+
+            // Lặp qua các nhóm đã gom và render HTML
+            for (const category in groupedTools) {
+                // Tạo tiêu đề cho mỗi nhóm
+                const categorySection = document.createElement('section');
+                categorySection.className = 'mb-12';
+                categorySection.innerHTML = `<h2 class="text-2xl font-bold border-b border-gray-300 pb-2 mb-6">${category}</h2>`;
+
+                // Tạo lưới chứa các card công cụ
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6';
+
+                // Lặp qua các công cụ trong nhóm và tạo card
+                groupedTools[category].forEach(tool => {
+                    const card = createToolCard(tool);
+                    grid.appendChild(card);
+                });
+
+                categorySection.appendChild(grid);
+                container.appendChild(categorySection);
+            }
+        });
+
+        // --- HÀM TẠO CARD CHO MỘT CÔNG CỤ ---
+        function createToolCard(tool) {
+            const card = document.createElement('a');
+            card.href = tool.url;
+            card.target = '_blank'; // Mở link trong tab mới
+            card.rel = 'noopener noreferrer';
+            card.className = 'tool-card bg-white rounded-lg border border-gray-200 p-6 block hover:border-blue-500';
+
+            // Hàm để lấy thông tin trạng thái (màu sắc và text)
+            const getStatusInfo = (status) => {
+                switch (status) {
+                    case 'active':
+                        return { color: 'bg-green-500', text: 'Hoạt động' };
+                    case 'inactive':
+                        return { color: 'bg-red-500', text: 'Không hoạt động' };
+                    case 'maintenance':
+                        return { color: 'bg-yellow-500', text: 'Bảo trì' };
+                    default:
+                        return { color: 'bg-gray-400', text: 'Không rõ' };
+                }
+            };
+            
+            const statusInfo = getStatusInfo(tool.status);
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <h3 class="text-xl font-bold text-gray-800">${tool.name}</h3>
+                    <div class="flex items-center space-x-2">
+                        <div class="w-3 h-3 rounded-full ${statusInfo.color}"></div>
+                        <span class="text-sm text-gray-500">${statusInfo.text}</span>
+                    </div>
+                </div>
+                <p class="text-gray-600 mt-2">${tool.description}</p>
+                <div class="text-blue-600 font-semibold mt-4 inline-block">
+                    Đi đến công cụ &rarr;
+                </div>
+            `;
+            
+            return card;
+        }
+
+        // --- LƯU Ý VỀ VIỆC KIỂM TRA TRẠNG THÁI ---
+        // Việc kiểm tra trạng thái (ping) một URL từ JavaScript phía client (trình duyệt)
+        // thường không khả thi do chính sách CORS (Cross-Origin Resource Sharing).
+        //
+        // Giải pháp thực tế:
+        // 1. Tạo một API endpoint trên server của bạn (ví dụ: /api/check-status?url=...).
+        // 2. Frontend sẽ gọi API này cho mỗi công cụ.
+        // 3. Backend (server) nhận yêu cầu, thực hiện ping đến URL của công cụ.
+        // 4. Backend trả về kết quả (ví dụ: { status: 'active' } hoặc { status: 'inactive' }).
+        // 5. Frontend cập nhật giao diện dựa trên kết quả nhận được.
+        //
+        // Đoạn code trên mô phỏng bằng cách sử dụng thuộc tính 'status' đã định sẵn trong dữ liệu.
+    </script>
+
+</body>
+</html>

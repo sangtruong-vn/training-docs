@@ -1,0 +1,712 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cẩm Nang QC</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        .nav-link {
+            transition: all 0.3s ease;
+            border-bottom: 2px solid transparent;
+        }
+        .nav-link.active {
+            border-bottom-color: #14b8a6; /* teal-500 */
+            color: #0f766e; /* teal-700 */
+        }
+        .tab-btn.active {
+            background-color: #14b8a6; /* teal-500 */
+            color: white;
+        }
+        .content-section {
+            display: none;
+            min-height: 100vh;
+        }
+        .content-section.active {
+            display: block;
+        }
+        .state {
+            transition: all 0.3s ease-in-out;
+            border: 2px solid #9ca3af;
+        }
+        .state.active {
+            background-color: #14b8a6;
+            color: white;
+            border-color: #0f766e;
+            transform: scale(1.1);
+        }
+        .transition-arrow {
+            position: absolute;
+            background-color: #6b7280;
+            height: 2px;
+            transform-origin: left center;
+        }
+        .transition-arrow::after {
+            content: '';
+            position: absolute;
+            right: -1px;
+            top: -4px;
+            border-top: 5px solid transparent;
+            border-bottom: 5px solid transparent;
+            border-left: 8px solid #6b7280;
+        }
+        .quiz-question.correct {
+            background-color: #d1fae5;
+            border-left: 4px solid #10b981;
+        }
+        .quiz-question.incorrect {
+            background-color: #fee2e2;
+            border-left: 4px solid #ef4444;
+        }
+        .toggle-bg:after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            background: white;
+            border-radius: 9999px;
+            width: 1.25rem;
+            height: 1.25rem;
+            transition: 0.3s;
+        }
+        input:checked + .toggle-bg:after {
+            transform: translateX(100%);
+        }
+        input:checked + .toggle-bg {
+            background: #14b8a6; 
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <header class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-xl md:text-2xl font-bold text-teal-700">Cẩm Nang QC</h1>
+                <div class="hidden sm:block">
+                    <div class="flex items-baseline space-x-4">
+                        <a href="#intro" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-teal-600">Giới Thiệu</a>
+                        <a href="#techniques" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-teal-600">Các Kỹ Thuật</a>
+                        <a href="#quiz" class="nav-link px-3 py-2 rounded-md text-sm font-medium text-slate-600 hover:text-teal-600">Bài Kiểm Tra</a>
+                    </div>
+                </div>
+                <div class="sm:hidden">
+                    <select id="mobile-nav" class="block w-full rounded-md border-gray-300 shadow-sm focus:border-teal-500 focus:ring-teal-500">
+                        <option value="intro">Giới Thiệu</option>
+                        <option value="techniques">Các Kỹ Thuật</option>
+                        <option value="quiz">Bài Kiểm Tra</option>
+                    </select>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <section id="intro" class="content-section active">
+            <div class="bg-white p-8 rounded-lg shadow">
+                <h2 class="text-2xl font-bold text-teal-700 mb-4">Chào Mừng Đội Ngũ QC Mới!</h2>
+                <p class="text-slate-600 leading-relaxed">
+                    Tài liệu tương tác này được biên soạn nhằm mục đích cung cấp kiến thức nền tảng và hướng dẫn chi tiết về các kỹ thuật thiết kế ca kiểm thử (test case) cơ bản và hiệu quả nhất. Thay vì đọc một tài liệu tĩnh, bạn có thể tương tác trực tiếp với các ví dụ để hiểu sâu hơn về cách mỗi kỹ thuật hoạt động.
+                </p>
+                <p class="mt-4 text-slate-600 leading-relaxed">
+                    Hãy bắt đầu bằng cách điều hướng đến mục <a href="#techniques" class="font-semibold text-teal-600 hover:underline">Các Kỹ Thuật</a> để khám phá, hoặc thử sức với <a href="#quiz" class="font-semibold text-teal-600 hover:underline">Bài Kiểm Tra</a> để đánh giá kiến thức của bạn. Chúc bạn học tập hiệu quả!
+                </p>
+            </div>
+        </section>
+
+        <section id="techniques" class="content-section">
+             <div class="bg-white p-6 md:p-8 rounded-lg shadow">
+                <h2 class="text-2xl font-bold text-teal-700 mb-4">Khám Phá Các Kỹ Thuật Test</h2>
+                <p class="text-slate-600 mb-6">Đây là khu vực để bạn tìm hiểu về các kỹ thuật kiểm thử hộp đen phổ biến. Mỗi kỹ thuật được trình bày với khái niệm, ví dụ và một công cụ tương tác để bạn thực hành. Hãy chọn một kỹ thuật bên dưới để bắt đầu.</p>
+                
+                <div id="tabs-container" class="mb-6 border-b border-slate-200">
+                    <nav class="flex flex-wrap -mb-px space-x-4" aria-label="Tabs">
+                        <button data-tab="ep" class="tab-btn whitespace-nowrap py-3 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none">Phân Vùng Tương Đương</button>
+                        <button data-tab="bva" class="tab-btn whitespace-nowrap py-3 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none">Phân Tích Giá Trị Biên</button>
+                        <button data-tab="dt" class="tab-btn whitespace-nowrap py-3 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none">Bảng Quyết Định</button>
+                        <button data-tab="st" class="tab-btn whitespace-nowrap py-3 px-4 border-b-2 border-transparent font-medium text-sm rounded-t-lg text-slate-500 hover:text-slate-700 hover:bg-slate-100 focus:outline-none">Chuyển Đổi Trạng Thái</button>
+                    </nav>
+                </div>
+
+                <div id="tab-content">
+                    <div data-tab-content="ep" class="tab-pane">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Kỹ Thuật Phân Vùng Tương Đương (EP)</h3>
+                        <p class="text-slate-600 mb-4">Kỹ thuật này chia dữ liệu đầu vào thành các nhóm (phân vùng) mà hệ thống xử lý tương tự nhau. Mục đích là để giảm số lượng test case bằng cách chỉ kiểm tra một giá trị đại diện cho mỗi nhóm.</p>
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Ví dụ tương tác: Trường nhập "Tuổi"</h4>
+                            <p class="text-sm text-slate-500 mb-4">Yêu cầu: Hệ thống chỉ chấp nhận tuổi là số nguyên từ 18 đến 60. Hãy thử nhập các giá trị khác nhau.</p>
+                            <input type="text" id="ep-input" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md" placeholder="Nhập tuổi và nhấn Enter...">
+                            <div id="ep-output" class="mt-4 p-4 rounded-md bg-white min-h-[50px] text-slate-700 font-medium">Kết quả phân tích sẽ hiện ở đây.</div>
+                        </div>
+                    </div>
+                    <div data-tab-content="bva" class="tab-pane hidden">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Kỹ Thuật Phân Tích Giá Trị Biên (BVA)</h3>
+                        <p class="text-slate-600 mb-4">Kỹ thuật này tập trung vào việc kiểm thử các giá trị tại "biên" của các phân vùng hợp lệ. Lỗi thường có xu hướng xảy ra ở các điểm biên này.</p>
+                         <div class="bg-slate-100 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Ví dụ tương tác: Trường nhập "Tuổi" (Biên)</h4>
+                            <p class="text-sm text-slate-500 mb-4">Yêu cầu: Tuổi từ 18 đến 60. Hãy thử các giá trị gần biên như 17, 18, 19 hoặc 59, 60, 61.</p>
+                            <input type="text" id="bva-input" class="w-full md:w-1/2 p-2 border border-slate-300 rounded-md" placeholder="Nhập giá trị biên...">
+                            <div id="bva-output" class="mt-4 p-4 rounded-md bg-white min-h-[50px] text-slate-700 font-medium">Kết quả phân tích sẽ hiện ở đây.</div>
+                        </div>
+                    </div>
+                    <div data-tab-content="dt" class="tab-pane hidden">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Kỹ Thuật Bảng Quyết Định</h3>
+                        <p class="text-slate-600 mb-4">Kỹ thuật này được sử dụng khi đầu ra phụ thuộc vào sự kết hợp của nhiều điều kiện. Nó giúp đảm bảo tất cả các tổ hợp logic đều được kiểm tra.</p>
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                            <h4 class="font-semibold mb-2">Ví dụ tương tác: Logic Đăng nhập</h4>
+                            <p class="text-sm text-slate-500 mb-4">Yêu cầu: Đăng nhập thành công khi cả username và password đều đúng. Thay đổi trạng thái các điều kiện để xem luật tương ứng.</p>
+                            <div class="flex items-center space-x-8 mb-6">
+                                <label class="flex items-center cursor-pointer">
+                                    <span class="mr-3 font-medium">Username Đúng?</span>
+                                    <input type="checkbox" id="dt-cond1" class="sr-only">
+                                    <div class="toggle-bg relative w-10 h-6 bg-gray-300 rounded-full"></div>
+                                </label>
+                                <label class="flex items-center cursor-pointer">
+                                    <span class="mr-3 font-medium">Password Đúng?</span>
+                                    <input type="checkbox" id="dt-cond2" class="sr-only">
+                                    <div class="toggle-bg relative w-10 h-6 bg-gray-300 rounded-full"></div>
+                                </label>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table id="decision-table" class="w-full text-sm text-left text-slate-500">
+                                    <thead class="text-xs text-slate-700 uppercase bg-slate-200">
+                                        <tr>
+                                            <th class="px-6 py-3">Điều kiện / Hành động</th>
+                                            <th class="px-6 py-3 text-center">Luật 1</th>
+                                            <th class="px-6 py-3 text-center">Luật 2</th>
+                                            <th class="px-6 py-3 text-center">Luật 3</th>
+                                            <th class="px-6 py-3 text-center">Luật 4</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr class="bg-white border-b">
+                                            <td class="px-6 py-4 font-semibold">C1: Username đúng?</td>
+                                            <td class="px-6 py-4 text-center">Sai</td>
+                                            <td class="px-6 py-4 text-center">Đúng</td>
+                                            <td class="px-6 py-4 text-center">Sai</td>
+                                            <td class="px-6 py-4 text-center">Đúng</td>
+                                        </tr>
+                                        <tr class="bg-white border-b">
+                                            <td class="px-6 py-4 font-semibold">C2: Password đúng?</td>
+                                            <td class="px-6 py-4 text-center">Sai</td>
+                                            <td class="px-6 py-4 text-center">Sai</td>
+                                            <td class="px-6 py-4 text-center">Đúng</td>
+                                            <td class="px-6 py-4 text-center">Đúng</td>
+                                        </tr>
+                                        <tr class="bg-slate-50 border-b">
+                                            <td class="px-6 py-4 font-semibold text-teal-600">A1: Hiển thị lỗi?</td>
+                                            <td class="px-6 py-4 text-center">Có</td>
+                                            <td class="px-6 py-4 text-center">Có</td>
+                                            <td class="px-6 py-4 text-center">Có</td>
+                                            <td class="px-6 py-4 text-center">Không</td>
+                                        </tr>
+                                        <tr class="bg-slate-50 border-b">
+                                            <td class="px-6 py-4 font-semibold text-teal-600">A2: Tới trang chủ?</td>
+                                            <td class="px-6 py-4 text-center">Không</td>
+                                            <td class="px-6 py-4 text-center">Không</td>
+                                            <td class="px-6 py-4 text-center">Không</td>
+                                            <td class="px-6 py-4 text-center">Có</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    <div data-tab-content="st" class="tab-pane hidden">
+                        <h3 class="text-xl font-semibold text-slate-800 mb-3">Kỹ Thuật Kiểm Thử Chuyển Đổi Trạng Thái</h3>
+                        <p class="text-slate-600 mb-4">Kỹ thuật này mô hình hóa hệ thống dưới dạng các trạng thái và các sự kiện gây ra sự chuyển đổi giữa các trạng thái đó. Rất hữu ích cho các chức năng có quy trình (workflow).</p>
+                        <div class="bg-slate-100 p-6 rounded-lg">
+                             <h4 class="font-semibold mb-2">Ví dụ tương tác: Quy trình đăng nhập (3 lần thử)</h4>
+                            <p class="text-sm text-slate-500 mb-4">Bắt đầu ở trạng thái "S1". Nhấn các nút để xem hệ thống chuyển trạng thái như thế nào.</p>
+                            <div class="flex space-x-4 mb-6">
+                                <button id="st-correct" class="px-4 py-2 bg-teal-500 text-white rounded-md hover:bg-teal-600">Nhập Mật Khẩu Đúng</button>
+                                <button id="st-incorrect" class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600">Nhập Mật Khẩu Sai</button>
+                                <button id="st-reset" class="px-4 py-2 bg-slate-500 text-white rounded-md hover:bg-slate-600">Reset</button>
+                            </div>
+                            <div id="st-diagram" class="relative w-full h-80 bg-white rounded-lg p-4">
+                                <!-- States -->
+                                <div id="state-S1" class="state absolute top-1/2 left-8 w-24 h-16 flex items-center justify-center text-center rounded-lg shadow -translate-y-1/2">Bắt đầu (S1)</div>
+                                <div id="state-S4" class="state absolute top-1/2 left-1/3 w-28 h-16 flex items-center justify-center text-center rounded-lg shadow -translate-y-1/2">Lần thử 2 (S4)</div>
+                                <div id="state-S5" class="state absolute top-1/2 left-2/3 w-28 h-16 flex items-center justify-center text-center rounded-lg shadow -translate-y-1/2">Lần thử 3 (S5)</div>
+                                <div id="state-S2" class="state absolute top-8 right-8 w-32 h-16 flex items-center justify-center text-center rounded-lg shadow bg-green-100 border-green-400">Thành công (S2)</div>
+                                <div id="state-S3" class="state absolute bottom-8 right-8 w-32 h-16 flex items-center justify-center text-center rounded-lg shadow bg-red-100 border-red-400">Bị khóa (S3)</div>
+                                <!-- Arrows will be added by JS -->
+                            </div>
+                            <p id="st-status" class="mt-4 font-semibold text-slate-700">Trạng thái hiện tại: Bắt đầu (S1). Bạn có 3 lần thử.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="quiz" class="content-section">
+            <div class="bg-white p-6 md:p-8 rounded-lg shadow">
+                <h2 class="text-2xl font-bold text-teal-700 mb-4">Bài Kiểm Tra Kiến Thức</h2>
+                <p class="text-slate-600 mb-6">Hãy trả lời các câu hỏi dưới đây để kiểm tra sự hiểu biết của bạn về các kỹ thuật đã học. Sau khi hoàn thành, nhấn nút "Kiểm Tra Đáp Án" ở cuối trang để xem kết quả.</p>
+                
+                <div id="quiz-form" class="space-y-6"></div>
+
+                <div class="mt-8 text-center">
+                    <button id="submit-quiz" class="bg-teal-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-teal-700 transition-colors">Kiểm Tra Đáp Án</button>
+                </div>
+
+                <div id="quiz-results" class="hidden mt-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-4 text-center">Kết Quả Bài Làm</h3>
+                    <div class="w-full max-w-xs mx-auto mb-6">
+                        <canvas id="quiz-chart"></canvas>
+                    </div>
+                    <p id="quiz-score" class="text-center font-semibold text-lg"></p>
+                    <p id="quiz-feedback" class="text-center text-slate-600 mt-2"></p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+    
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const quizData = [
+        {
+            question: "Mục đích chính của kỹ thuật Phân vùng tương đương là gì?",
+            options: ["Tìm lỗi ở các giá trị biên.", "Giảm số lượng test case cần thực hiện.", "Kiểm tra tất cả các tổ hợp điều kiện.", "Kiểm tra luồng xử lý của hệ thống."],
+            answer: "Giảm số lượng test case cần thực hiện.",
+            explanation: "Mục đích chính của EP là nhóm các đầu vào tương tự nhau để giảm số lượng test case mà vẫn đảm bảo độ bao phủ hợp lý."
+        },
+        {
+            question: "Cho một trường nhập liệu chấp nhận các số nguyên từ -100 đến 100. Đâu là một phân vùng không hợp lệ?",
+            options: ["0", "-99", "101", "50"],
+            answer: "101",
+            explanation: "101 nằm ngoài phạm vi cho phép [-100, 100]."
+        },
+        {
+            question: "Với trường nhập liệu trong Câu 2 (từ -100 đến 100), các giá trị biên nào cần được kiểm tra theo kỹ thuật BVA?",
+            options: ["-101, -100, -99 và 99, 100, 101", "-100 và 100", "0", "-1, 0, 1"],
+            answer: "-101, -100, -99 và 99, 100, 101",
+            explanation: "Chúng ta kiểm tra các giá trị tại biên, ngay dưới biên và ngay trên biên của cả hai đầu mút của phạm vi."
+        },
+        {
+            question: "Kỹ thuật nào phù hợp nhất để kiểm tra một chức năng có nhiều điều kiện đầu vào phức tạp và các quy tắc nghiệp vụ lồng nhau?",
+            options: ["Phân tích giá trị biên", "Phân vùng tương đương", "Bảng quyết định", "Chuyển đổi trạng thái"],
+            answer: "Bảng quyết định",
+            explanation: "Bảng quyết định được thiết kế đặc biệt để xử lý các logic phức tạp dựa trên nhiều điều kiện."
+        },
+        {
+            question: `Cho chức năng giảm giá: "Đơn hàng trên 1.000.000 VNĐ và là thành viên VIP sẽ được giảm 15%. Đơn hàng trên 1.000.000 VNĐ nhưng không phải VIP được giảm 10%". Các điều kiện chính là gì?`,
+            type: "text",
+            answer: "Giá trị đơn hàng > 1.000.000 VNĐ và Tình trạng thành viên VIP.",
+            explanation: "Hai điều kiện chính là 'Giá trị đơn hàng > 1.000.000 VNĐ?' và 'Là thành viên VIP?'."
+        },
+         {
+            question: "Kỹ thuật kiểm thử chuyển đổi trạng thái phù hợp nhất với loại ứng dụng nào sau đây?",
+            options: ["Một trang web tin tức đơn giản.", "Một máy ATM.", "Một công cụ tính toán.", "Một biểu mẫu đăng ký."],
+            answer: "Một máy ATM.",
+            explanation: "Máy ATM có các trạng thái rõ ràng (chờ thẻ, nhập pin, chọn giao dịch,...) và các sự kiện làm thay đổi trạng thái đó."
+        },
+        {
+            question: `Trong sơ đồ chuyển đổi trạng thái, "sự kiện" (event) là gì?`,
+            options: ["Một trạng thái của hệ thống.", "Một hành động của người dùng hoặc hệ thống gây ra sự thay đổi trạng thái.", "Kết quả của một sự thay đổi trạng thái.", "Lỗi của hệ thống."],
+            answer: "Một hành động của người dùng hoặc hệ thống gây ra sự thay đổi trạng thái.",
+            explanation: "Một sự kiện (ví dụ: người dùng nhấn nút) là tác nhân kích hoạt một sự chuyển đổi từ trạng thái này sang trạng thái khác."
+        },
+        {
+            question: "Cho một trường mật khẩu yêu cầu độ dài từ 8 đến 16 ký tự. Sử dụng Phân vùng tương đương, hãy xác định 3 test case (1 hợp lệ, 2 không hợp lệ).",
+            type: "text",
+            answer: "Hợp lệ: 10 ký tự. Không hợp lệ: 7 ký tự, 17 ký tự (hoặc các giá trị tương tự).",
+            explanation: "Một giá trị nằm trong khoảng [8, 16], một giá trị < 8, và một giá trị > 16."
+        },
+        {
+            question: "Sử dụng BVA cho trường mật khẩu trong Câu 8, hãy liệt kê các giá trị độ dài cần kiểm tra.",
+            type: "text",
+            answer: "7, 8, 9 và 15, 16, 17",
+            explanation: "Kiểm tra ngay dưới, tại, và ngay trên của cả hai biên (8 và 16)."
+        },
+        {
+            question: "Bảng quyết định giúp ích gì trong việc tìm kiếm các ca kiểm thử bị bỏ sót?",
+            options: ["Bằng cách tập trung vào các giá trị biên.", "Bằng cách liệt kê một cách có hệ thống tất cả các tổ hợp điều kiện.", "Bằng cách giảm số lượng test case.", "Bằng cách mô hình hóa các trạng thái của hệ thống."],
+            answer: "Bằng cách liệt kê một cách có hệ thống tất cả các tổ hợp điều kiện.",
+            explanation: "Bằng cách liệt kê tất cả các tổ hợp điều kiện, bảng quyết định giúp người kiểm thử dễ dàng nhận ra các kịch bản chưa được xem xét."
+        },
+    ];
+
+    let quizChart = null;
+    
+    // Navigation
+    const navLinks = document.querySelectorAll('.nav-link');
+    const mobileNav = document.getElementById('mobile-nav');
+    const sections = document.querySelectorAll('.content-section');
+
+    function setActiveSection(hash) {
+        hash = hash.startsWith('#') ? hash.substring(1) : hash;
+        
+        navLinks.forEach(link => {
+            if (link.hash.substring(1) === hash) {
+                link.classList.add('active');
+            } else {
+                link.classList.remove('active');
+            }
+        });
+
+        sections.forEach(section => {
+            if (section.id === hash) {
+                section.classList.add('active');
+            } else {
+                section.classList.remove('active', 'hidden');
+                section.style.display = 'none';
+            }
+        });
+
+        const activeSection = document.getElementById(hash);
+        if(activeSection) activeSection.style.display = 'block';
+
+        if(mobileNav.value !== hash) {
+            mobileNav.value = hash;
+        }
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.location.hash = link.hash;
+        });
+    });
+    
+    mobileNav.addEventListener('change', () => {
+        window.location.hash = mobileNav.value;
+    });
+
+    window.addEventListener('hashchange', () => {
+        const hash = window.location.hash || '#intro';
+        setActiveSection(hash);
+    });
+
+    // Initial load
+    const initialHash = window.location.hash || '#intro';
+    setActiveSection(initialHash);
+
+    // Tabs
+    const tabContainer = document.getElementById('tabs-container');
+    const tabContent = document.getElementById('tab-content');
+
+    if (tabContainer) {
+        const tabs = tabContainer.querySelectorAll('.tab-btn');
+        const panes = tabContent.querySelectorAll('.tab-pane');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                tabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                panes.forEach(pane => {
+                    if (pane.dataset.tabContent === tab.dataset.tab) {
+                        pane.classList.remove('hidden');
+                    } else {
+                        pane.classList.add('hidden');
+                    }
+                });
+            });
+        });
+        tabs[0].click();
+    }
+
+    // Interactive Examples
+    // EP
+    const epInput = document.getElementById('ep-input');
+    const epOutput = document.getElementById('ep-output');
+    if (epInput) {
+        epInput.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') {
+                const value = epInput.value;
+                let result = '';
+                
+                if (value.trim() === '') {
+                    result = '<strong class="text-orange-600">Phân vùng không hợp lệ:</strong> Để trống.';
+                } else if (isNaN(value)) {
+                    result = '<strong class="text-orange-600">Phân vùng không hợp lệ:</strong> Không phải là số.';
+                } else {
+                    const num = parseFloat(value);
+                    if (!Number.isInteger(num)) {
+                         result = '<strong class="text-orange-600">Phân vùng không hợp lệ:</strong> Số thập phân.';
+                    } else if (num < 18) {
+                        result = '<strong class="text-orange-600">Phân vùng không hợp lệ:</strong> Nhỏ hơn 18.';
+                    } else if (num > 60) {
+                        result = '<strong class="text-orange-600">Phân vùng không hợp lệ:</strong> Lớn hơn 60.';
+                    } else {
+                        result = '<strong class="text-green-600">Phân vùng hợp lệ:</strong> Trong khoảng [18, 60].';
+                    }
+                }
+                epOutput.innerHTML = result;
+            }
+        });
+    }
+
+    // BVA
+    const bvaInput = document.getElementById('bva-input');
+    const bvaOutput = document.getElementById('bva-output');
+    if(bvaInput) {
+        bvaInput.addEventListener('keyup', e => {
+             if (e.key === 'Enter') {
+                const value = parseInt(bvaInput.value, 10);
+                let result = '';
+                if(isNaN(value)) {
+                    result = "Vui lòng nhập một số nguyên.";
+                } else if (value === 17) {
+                    result = '<strong class="text-blue-600">Giá trị biên (không hợp lệ):</strong> Ngay dưới biên dưới.';
+                } else if (value === 18) {
+                    result = '<strong class="text-teal-600">Giá trị biên (hợp lệ):</strong> Tại biên dưới.';
+                } else if (value === 19) {
+                    result = '<strong class="text-green-600">Giá trị biên (hợp lệ):</strong> Ngay trên biên dưới.';
+                } else if (value === 59) {
+                    result = '<strong class="text-green-600">Giá trị biên (hợp lệ):</strong> Ngay dưới biên trên.';
+                } else if (value === 60) {
+                    result = '<strong class="text-teal-600">Giá trị biên (hợp lệ):</strong> Tại biên trên.';
+                } else if (value === 61) {
+                    result = '<strong class="text-blue-600">Giá trị biên (không hợp lệ):</strong> Ngay trên biên trên.';
+                } else {
+                    result = 'Giá trị này không phải là giá trị biên tiêu biểu. Hãy thử 17, 18, 19, 59, 60, hoặc 61.';
+                }
+                bvaOutput.innerHTML = result;
+            }
+        });
+    }
+
+    // Decision Table
+    const dtCond1 = document.getElementById('dt-cond1');
+    const dtCond2 = document.getElementById('dt-cond2');
+    const dtTable = document.getElementById('decision-table');
+
+    function updateDecisionTable() {
+        if (!dtTable) return;
+        const c1 = dtCond1.checked; // username
+        const c2 = dtCond2.checked; // password
+        let ruleIndex = -1;
+
+        if (!c1 && !c2) ruleIndex = 1;      // S-S
+        else if (c1 && !c2) ruleIndex = 2; // Đ-S
+        else if (!c1 && c2) ruleIndex = 3; // S-Đ
+        else if (c1 && c2) ruleIndex = 4;  // Đ-Đ
+
+        const cells = dtTable.querySelectorAll('td, th');
+        cells.forEach(cell => cell.style.backgroundColor = '');
+
+        if(ruleIndex !== -1) {
+            const th = dtTable.querySelector(`th:nth-child(${ruleIndex + 1})`);
+            if(th) th.style.backgroundColor = '#a7f3d0';
+            const ruleCells = dtTable.querySelectorAll(`td:nth-child(${ruleIndex + 1})`);
+            ruleCells.forEach(cell => cell.style.backgroundColor = '#a7f3d0');
+        }
+    }
+
+    if (dtCond1 && dtCond2) {
+        dtCond1.addEventListener('change', updateDecisionTable);
+        dtCond2.addEventListener('change', updateDecisionTable);
+        updateDecisionTable();
+    }
+
+    // State Transition
+    const stCorrectBtn = document.getElementById('st-correct');
+    const stIncorrectBtn = document.getElementById('st-incorrect');
+    const stResetBtn = document.getElementById('st-reset');
+    const stStatus = document.getElementById('st-status');
+    const stStates = {
+        S1: document.getElementById('state-S1'),
+        S2: document.getElementById('state-S2'),
+        S3: document.getElementById('state-S3'),
+        S4: document.getElementById('state-S4'),
+        S5: document.getElementById('state-S5'),
+    };
+    
+    let currentState = 'S1';
+    let attempts = 3;
+
+    function updateStateUI() {
+        Object.values(stStates).forEach(el => el.classList.remove('active'));
+        if (stStates[currentState]) {
+            stStates[currentState].classList.add('active');
+        }
+
+        let statusText = '';
+        switch(currentState) {
+            case 'S1': statusText = `Trạng thái hiện tại: Bắt đầu (S1). Bạn có 3 lần thử.`; break;
+            case 'S4': statusText = `Trạng thái hiện tại: Sai lần 1 (S4). Bạn còn 2 lần thử.`; break;
+            case 'S5': statusText = `Trạng thái hiện tại: Sai lần 2 (S5). Bạn còn 1 lần thử.`; break;
+            case 'S2': statusText = `Trạng thái hiện tại: Thành công (S2). Chúc mừng!`; break;
+            case 'S3': statusText = `Trạng thái hiện tại: Bị khóa (S3). Tài khoản của bạn đã bị khóa.`; break;
+        }
+        stStatus.textContent = statusText;
+
+        stCorrectBtn.disabled = ['S2', 'S3'].includes(currentState);
+        stIncorrectBtn.disabled = ['S2', 'S3'].includes(currentState);
+    }
+    
+    if (stCorrectBtn) {
+        stCorrectBtn.addEventListener('click', () => {
+            if (['S1', 'S4', 'S5'].includes(currentState)) {
+                currentState = 'S2';
+            }
+            updateStateUI();
+        });
+    }
+
+    if (stIncorrectBtn) {
+        stIncorrectBtn.addEventListener('click', () => {
+            if (currentState === 'S1') {
+                currentState = 'S4';
+                attempts = 2;
+            } else if (currentState === 'S4') {
+                currentState = 'S5';
+                attempts = 1;
+            } else if (currentState === 'S5') {
+                currentState = 'S3';
+                attempts = 0;
+            }
+            updateStateUI();
+        });
+    }
+
+    if (stResetBtn) {
+        stResetBtn.addEventListener('click', () => {
+            currentState = 'S1';
+            attempts = 3;
+            updateStateUI();
+        });
+        updateStateUI(); // Initial call
+    }
+
+    // Quiz
+    const quizForm = document.getElementById('quiz-form');
+    const submitQuizBtn = document.getElementById('submit-quiz');
+    const quizResultsDiv = document.getElementById('quiz-results');
+    const quizScoreP = document.getElementById('quiz-score');
+    const quizFeedbackP = document.getElementById('quiz-feedback');
+
+    function renderQuiz() {
+        if (!quizForm) return;
+        quizForm.innerHTML = quizData.map((item, index) => {
+            const questionId = `q${index}`;
+            if (item.type === 'text') {
+                return `
+                <div class="quiz-question bg-white p-4 rounded-lg shadow-sm border border-slate-200" id="${questionId}-container">
+                    <p class="font-semibold mb-3">${index + 1}. ${item.question}</p>
+                    <textarea id="${questionId}" rows="2" class="w-full p-2 border border-slate-300 rounded-md focus:ring-teal-500 focus:border-teal-500"></textarea>
+                    <div id="${questionId}-feedback" class="hidden mt-2 text-sm"></div>
+                </div>
+                `;
+            }
+            
+            const optionsHtml = item.options.map((option, i) => `
+                <label class="flex items-center space-x-3 p-2 rounded-md hover:bg-slate-100 cursor-pointer">
+                    <input type="radio" name="${questionId}" value="${option}" class="h-4 w-4 text-teal-600 focus:ring-teal-500 border-slate-300">
+                    <span>${option}</span>
+                </label>
+            `).join('');
+
+            return `
+            <div class="quiz-question bg-white p-4 rounded-lg shadow-sm border border-slate-200" id="${questionId}-container">
+                <p class="font-semibold mb-3">${index + 1}. ${item.question}</p>
+                <div class="space-y-2">${optionsHtml}</div>
+                <div id="${questionId}-feedback" class="hidden mt-2 text-sm"></div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    function submitQuiz() {
+        let score = 0;
+        quizData.forEach((item, index) => {
+            const questionId = `q${index}`;
+            const container = document.getElementById(`${questionId}-container`);
+            const feedbackDiv = document.getElementById(`${questionId}-feedback`);
+            let userAnswer;
+            let isCorrect = false;
+
+            if (item.type === 'text') {
+                userAnswer = document.getElementById(questionId).value.trim();
+                // For text questions, we just show the model answer
+                isCorrect = true; 
+            } else {
+                const checkedOption = document.querySelector(`input[name="${questionId}"]:checked`);
+                userAnswer = checkedOption ? checkedOption.value : null;
+                if(userAnswer === item.answer) {
+                    isCorrect = true;
+                    score++;
+                }
+            }
+
+            container.classList.remove('correct', 'incorrect');
+            if(isCorrect) {
+                container.classList.add('correct');
+                feedbackDiv.innerHTML = `<strong class="text-green-700">Đúng!</strong> ${item.explanation}`;
+            } else {
+                container.classList.add('incorrect');
+                feedbackDiv.innerHTML = `<strong class="text-red-700">Sai!</strong> Câu trả lời đúng là: "${item.answer}". ${item.explanation}`;
+            }
+            feedbackDiv.classList.remove('hidden');
+        });
+
+        const mcqCount = quizData.filter(q => q.type !== 'text').length;
+        quizResultsDiv.classList.remove('hidden');
+        quizScoreP.textContent = `Bạn đã trả lời đúng ${score}/${mcqCount} câu trắc nghiệm.`;
+
+        let feedbackText = '';
+        const percentage = (score / mcqCount) * 100;
+        if (percentage >= 80) feedbackText = "Xuất sắc! Bạn đã nắm rất vững kiến thức.";
+        else if (percentage >= 50) feedbackText = "Khá tốt! Hãy xem lại những câu sai để củng cố kiến thức nhé.";
+        else feedbackText = "Cần cố gắng hơn. Hãy dành thời gian xem lại các kỹ thuật và thử lại bài test.";
+        quizFeedbackP.textContent = feedbackText;
+
+        renderQuizChart(score, mcqCount - score);
+        quizResultsDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function renderQuizChart(correct, incorrect) {
+        const ctx = document.getElementById('quiz-chart').getContext('2d');
+        if (quizChart) {
+            quizChart.destroy();
+        }
+        quizChart = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Đúng', 'Sai'],
+                datasets: [{
+                    data: [correct, incorrect],
+                    backgroundColor: ['#10b981', '#ef4444'],
+                    borderColor: ['#ffffff', '#ffffff'],
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Tỷ Lệ Đúng/Sai (Trắc nghiệm)'
+                    }
+                }
+            }
+        });
+    }
+
+    if (submitQuizBtn) {
+        submitQuizBtn.addEventListener('click', submitQuiz);
+    }
+    
+    renderQuiz();
+});
+</script>
+</body>
+</html>

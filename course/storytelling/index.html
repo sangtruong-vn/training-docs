@@ -9,15 +9,11 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Chosen Palette: Warm Harmony -->
-    <!-- Application Structure Plan: Ứng dụng được thiết kế theo cấu trúc chuyên đề, không theo tuyến tính của slide, nhằm tối ưu hóa trải nghiệm học tập. Cấu trúc bao gồm: 1. Trang chủ giới thiệu vấn đề và giải pháp. 2. "Tại Sao Kể Chuyện?": Trực quan hóa vấn đề cốt lõi (ví dụ: 65% thời gian giao tiếp). 3. "Thấu Hiểu Khán Giả": Công cụ tương tác để khám phá các nhóm đối tượng (CEO, CFO, v.v.). 4. "Học Viện Kể Chuyện": Giới thiệu các mô hình (PAR, BAB, SCR) dưới dạng thẻ lật tương tác. 5. "Phòng Tình Huống": Khu vực thực hành, nơi người dùng áp dụng các mô hình vào các kịch bản thực tế. Cấu trúc này giúp người dùng học theo nhu cầu, từ hiểu vấn đề, học công cụ, đến thực hành, tạo ra một lộ trình linh hoạt và hiệu quả hơn. -->
-    <!-- Visualization & Content Choices: 1. Thống kê "65% thời gian": Goal-Inform -> Chart.js Donut Chart -> Tương tác khi hover -> Trực quan hóa con số quan trọng nhất, tạo ấn tượng mạnh. 2. Phân tích đối tượng: Goal-Compare -> Tabs tương tác (HTML/JS) -> Click để xem chi tiết -> Giúp người dùng so sánh nhanh và tìm thông tin cần thiết cho tình huống cụ thể. 3. Các mô hình kể chuyện: Goal-Organize -> Thẻ lật (HTML/CSS/JS) -> Click để xem giải thích -> Trình bày thông tin phức tạp một cách gọn gàng, khuyến khích khám phá. 4. Thực hành tình huống: Goal-Apply -> Wizard/quiz tương tác (HTML/JS) -> Chọn kịch bản, chọn mô hình -> Biến kiến thức thụ động thành kỹ năng chủ động. Tất cả đều tuân thủ nguyên tắc không dùng SVG/Mermaid. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body { font-family: 'Lexend', sans-serif; scroll-behavior: smooth; }
         .active-nav { color: #D9534F; border-bottom: 2px solid #D9534F; }
         .inactive-nav { border-bottom: 2px solid transparent; }
-        .section { display: none; }
+        .section { display: none; min-height: 100vh; padding-top: 50px; }
         .section.active { display: block; }
         .chart-container { position: relative; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto; height: 300px; max-height: 400px; }
         @media (min-width: 768px) { .chart-container { height: 350px; } }

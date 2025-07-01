@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Press Start 2P', cursive;
+            background-color: #1a202c; /* bg-gray-900 */
+            color: #a0aec0; /* text-gray-400 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+        canvas {
+            background-color: #000;
+            border: 4px solid #4a5568; /* border-gray-700 */
+            border-radius: 8px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .controls-container button, .touch-controls button {
+            transition: all 0.2s ease-in-out;
+        }
+        .controls-container button:hover, .touch-controls button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .touch-controls {
+            display: none; /* Hidden by default */
+        }
+        /* Show touch controls on smaller screens */
+        @media (max-width: 768px) {
+            .touch-controls {
+                display: grid;
+            }
+            .desktop-instructions {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-400">
+
+    <div class="text-center p-4">
+        <h1 class="text-4xl md:text-5xl text-white mb-2">SNAKE</h1>
+        <div class="text-lg text-green-400 mb-4">
+            <span>SCORE:</span>
+            <span id="score">0</span>
+        </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <!-- Game Over Modal -->
+    <div id="gameOverModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center">
+        <div class="bg-gray-800 border-2 border-red-500 rounded-lg p-8 text-center shadow-2xl">
+            <h2 id="gameOverTitle" class="text-4xl text-red-500 mb-4">GAME OVER</h2>
+            <p class="text-xl text-white mb-2">Final Score: <span id="finalScore">0</span></p>
+            <p id="highScoreText" class="text-lg text-yellow-400 mb-6">New High Score!</p>
+            <button id="restartButton" class="w-full bg-green-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-4 focus:ring-green-300">
+                RESTART
+            </button>
+        </div>
+    </div>
+    
+    <!-- Desktop Controls Instructions -->
+    <div class="desktop-instructions text-center mt-6 p-4 border border-dashed border-gray-700 rounded-lg">
+        <h3 class="text-lg text-white mb-2">Controls</h3>
+        <p>Use <kbd class="px-2 py-1.5 text-xs font-semibold text-gray-800 bg-gray-100 border border-gray-200 rounded-lg">ARROW KEYS</kbd> to move</p>
+    </div>
+
+    <!-- Touch Controls for Mobile -->
+    <div class="touch-controls grid-cols-3 gap-2 mt-6 w-48">
+        <div></div>
+        <button id="upBtn" class="bg-gray-700 text-white p-4 rounded-lg col-span-1 transform rotate-180">▶</button>
+        <div></div>
+        <button id="leftBtn" class="bg-gray-700 text-white p-4 rounded-lg col-span-1 transform rotate-180">▶</button>
+        <button id="downBtn" class="bg-gray-700 text-white p-4 rounded-lg col-span-1">▶</button>
+        <button id="rightBtn" class="bg-gray-700 text-white p-4 rounded-lg col-span-1">▶</button>
+    </div>
+
+    <script>
+        // --- DOM Elements ---
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const scoreDisplay = document.getElementById('score');
+        const finalScoreDisplay = document.getElementById('finalScore');
+        const highScoreText = document.getElementById('highScoreText');
+        const gameOverModal = document.getElementById('gameOverModal');
+        const restartButton = document.getElementById('restartButton');
+
+        // --- Game Constants ---
+        const GRID_SIZE = 20; // Size of each square in the grid
+        const CANVAS_WIDTH = canvas.width;
+        const CANVAS_HEIGHT = canvas.height;
+        const SNAKE_COLOR = '#48bb78'; // green-500
+        const FOOD_COLOR = '#f56565'; // red-500
+        const INITIAL_SPEED = 200; // Milliseconds between game ticks
+
+        // --- Game State ---
+        let snake = [];
+        let food = {};
+        let direction = 'right';
+        let dx = GRID_SIZE;
+        let dy = 0;
+        let score = 0;
+        let highScore = localStorage.getItem('snakeHighScore') || 0;
+        let changingDirection = false;
+        let gameLoopTimeout;
+        let gameSpeed = INITIAL_SPEED;
+
+        /**
+         * The main game loop function. Repeats at a set interval.
+         */
+        function main() {
+            if (didGameEnd()) {
+                showGameOver();
+                return;
+            }
+
+            // Schedule the next frame
+            changingDirection = false;
+            gameLoopTimeout = setTimeout(function onTick() {
+                clearCanvas();
+                drawFood();
+                advanceSnake();
+                drawSnake();
+                main(); // Call main again for the next loop
+            }, gameSpeed);
+        }
+
+        /**
+         * Initializes or resets the game state.
+         */
+        function startGame() {
+            // Reset state
+            snake = [
+                { x: GRID_SIZE * 5, y: GRID_SIZE * 5 },
+                { x: GRID_SIZE * 4, y: GRID_SIZE * 5 },
+                { x: GRID_SIZE * 3, y: GRID_SIZE * 5 },
+                { x: GRID_SIZE * 2, y: GRID_SIZE * 5 },
+                { x: GRID_SIZE, y: GRID_SIZE * 5 }
+            ];
+            direction = 'right';
+            dx = GRID_SIZE;
+            dy = 0;
+            score = 0;
+            gameSpeed = INITIAL_SPEED;
+            updateScoreDisplay();
+            hideGameOver();
+            
+            createFood(); // Create the first piece of food
+            clearTimeout(gameLoopTimeout); // Stop any previous game loop
+            main(); // Start the new game loop
+        }
+
+        /**
+         * Clears the entire canvas.
+         */
+        function clearCanvas() {
+            ctx.fillStyle = '#1a202c'; // Dark background
+            ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+        }
+
+        /**
+         * Draws a single part of the snake's body.
+         * @param {object} snakePart - The {x, y} coordinates of the snake part.
+         */
+        function drawSnakePart(snakePart) {
+            ctx.fillStyle = SNAKE_COLOR;
+            ctx.strokeStyle = '#1a202c'; // Border color for segments
+            ctx.fillRect(snakePart.x, snakePart.y, GRID_SIZE, GRID_SIZE);
+            ctx.strokeRect(snakePart.x, snakePart.y, GRID_SIZE, GRID_SIZE);
+        }
+
+        /**
+         * Draws the entire snake by iterating through its parts.
+         */
+        function drawSnake() {
+            snake.forEach(drawSnakePart);
+        }
+        
+        /**
+         * Moves the snake forward by one grid unit.
+         */
+        function advanceSnake() {
+            const head = { x: snake[0].x + dx, y: snake[0].y + dy };
+            snake.unshift(head); // Add new head to the front
+
+            const didEatFood = snake[0].x === food.x && snake[0].y === food.y;
+            if (didEatFood) {
+                // Increase score
+                score += 10;
+                // Speed up the game slightly
+                if (gameSpeed > 80) { // Capping the speed
+                    gameSpeed -= 5;
+                }
+                updateScoreDisplay();
+                // Generate new food
+                createFood();
+            } else {
+                // Remove the tail
+                snake.pop();
+            }
+        }
+
+        /**
+         * Changes the snake's direction based on keyboard input.
+         * @param {KeyboardEvent} event - The keydown event.
+         */
+        function changeDirection(event) {
+            if (changingDirection) return;
+            changingDirection = true;
+
+            const keyPressed = event.key;
+            const goingUp = dy === -GRID_SIZE;
+            const goingDown = dy === GRID_SIZE;
+            const goingRight = dx === GRID_SIZE;
+            const goingLeft = dx === -GRID_SIZE;
+
+            if (keyPressed === 'ArrowLeft' && !goingRight) {
+                direction = 'left';
+                dx = -GRID_SIZE;
+                dy = 0;
+            }
+            if (keyPressed === 'ArrowUp' && !goingDown) {
+                direction = 'up';
+                dx = 0;
+                dy = -GRID_SIZE;
+            }
+            if (keyPressed === 'ArrowRight' && !goingLeft) {
+                direction = 'right';
+                dx = GRID_SIZE;
+                dy = 0;
+            }
+            if (keyPressed === 'ArrowDown' && !goingUp) {
+                direction = 'down';
+                dx = 0;
+                dy = GRID_SIZE;
+            }
+        }
+
+        /**
+         * Generates a random coordinate for food or snake placement.
+         * @param {number} min - The minimum value.
+         * @param {number} max - The maximum value.
+         * @returns {number} A random coordinate snapped to the grid.
+         */
+        function randomCoord(min, max) {
+            return Math.round((Math.random() * (max - min) + min) / GRID_SIZE) * GRID_SIZE;
+        }
+
+        /**
+         * Creates a new piece of food at a random location.
+         */
+        function createFood() {
+            food.x = randomCoord(0, CANVAS_WIDTH - GRID_SIZE);
+            food.y = randomCoord(0, CANVAS_HEIGHT - GRID_SIZE);
+            
+            // If food is created on the snake, generate new food
+            snake.forEach(function isFoodOnSnake(part) {
+                if (part.x === food.x && part.y === food.y) {
+                    createFood();
+                }
+            });
+        }
+        
+        /**
+         * Draws the food on the canvas.
+         */
+        function drawFood() {
+            ctx.fillStyle = FOOD_COLOR;
+            ctx.strokeStyle = '#fbd38d'; // A light border for the food
+            ctx.fillRect(food.x, food.y, GRID_SIZE, GRID_SIZE);
+            ctx.strokeRect(food.x, food.y, GRID_SIZE, GRID_SIZE);
+        }
+
+        /**
+         * Checks for game-ending conditions (collision).
+         * @returns {boolean} - True if the game has ended, false otherwise.
+         */
+        function didGameEnd() {
+            // Check for collision with self
+            for (let i = 4; i < snake.length; i++) {
+                if (snake[i].x === snake[0].x && snake[i].y === snake[0].y) return true;
+            }
+
+            // Check for collision with walls
+            const hitLeftWall = snake[0].x < 0;
+            const hitRightWall = snake[0].x > CANVAS_WIDTH - GRID_SIZE;
+            const hitTopWall = snake[0].y < 0;
+            const hitBottomWall = snake[0].y > CANVAS_HEIGHT - GRID_SIZE;
+
+            return hitLeftWall || hitRightWall || hitTopWall || hitBottomWall;
+        }
+
+        /**
+         * Updates the score display on the page.
+         */
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = score;
+        }
+        
+        /**
+         * Displays the game over modal and updates scores.
+         */
+        function showGameOver() {
+             clearTimeout(gameLoopTimeout);
+             finalScoreDisplay.textContent = score;
+             if (score > highScore) {
+                highScore = score;
+                localStorage.setItem('snakeHighScore', highScore);
+                highScoreText.style.display = 'block';
+             } else {
+                highScoreText.style.display = 'none';
+             }
+             gameOverModal.classList.remove('hidden');
+        }
+
+        /**
+         * Hides the game over modal.
+         */
+        function hideGameOver() {
+            gameOverModal.classList.add('hidden');
+        }
+
+        // --- Event Listeners ---
+        document.addEventListener('keydown', changeDirection);
+        restartButton.addEventListener('click', startGame);
+
+        // Touch Controls
+        document.getElementById('upBtn').addEventListener('click', () => {
+             if (direction !== 'down') { direction = 'up'; dx = 0; dy = -GRID_SIZE; }
+        });
+        document.getElementById('downBtn').addEventListener('click', () => {
+            if (direction !== 'up') { direction = 'down'; dx = 0; dy = GRID_SIZE; }
+        });
+        document.getElementById('leftBtn').addEventListener('click', () => {
+            if (direction !== 'right') { direction = 'left'; dx = -GRID_SIZE; dy = 0; }
+        });
+        document.getElementById('rightBtn').addEventListener('click', () => {
+            if (direction !== 'left') { direction = 'right'; dx = GRID_SIZE; dy = 0; }
+        });
+
+
+        // --- Initial Game Start ---
+        startGame();
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Tập Trắc Nghiệm - AWS AI Practitioner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+        }
+        .option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .option:hover:not([style*="pointer-events: none"]) {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        #progress-bar-container {
+            width: 100%;
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 8px;
+            margin-bottom: 1rem;
+        }
+        #progress-bar {
+            height: 100%;
+            background-color: #3b82f6;
+            border-radius: 9999px;
+            transition: width 0.3s ease-in-out;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 md:p-8">
+        <div class="flex justify-between items-center mb-4">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Luyện tập AWS AI Practitioner</h1>
+            <div id="score-tracker" class="text-lg font-semibold text-blue-600">Điểm: 0</div>
+        </div>
+        
+        <div id="progress-bar-container">
+            <div id="progress-bar" style="width: 0%;"></div>
+        </div>
+        <div id="question-counter" class="text-sm text-gray-500 mb-6 text-right">Câu 1 / 65</div>
+
+        <div id="question-area">
+            <h2 id="question-text" class="text-xl font-semibold text-gray-700 mb-6">Đang tải câu hỏi...</h2>
+            <div id="options-container" class="space-y-4">
+                <!-- Các lựa chọn sẽ được chèn vào đây bằng JavaScript -->
+            </div>
+        </div>
+
+        <div id="feedback-area" class="mt-6 p-4 rounded-lg text-gray-700 hidden">
+            <p id="feedback-text" class="font-semibold"></p>
+            <p id="explanation-text" class="mt-2 text-sm"></p>
+        </div>
+        
+        <div id="result-area" class="hidden text-center py-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Hoàn thành!</h2>
+            <p class="text-xl text-gray-600">Điểm cuối cùng của bạn là <span id="final-score" class="font-bold"></span>.</p>
+            <p id="result-message" class="text-md text-gray-500 mt-2"></p>
+            <button id="restart-btn" class="mt-8 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Làm lại
+            </button>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+            <button id="submit-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50" disabled>
+                Kiểm tra
+            </button>
+            <button id="next-btn" class="hidden bg-gray-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50">
+                Câu tiếp theo
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Ngân hàng câu hỏi ---
+        const questions = [
+            // 8 câu hỏi gốc
+            { question: "Dịch vụ AWS nào sau đây được sử dụng để xây dựng, huấn luyện và triển khai các mô hình học máy (machine learning) một cách nhanh chóng?", options: ["Amazon Lex", "Amazon Polly", "Amazon SageMaker", "Amazon Rekognition"], answer: "Amazon SageMaker", explanation: "Amazon SageMaker là một dịch vụ được quản lý hoàn toàn, cung cấp cho mọi nhà phát triển và nhà khoa học dữ liệu khả năng xây dựng, huấn luyện và triển khai các mô hình học máy (ML) trên quy mô lớn." },
+            { question: "Một công ty muốn phân tích hình ảnh và video để xác định các đối tượng, con người, văn bản, cảnh và hoạt động. Dịch vụ AWS AI nào phù hợp nhất cho yêu cầu này?", options: ["Amazon Comprehend", "Amazon Rekognition", "Amazon Transcribe", "Amazon Textract"], answer: "Amazon Rekognition", explanation: "Amazon Rekognition giúp dễ dàng thêm phân tích hình ảnh và video vào ứng dụng của bạn bằng cách sử dụng công nghệ deep learning đã được chứng minh, có khả năng mở rộng cao mà không yêu cầu chuyên môn về học máy." },
+            { question: "Bạn cần chuyển đổi văn bản thành giọng nói tự nhiên. Dịch vụ AWS nào bạn nên sử dụng?", options: ["Amazon Transcribe", "Amazon Polly", "Amazon Lex", "Amazon Translate"], answer: "Amazon Polly", explanation: "Amazon Polly là một dịch vụ chuyển văn bản thành giọng nói (Text-to-Speech), sử dụng công nghệ deep learning tiên tiến để tổng hợp giọng nói nghe như người thật." },
+            { question: "Một nhà phát triển muốn xây dựng một chatbot cho ứng dụng đặt pizza. Dịch vụ nào của AWS cho phép họ xây dựng giao diện đàm thoại bằng giọng nói và văn bản?", options: ["Amazon Kendra", "Amazon Personalize", "Amazon Forecast", "Amazon Lex"], answer: "Amazon Lex", explanation: "Amazon Lex là một dịch vụ để xây dựng các giao diện đàm thoại vào bất kỳ ứng dụng nào bằng giọng nói và văn bản. Nó cung cấp công nghệ deep learning của nhận dạng giọng nói tự động (ASR) và hiểu ngôn ngữ tự nhiên (NLU)." },
+            { question: "Loại học máy nào liên quan đến việc huấn luyện một mô hình trên một tập dữ liệu có các cặp đầu vào-đầu ra đã được gán nhãn?", options: ["Học không giám sát (Unsupervised learning)", "Học tăng cường (Reinforcement learning)", "Học có giám sát (Supervised learning)", "Học sâu (Deep learning)"], answer: "Học có giám sát (Supervised learning)", explanation: "Trong học có giám sát, thuật toán học từ một tập dữ liệu huấn luyện đã được gán nhãn, giúp thuật toán học cách dự đoán đầu ra từ dữ liệu đầu vào mới." },
+            { question: "Dịch vụ AWS nào sử dụng xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin chi tiết và mối quan hệ trong văn bản?", options: ["Amazon Textract", "Amazon Translate", "Amazon Comprehend", "Amazon Rekognition"], answer: "Amazon Comprehend", explanation: "Amazon Comprehend là một dịch vụ xử lý ngôn ngữ tự nhiên (NLP) sử dụng học máy để tìm ra thông tin chi tiết và mối quan hệ trong văn bản. Nó xác định ngôn ngữ của văn bản; trích xuất các cụm từ chính, địa điểm, tên người, thương hiệu hoặc sự kiện." },
+            { question: "Một công ty bán lẻ trực tuyến muốn cung cấp các đề xuất sản phẩm được cá nhân hóa cho người dùng của mình. Dịch vụ AWS nào có thể giúp họ đạt được điều này?", options: ["Amazon Forecast", "Amazon Personalize", "Amazon Kendra", "Amazon SageMaker"], answer: "Amazon Personalize", explanation: "Amazon Personalize là một dịch vụ học máy cho phép các nhà phát triển dễ dàng thêm các đề xuất được cá nhân hóa vào ứng dụng của họ. Nó dựa trên cùng một công nghệ được sử dụng tại Amazon.com." },
+            { question: "Dịch vụ nào của AWS có thể tự động trích xuất văn bản và dữ liệu từ các tài liệu được quét?", options: ["Amazon Transcribe", "Amazon Polly", "Amazon Textract", "Amazon Comprehend"], answer: "Amazon Textract", explanation: "Amazon Textract tự động trích xuất văn bản, chữ viết tay và dữ liệu từ các tài liệu được quét. Nó vượt xa nhận dạng ký tự quang học (OCR) đơn giản để xác định nội dung của các trường trong biểu mẫu và thông tin được lưu trữ trong bảng." },
+            
+            // 57 câu hỏi mới
+            { question: "Hiện tượng nào xảy ra khi một mô hình học máy hoạt động rất tốt trên dữ liệu huấn luyện nhưng lại kém trên dữ liệu mới?", options: ["Underfitting (Dưới khớp)", "Overfitting (Quá khớp)", "Bias (Thiên vị)", "Variance (Phương sai)"], answer: "Overfitting (Quá khớp)", explanation: "Overfitting xảy ra khi mô hình học quá chi tiết các nhiễu và đặc điểm của tập dữ liệu huấn luyện, khiến nó không thể tổng quát hóa tốt cho dữ liệu chưa từng thấy." },
+            { question: "Trong học máy, bài toán nào dự đoán một giá trị liên tục (ví dụ: giá nhà)?", options: ["Classification (Phân loại)", "Regression (Hồi quy)", "Clustering (Phân cụm)", "Reinforcement Learning (Học tăng cường)"], answer: "Regression (Hồi quy)", explanation: "Hồi quy là một loại bài toán học có giám sát nhằm dự đoán một kết quả có giá trị liên tục, chẳng hạn như giá cả, nhiệt độ hoặc doanh số." },
+            { question: "Dịch vụ nào của AWS được thiết kế để cung cấp khả năng tìm kiếm thông minh cho các trang web và ứng dụng bằng cách sử dụng xử lý ngôn ngữ tự nhiên?", options: ["Amazon Lex", "Amazon Comprehend", "Amazon Kendra", "Amazon Textract"], answer: "Amazon Kendra", explanation: "Amazon Kendra là một dịch vụ tìm kiếm thông minh, được hỗ trợ bởi học máy. Kendra tái định hình tìm kiếm doanh nghiệp cho các trang web và ứng dụng của bạn để người dùng có thể dễ dàng tìm thấy nội dung họ đang tìm kiếm." },
+            { question: "Tính năng nào của Amazon SageMaker giúp tự động xây dựng, huấn luyện và tinh chỉnh các mô hình học máy tốt nhất dựa trên dữ liệu của bạn?", options: ["SageMaker Studio", "SageMaker Ground Truth", "SageMaker Autopilot", "SageMaker Data Wrangler"], answer: "SageMaker Autopilot", explanation: "Amazon SageMaker Autopilot tự động kiểm tra các thuật toán và siêu tham số khác nhau để tìm ra mô hình tốt nhất cho tập dữ liệu của bạn, giúp tiết kiệm thời gian và công sức." },
+            { question: "Một tổ chức chăm sóc sức khỏe cần trích xuất thông tin y tế, chẳng hạn như chẩn đoán và thuốc, từ các ghi chú của bác sĩ. Dịch vụ nào là phù hợp nhất?", options: ["Amazon Comprehend", "Amazon Comprehend Medical", "Amazon Textract", "Amazon Transcribe Medical"], answer: "Amazon Comprehend Medical", explanation: "Amazon Comprehend Medical là một dịch vụ NLP đủ điều kiện HIPAA, sử dụng học máy để trích xuất thông tin sức khỏe từ văn bản y tế phi cấu trúc." },
+            { question: "Khái niệm nào trong AI có trách nhiệm (Responsible AI) đề cập đến việc đảm bảo các mô hình ML không tạo ra kết quả thiên vị đối với các nhóm người dùng cụ thể?", options: ["Explainability (Khả năng giải thích)", "Fairness (Công bằng)", "Transparency (Minh bạch)", "Privacy (Quyền riêng tư)"], answer: "Fairness (Công bằng)", explanation: "Công bằng trong AI là việc đảm bảo rằng các dự đoán của mô hình không bị ảnh hưởng tiêu cực bởi các đặc điểm nhạy cảm của người dùng như chủng tộc, giới tính hoặc khuynh hướng." },
+            { question: "Bạn đang xây dựng một hệ thống dự báo nhu cầu cho chuỗi cửa hàng bán lẻ. Dịch vụ AWS nào được thiết kế riêng cho các bài toán dự báo chuỗi thời gian?", options: ["Amazon Personalize", "Amazon SageMaker", "Amazon Forecast", "Amazon Kendra"], answer: "Amazon Forecast", explanation: "Amazon Forecast là một dịch vụ được quản lý hoàn toàn, sử dụng học máy để cung cấp các dự báo chuỗi thời gian có độ chính xác cao, dựa trên cùng công nghệ được Amazon sử dụng." },
+            { question: "Dịch vụ nào của Amazon SageMaker giúp bạn gắn nhãn cho các tập dữ liệu lớn để huấn luyện mô hình?", options: ["SageMaker Data Wrangler", "SageMaker Feature Store", "SageMaker Ground Truth", "SageMaker Pipelines"], answer: "SageMaker Ground Truth", explanation: "Amazon SageMaker Ground Truth giúp bạn xây dựng các tập dữ liệu huấn luyện có độ chính xác cao cho học máy một cách nhanh chóng, bằng cách sử dụng nhân viên gán nhãn thông qua Amazon Mechanical Turk và các nhà cung cấp bên thứ ba, hoặc lực lượng lao động riêng của bạn." },
+            { question: "Một công ty muốn chuyển đổi hàng loạt tài liệu âm thanh được ghi lại thành văn bản. Dịch vụ nào là lựa chọn tốt nhất?", options: ["Amazon Polly", "Amazon Lex", "Amazon Transcribe", "Amazon Translate"], answer: "Amazon Transcribe", explanation: "Amazon Transcribe là dịch vụ nhận dạng giọng nói tự động (ASR) giúp dễ dàng thêm khả năng chuyển giọng nói thành văn bản vào ứng dụng. Nó có thể xử lý các tệp âm thanh theo lô (batch) hoặc theo thời gian thực (real-time)." },
+            { question: "Mục đích chính của tập dữ liệu xác thực (validation set) trong vòng đời ML là gì?", options: ["Để huấn luyện mô hình", "Để đánh giá hiệu suất cuối cùng của mô hình", "Để tinh chỉnh các siêu tham số của mô hình", "Để thu thập dữ liệu mới"], answer: "Để tinh chỉnh các siêu tham-số của mô hình", explanation: "Tập xác thực được sử dụng để điều chỉnh các siêu tham số của mô hình (ví dụ: tốc độ học) và chọn ra mô hình hoạt động tốt nhất, tránh tình trạng quá khớp với tập kiểm tra (test set)." },
+            { question: "Dịch vụ nào của AWS cho phép các nhà phát triển viết mã nhanh hơn bằng cách cung cấp các đề xuất mã nguồn theo thời gian thực?", options: ["AWS Cloud9", "Amazon CodeGuru", "Amazon CodeWhisperer", "AWS CodeCommit"], answer: "Amazon CodeWhisperer", explanation: "Amazon CodeWhisperer là một người bạn đồng hành mã hóa dựa trên AI, giúp cải thiện năng suất của nhà phát triển bằng cách tạo ra các đề xuất mã nguồn trong thời gian thực dựa trên các bình luận và mã hiện có của họ." },
+            { question: "Loại học máy nào mà một tác nhân (agent) học cách hành xử trong một môi trường bằng cách thực hiện các hành động và nhận phần thưởng hoặc hình phạt?", options: ["Học có giám sát", "Học không giám sát", "Học bán giám sát", "Học tăng cường"], answer: "Học tăng cường", explanation: "Học tăng cường (Reinforcement Learning) là một lĩnh vực của học máy liên quan đến cách các tác nhân thông minh nên thực hiện các hành động trong một môi trường để tối đa hóa phần thưởng tích lũy." },
+            { question: "Amazon Rekognition có thể được sử dụng cho tác vụ nào sau đây?", options: ["Dịch văn bản giữa các ngôn ngữ", "Phát hiện các vật thể không an toàn trong hình ảnh (content moderation)", "Tạo dự báo tài chính", "Xây dựng chatbot"], answer: "Phát hiện các vật thể không an-toàn trong hình ảnh (content moderation)", explanation: "Amazon Rekognition có thể phân tích hình ảnh và video để phát hiện nội dung không phù hợp, không an toàn hoặc phản cảm, giúp cho việc kiểm duyệt nội dung trở nên dễ dàng hơn." },
+            { question: "Thành phần nào của Amazon Lex định nghĩa một mục tiêu mà người dùng muốn đạt được (ví dụ: 'đặt pizza')?", options: ["Slot (Khe)", "Intent (Ý định)", "Utterance (Phát ngôn)", "Prompt (Lời nhắc)"], answer: "Intent (Ý định)", explanation: "Một ý định (Intent) đại diện cho một hành động mà người dùng muốn thực hiện. Mỗi ý định chứa các phát ngôn mẫu (sample utterances) và các khe (slots) để thu thập thông tin cần thiết." },
+            { question: "Dịch vụ nào của SageMaker cung cấp một kho lưu trữ tập trung để lưu trữ, cập nhật, truy xuất và chia sẻ các đặc trưng (features) học máy?", options: ["SageMaker Data Wrangler", "SageMaker Feature Store", "SageMaker Ground Truth", "SageMaker Studio"], answer: "SageMaker Feature Store", explanation: "Amazon SageMaker Feature Store là một kho lưu trữ được quản lý hoàn toàn cho các đặc trưng ML, giúp các nhóm dễ dàng chia sẻ và tái sử dụng các đặc trưng, đảm bảo tính nhất quán giữa huấn luyện và suy luận." },
+            { question: "Một công ty tài chính muốn phát hiện các giao dịch thẻ tín dụng có khả năng gian lận trong thời gian thực. Dịch vụ nào của AWS được thiết kế cho mục đích này?", options: ["Amazon GuardDuty", "Amazon Inspector", "Amazon Fraud Detector", "Amazon Comprehend"], answer: "Amazon Fraud Detector", explanation: "Amazon Fraud Detector là một dịch vụ được quản lý hoàn toàn giúp dễ dàng xác định các hoạt động trực tuyến có khả năng gian lận, chẳng hạn như thanh toán gian lận và tạo tài khoản giả." },
+            { question: "Trong Amazon Polly, bạn có thể sử dụng ngôn ngữ đánh dấu nào để kiểm soát các khía cạnh khác nhau của giọng nói như phát âm, âm lượng và tốc độ?", options: ["HTML", "XML", "JSON", "SSML"], answer: "SSML", explanation: "Ngôn ngữ đánh dấu tổng hợp giọng nói (Speech Synthesis Markup Language - SSML) là một ngôn ngữ đánh dấu dựa trên XML cho phép các nhà phát triển tùy chỉnh việc tạo ra giọng nói từ văn bản." },
+            { question: "Dịch vụ nào của AWS giúp phân tích các cuộc gọi trong trung tâm liên lạc để thu được thông tin chi tiết về khách hàng và chất lượng dịch vụ?", options: ["Amazon Transcribe", "Amazon Connect", "Contact Lens for Amazon Connect", "Amazon Lex"], answer: "Contact Lens for Amazon Connect", explanation: "Contact Lens for Amazon Connect là một bộ khả năng phân tích được hỗ trợ bởi học máy, tích hợp sẵn trong Amazon Connect. Nó giúp bạn hiểu rõ hơn về cảm xúc và xu hướng của các cuộc trò chuyện với khách hàng." },
+            { question: "Khi sử dụng Amazon Translate, tính năng nào cho phép bạn tùy chỉnh kết quả dịch để đảm bảo các tên thương hiệu hoặc thuật ngữ cụ thể luôn được dịch theo một cách nhất định?", options: ["Batch Translation (Dịch hàng loạt)", "Real-time Translation (Dịch thời gian thực)", "Custom Terminology (Thuật ngữ tùy chỉnh)", "Automatic Language Detection (Tự động phát hiện ngôn ngữ)"], answer: "Custom Terminology (Thuật ngữ tùy chỉnh)", explanation: "Thuật ngữ tùy chỉnh cho phép bạn tạo một tệp chứa các cặp thuật ngữ nguồn và đích để tùy chỉnh đầu ra của Amazon Translate, đảm bảo tính nhất quán và chính xác cho các từ vựng chuyên ngành." },
+            { question: "Tính năng nào của Amazon SageMaker cung cấp các mô hình, sổ tay và bộ dữ liệu được xây dựng sẵn để giúp người dùng bắt đầu nhanh chóng với các bài toán ML phổ biến?", options: ["SageMaker Autopilot", "SageMaker JumpStart", "SageMaker Neo", "SageMaker Debugger"], answer: "SageMaker JumpStart", explanation: "Amazon SageMaker JumpStart cung cấp quyền truy cập vào hàng trăm thuật toán và mô hình được xây dựng sẵn, cũng như các giải pháp được cấu hình sẵn cho các trường hợp sử dụng phổ biến, giúp tăng tốc đáng kể quá trình phát triển ML." },
+            { question: "Một nhà máy sản xuất muốn sử dụng thị giác máy tính để phát hiện các lỗi nhỏ trên dây chuyền lắp ráp của mình. Dịch vụ nào của AWS phù hợp nhất?", options: ["Amazon Rekognition", "Amazon Lookout for Vision", "Amazon Monitron", "Amazon Textract"], answer: "Amazon Lookout for Vision", explanation: "Amazon Lookout for Vision là một dịch vụ thị giác máy tính sử dụng ML để tìm kiếm các lỗi và sự bất thường trong hình ảnh và luồng video từ dây chuyền sản xuất của bạn." },
+            { question: "Khái niệm nào trong ML đề cập đến quá trình chuyển đổi dữ liệu thô thành các định dạng phù hợp hơn cho việc huấn luyện mô hình?", options: ["Model deployment (Triển khai mô hình)", "Hyperparameter tuning (Tinh chỉnh siêu tham số)", "Feature engineering (Kỹ thuật đặc trưng)", "Model evaluation (Đánh giá mô hình)"], answer: "Feature engineering (Kỹ thuật đặc trưng)", explanation: "Kỹ thuật đặc trưng là quá trình sử dụng kiến thức chuyên môn để tạo ra các biến đầu vào (đặc trưng) mới từ dữ liệu thô, giúp các thuật toán học máy hoạt động hiệu quả hơn." },
+            { question: "Dịch vụ nào của SageMaker giúp các nhà phân tích kinh doanh xây dựng mô hình ML bằng giao diện trực quan mà không cần viết mã?", options: ["SageMaker Studio", "SageMaker Canvas", "SageMaker Data Wrangler", "SageMaker Autopilot"], answer: "SageMaker Canvas", explanation: "Amazon SageMaker Canvas cung cấp cho các nhà phân tích kinh doanh một giao diện trực quan, điểm và nhấp, cho phép họ tạo ra các dự đoán ML chính xác một mình - mà không cần kinh nghiệm về học máy hoặc viết một dòng mã nào." },
+            { question: "Một công ty muốn phân tích các chỉ số vận hành từ thiết bị công nghiệp để dự đoán thời điểm cần bảo trì. Dịch vụ nào của AWS có thể giúp?", options: ["Amazon Lookout for Vision", "Amazon Lookout for Equipment", "Amazon Forecast", "Amazon Monitron"], answer: "Amazon Lookout for Equipment", explanation: "Amazon Lookout for Equipment phân tích dữ liệu từ các cảm biến trên thiết bị của bạn để phát hiện các hành vi bất thường, giúp bạn có thể hành động và tránh thời gian chết ngoài kế hoạch." },
+            { question: "Trong Amazon Transcribe, tính năng nào cho phép dịch vụ nhận dạng và gắn nhãn cho những người nói khác nhau trong một bản ghi âm?", options: ["Custom Vocabulary (Từ vựng tùy chỉnh)", "Speaker Identification (Nhận dạng người nói)", "Channel Identification (Nhận dạng kênh)", "Streaming Transcription (Phiên âm luồng)"], answer: "Speaker Identification (Nhận dạng người nói)", explanation: "Nhận dạng người nói (còn gọi là phân đoạn người nói) xử lý âm thanh để xác định ai đã nói và khi nào, sau đó gán nhãn cho từng từ trong bản ghi." },
+            { question: "Một công ty truyền thông muốn xây dựng một công cụ đề xuất tin bài tương tự như những gì người dùng đã đọc. Đây là một ví dụ về loại bài toán nào?", options: ["Regression (Hồi quy)", "Forecasting (Dự báo)", "Classification (Phân loại)", "Recommendation (Đề xuất)"], answer: "Recommendation (Đề xuất)", explanation: "Hệ thống đề xuất dự đoán sở thích hoặc xếp hạng mà người dùng sẽ dành cho một mặt hàng. Amazon Personalize là dịch vụ lý tưởng cho trường hợp sử dụng này." },
+            { question: "Dịch vụ nào của SageMaker giúp gỡ lỗi và phân tích các vấn đề trong quá trình huấn luyện mô hình, chẳng hạn như hiện tượng mất mát (loss) không giảm?", options: ["SageMaker Clarify", "SageMaker Model Monitor", "SageMaker Debugger", "SageMaker Pipelines"], answer: "SageMaker Debugger", explanation: "Amazon SageMaker Debugger cho phép các nhà phát triển gỡ lỗi và phân tích các công việc huấn luyện phức tạp để khắc phục các vấn đề về tối ưu hóa mô hình, chẳng hạn như gradient biến mất hoặc bùng nổ." },
+            { question: "Mục tiêu chính của học không giám sát (unsupervised learning) là gì?", options: ["Dự đoán một giá trị mục tiêu đã được gán nhãn", "Tìm ra các mẫu hoặc cấu trúc tiềm ẩn trong dữ liệu chưa được gán nhãn", "Học thông qua thử và sai với phần thưởng", "Phân loại dữ liệu vào các danh mục được xác định trước"], answer: "Tìm ra các mẫu hoặc cấu trúc tiềm ẩn trong dữ liệu chưa được gán nhãn", explanation: "Học không giám sát phân tích dữ liệu chưa được gán nhãn để tìm ra các nhóm (phân cụm) hoặc các quy tắc liên kết mà không có bất kỳ kiến thức nào về các nhãn đầu ra." },
+            { question: "Một nhà phát triển ứng dụng di động muốn cho phép người dùng chụp ảnh thực đơn và dịch nó sang ngôn ngữ của họ. Sự kết hợp của những dịch vụ nào là tốt nhất?", options: ["Amazon Rekognition và Amazon Polly", "Amazon Textract và Amazon Translate", "Amazon Transcribe và Amazon Lex", "Amazon Comprehend và Amazon Polly"], answer: "Amazon Textract và Amazon Translate", explanation: "Amazon Textract có thể trích xuất văn bản từ hình ảnh của thực đơn, và sau đó Amazon Translate có thể dịch văn bản đó sang ngôn ngữ mong muốn." },
+            { question: "Dịch vụ nào của SageMaker giúp phát hiện sự sai lệch về chất lượng của các mô hình ML đã được triển khai trong môi trường sản xuất?", options: ["SageMaker Debugger", "SageMaker Clarify", "SageMaker Model Monitor", "SageMaker Autopilot"], answer: "SageMaker Model Monitor", explanation: "Amazon SageMaker Model Monitor liên tục theo dõi chất lượng của các mô hình học máy của bạn trong sản xuất, phát hiện các sai lệch như trôi dạt dữ liệu (data drift) và trôi dạt khái niệm (concept drift)." },
+            { question: "Một công ty muốn đảm bảo rằng các mô hình cho vay của họ không phân biệt đối xử dựa trên các thuộc tính nhạy cảm. Dịch vụ nào của SageMaker có thể giúp đánh giá sự thiên vị (bias)?", options: ["SageMaker Ground Truth", "SageMaker Debugger", "SageMaker Clarify", "SageMaker Model Monitor"], answer: "SageMaker Clarify", explanation: "Amazon SageMaker Clarify cung cấp cho các nhà phát triển học máy khả năng hiển thị cao hơn vào dữ liệu huấn luyện và các mô hình của họ để họ có thể xác định và hạn chế sự thiên vị và giải thích các dự đoán." },
+            { question: "Đâu là ví dụ về một bài toán phân loại (classification)?", options: ["Dự đoán giá cổ phiếu vào ngày mai", "Phân nhóm khách hàng dựa trên hành vi mua sắm", "Xác định xem một email là thư rác (spam) hay không phải thư rác (ham)", "Dự báo doanh số bán hàng cho quý tới"], answer: "Xác định xem một email là thư rác (spam) hay không phải thư rác (ham)", explanation: "Phân loại là bài toán dự đoán một nhãn rời rạc (danh mục). Việc xác định một email thuộc loại 'spam' hay 'ham' là một ví dụ kinh điển về phân loại nhị phân." },
+            { question: "Dịch vụ AWS nào giúp tổng hợp và phân tích dữ liệu sức khỏe quy mô lớn và chuẩn bị nó cho ML?", options: ["Amazon Comprehend Medical", "Amazon Transcribe Medical", "Amazon HealthLake", "Amazon Forecast"], answer: "Amazon HealthLake", explanation: "Amazon HealthLake là một dịch vụ đủ điều kiện HIPAA cung cấp một kho dữ liệu tập trung để lưu trữ, chuyển đổi, truy vấn và phân tích dữ liệu sức khỏe ở quy mô lớn." },
+            { question: "Một nhà khoa học dữ liệu muốn tự động hóa và điều phối toàn bộ quy trình làm việc ML của họ, từ chuẩn bị dữ liệu đến triển khai mô hình. Dịch vụ nào của SageMaker phù hợp nhất?", options: ["SageMaker Studio", "SageMaker Pipelines", "SageMaker Data Wrangler", "SageMaker Autopilot"], answer: "SageMaker Pipelines", explanation: "Amazon SageMaker Pipelines là dịch vụ tích hợp liên tục và phân phối liên tục (CI/CD) được xây dựng có mục đích đầu tiên cho học máy, giúp tự động hóa các bước khác nhau của quy trình làm việc ML." },
+            { question: "Amazon Rekognition có thể phát hiện loại thông tin nào sau đây trong một hình ảnh?", options: ["Cảm xúc của khuôn mặt", "Dịch văn bản", "Dự báo doanh thu", "Tóm tắt tài liệu"], answer: "Cảm xúc của khuôn mặt", explanation: "Amazon Rekognition có thể phân tích các đặc điểm trên khuôn mặt để phát hiện các cảm xúc như 'Vui vẻ', 'Buồn bã', 'Tức giận', 'Ngạc nhiên', v.v." },
+            { question: "Một công ty muốn phân tích các bình luận của khách hàng trên mạng xã hội để xác định xem cảm xúc chung là tích cực, tiêu cực hay trung tính. Dịch vụ nào là phù hợp nhất?", options: ["Amazon Translate", "Amazon Comprehend", "Amazon Lex", "Amazon Textract"], answer: "Amazon Comprehend", explanation: "Phân tích tình cảm (Sentiment analysis) là một tính năng cốt lõi của Amazon Comprehend, giúp xác định cảm xúc được thể hiện trong một đoạn văn bản." },
+            { question: "Đâu là lợi ích chính của việc sử dụng các dịch vụ AI cấp cao của AWS (ví dụ: Rekognition, Polly) so với việc tự xây dựng mô hình trên SageMaker?", options: ["Kiểm soát hoàn toàn thuật toán", "Không cần dữ liệu đã được gán nhãn", "Yêu cầu chuyên môn sâu về ML", "Tốc độ triển khai nhanh hơn và không cần quản lý cơ sở hạ tầng"], answer: "Tốc độ triển khai nhanh hơn và không cần quản lý cơ sở hạ tầng", explanation: "Các dịch vụ AI cấp cao được đào tạo trước và quản lý hoàn toàn, cho phép các nhà phát triển thêm trí thông minh vào ứng dụng một cách nhanh chóng thông qua các lệnh gọi API đơn giản mà không cần kiến thức chuyên sâu về ML." },
+            { question: "Dịch vụ nào của AWS cung cấp một hệ thống giám sát đầu cuối cho thiết bị công nghiệp sử dụng các cảm biến và một cổng kết nối để phát hiện các tình trạng bất thường?", options: ["Amazon Lookout for Equipment", "Amazon SageMaker", "Amazon Monitron", "AWS IoT Core"], answer: "Amazon Monitron", explanation: "Amazon Monitron là một hệ thống đầu cuối sử dụng học máy để phát hiện các tình trạng bất thường trong thiết bị công nghiệp, bao gồm các cảm biến không dây, một cổng kết nối và một ứng dụng di động để theo dõi." },
+            { question: "Trong Amazon Lex, 'utterances' (phát ngôn) là gì?", options: ["Các câu hỏi mà bot hỏi người dùng", "Các hành động mà bot có thể thực hiện", "Các cụm từ mà người dùng có thể nói để kích hoạt một ý định", "Các thông tin mà bot cần thu thập từ người dùng"], answer: "Các cụm từ mà người dùng có thể nói để kích hoạt một ý định", explanation: "Phát ngôn mẫu là các cụm từ mà người dùng có khả năng nói để thể hiện ý định của họ. Ví dụ: 'Tôi muốn đặt pizza' hoặc 'Đặt một chiếc pizza' là các phát ngôn cho ý định 'OrderPizza'." },
+            { question: "Tính năng nào của Amazon SageMaker giúp tối ưu hóa một mô hình đã được huấn luyện để chạy hiệu quả hơn trên các thiết bị phần cứng mục tiêu cụ thể?", options: ["SageMaker Debugger", "SageMaker Clarify", "SageMaker Neo", "SageMaker Autopilot"], answer: "SageMaker Neo", explanation: "Amazon SageMaker Neo tối ưu hóa các mô hình để chạy nhanh hơn gấp đôi mà không mất độ chính xác. Nó tự động tối ưu hóa các mô hình học máy được xây dựng bằng các framework phổ biến cho các thiết bị biên hoặc môi trường đám mây cụ thể." },
+            { question: "Một công ty muốn trích xuất dữ liệu từ các bảng và biểu mẫu trong các tệp PDF và hình ảnh. Dịch vụ nào có thể thực hiện điều này?", options: ["Amazon Comprehend", "Amazon Rekognition", "Amazon Textract", "Amazon Transcribe"], answer: "Amazon Textract", explanation: "Amazon Textract vượt xa OCR đơn giản bằng cách xác định và trích xuất dữ liệu từ các biểu mẫu (cặp khóa-giá trị) và các bảng, giữ nguyên cấu trúc của chúng." },
+            { question: "Đâu là một ví dụ về học không giám sát?", options: ["Dự đoán liệu một khách hàng có rời bỏ hay không", "Phân nhóm các bài báo tin tức thành các chủ đề khác nhau", "Xác định các chữ số viết tay", "Dự báo nhiệt độ"], answer: "Phân nhóm các bài báo tin tức thành các chủ-đề khác nhau", explanation: "Phân cụm (clustering) là một kỹ thuật học không giám sát phổ biến. Trong trường hợp này, thuật toán sẽ tự tìm ra các nhóm chủ đề trong các bài báo mà không cần được cho biết trước các chủ đề đó là gì." },
+            { question: "Dịch vụ nào của AWS cho phép bạn xây dựng các mô hình đề xuất sản phẩm có độ chính xác cao?", options: ["Amazon Forecast", "Amazon Kendra", "Amazon Personalize", "Amazon Comprehend"], answer: "Amazon Personalize", explanation: "Amazon Personalize giúp các nhà phát triển dễ dàng xây dựng các ứng dụng với các đề xuất được cá nhân hóa, sử dụng cùng công nghệ đã được Amazon.com hoàn thiện trong nhiều năm." },
+            { question: "Mô hình học máy là gì?", options: ["Một tập dữ liệu lớn", "Một thuật toán được sử dụng để huấn luyện", "Một chương trình máy tính đã học được các mẫu từ dữ liệu", "Một máy chủ vật lý để chạy các tác vụ ML"], answer: "Một chương trình máy tính đã học được các mẫu từ dữ liệu", explanation: "Một mô hình là đầu ra của quá trình huấn luyện. Nó là một thực thể tính toán có thể nhận dữ liệu đầu vào và tạo ra các dự đoán dựa trên các mẫu mà nó đã học được." },
+            { question: "Dịch vụ nào của SageMaker cung cấp một môi trường phát triển tích hợp (IDE) dựa trên web cho học máy?", options: ["SageMaker Canvas", "SageMaker Studio", "SageMaker Ground Truth", "SageMaker Pipelines"], answer: "SageMaker Studio", explanation: "Amazon SageMaker Studio là IDE dựa trên web đầu tiên cho học máy, cung cấp một giao diện trực quan duy nhất nơi bạn có thể thực hiện tất cả các bước phát triển ML." },
+            { question: "Tại sao việc có dữ liệu đa dạng và đại diện lại quan trọng cho việc huấn luyện mô hình ML?", options: ["Để làm cho mô hình nhỏ hơn", "Để giảm thời gian huấn luyện", "Để tránh sự thiên vị (bias) và cải thiện khả năng tổng quát hóa", "Để giảm chi phí lưu trữ"], answer: "Để tránh sự thiên vị (bias) và cải thiện khả năng tổng quát hóa", explanation: "Nếu dữ liệu huấn luyện không đại diện cho thế giới thực, mô hình sẽ học các mẫu sai lệch và hoạt động kém khi gặp dữ liệu mới, đa dạng hơn." },
+            { question: "Một công ty muốn phát hiện các thông tin nhận dạng cá nhân (PII) trong một kho tài liệu lớn. Họ nên sử dụng dịch vụ nào?", options: ["Amazon Macie", "Amazon Comprehend", "Amazon GuardDuty", "Amazon Textract"], answer: "Amazon Comprehend", explanation: "Amazon Comprehend có khả năng phát hiện PII, cho phép bạn xác định và che (redact) các thông tin nhạy cảm như số an sinh xã hội, số thẻ tín dụng và tên trong các tài liệu văn bản." },
+            { question: "Trong học có giám sát, 'nhãn' (label) là gì?", options: ["Dữ liệu đầu vào của mô hình", "Câu trả lời hoặc kết quả đúng mà mô hình cần dự đoán", "Một siêu tham số của mô hình", "Tên của thuật toán"], answer: "Câu trả lời hoặc kết quả đúng mà mô hình cần dự đoán", explanation: "Nhãn là giá trị đầu ra (hoặc biến mục tiêu) trong một tập dữ liệu đã được gán nhãn. Ví dụ, trong bài toán phân loại email, nhãn sẽ là 'spam' hoặc 'không phải spam'." },
+            { question: "Dịch vụ nào của AWS có thể được sử dụng để dịch các cuộc trò chuyện trong thời gian thực?", options: ["Amazon Polly", "Amazon Transcribe", "Amazon Translate", "Amazon Lex"], answer: "Amazon Translate", explanation: "Amazon Translate hỗ trợ dịch văn bản theo thời gian thực, cho phép các ứng dụng như dịch các cuộc trò chuyện trực tiếp hoặc nội dung mạng xã hội một cách nhanh chóng." },
+            { question: "Một nhà bán lẻ muốn sử dụng dữ liệu bán hàng lịch sử để dự báo doanh số cho 20 sản phẩm bán chạy nhất trong 6 tháng tới. Dịch vụ nào là phù hợp nhất?", options: ["Amazon Personalize", "Amazon Forecast", "Amazon SageMaker", "Amazon Comprehend"], answer: "Amazon Forecast", explanation: "Amazon Forecast được thiết kế đặc biệt cho các bài toán dự báo chuỗi thời gian như dự báo nhu cầu sản phẩm, lập kế hoạch tài chính và lập kế hoạch nguồn lực." },
+            { question: "Tính năng nào của Amazon Rekognition có thể được sử dụng để phát hiện nhân viên có đang đeo thiết bị bảo hộ cá nhân (PPE) như mũ bảo hiểm hay không?", options: ["Content Moderation", "Face Detection", "PPE Detection", "Text in Image"], answer: "PPE Detection", explanation: "Tính năng phát hiện PPE của Amazon Rekognition có thể phân tích hình ảnh để xác định xem người trong ảnh có đang mặc các loại thiết bị bảo hộ cá nhân phổ biến hay không, giúp cải thiện an toàn lao động." },
+            { question: "Dịch vụ nào của SageMaker giúp chuẩn bị dữ liệu cho ML bằng cách cung cấp một giao diện trực quan để làm sạch, chuyển đổi và trực quan hóa dữ liệu?", options: ["SageMaker Data Wrangler", "SageMaker Feature Store", "SageMaker Ground Truth", "SageMaker Autopilot"], answer: "SageMaker Data Wrangler", explanation: "SageMaker Data Wrangler giảm thời gian cần thiết để tổng hợp và chuẩn bị dữ liệu cho học máy từ vài tuần xuống còn vài phút thông qua một giao diện trực quan duy nhất." },
+            { question: "Đâu là trách nhiệm của AWS theo Mô hình Trách nhiệm chung (Shared Responsibility Model) đối với Amazon SageMaker?", options: ["Bảo mật dữ liệu huấn luyện của khách hàng", "Quản lý quyền IAM cho người dùng", "Bảo mật cơ sở hạ tầng vật lý chạy SageMaker", "Phát hiện thiên vị trong mô hình của khách hàng"], answer: "Bảo mật cơ sở hạ tầng vật lý chạy SageMaker", explanation: "Theo Mô hình Trách nhiệm chung, AWS chịu trách nhiệm về 'bảo mật của đám mây', bao gồm phần cứng, phần mềm, mạng và các cơ sở vật chất chạy các dịch vụ của AWS." },
+            { question: "Một công ty muốn xây dựng một mô hình để dự đoán khả năng khách hàng rời bỏ dịch vụ (customer churn). Đây là loại bài toán ML nào?", options: ["Regression (Hồi quy)", "Clustering (Phân cụm)", "Classification (Phân loại)", "Reinforcement Learning (Học tăng cường)"], answer: "Classification (Phân loại)", explanation: "Dự đoán khả năng rời bỏ là một bài toán phân loại nhị phân, trong đó mô hình dự đoán xem một khách hàng sẽ thuộc vào lớp 'rời bỏ' hay 'không rời bỏ'." },
+            { question: "Dịch vụ nào của AWS cung cấp các thuật toán ML được xây dựng sẵn và được tối ưu hóa cho hiệu suất cao trên SageMaker?", options: ["SageMaker JumpStart", "Các thuật toán tích hợp sẵn của SageMaker (Built-in algorithms)", "AWS Marketplace", "SageMaker Autopilot"], answer: "Các thuật toán tích hợp sẵn của SageMaker (Built-in algorithms)", explanation: "Amazon SageMaker cung cấp một loạt các thuật toán tích hợp sẵn, hiệu suất cao bao gồm nhiều loại bài toán khác nhau, giúp bạn bắt đầu huấn luyện nhanh chóng mà không cần viết mã thuật toán từ đầu." },
+            { question: "Khái niệm nào trong AI có trách nhiệm đề cập đến khả năng hiểu và diễn giải các quyết định của một mô hình ML?", options: ["Fairness (Công bằng)", "Privacy (Quyền riêng tư)", "Explainability (Khả năng giải thích)", "Security (Bảo mật)"], answer: "Explainability (Khả năng giải thích)", explanation: "Khả năng giải thích (hay diễn giải) là rất quan trọng để xây dựng niềm tin vào các hệ thống AI, cho phép con người hiểu tại sao một mô hình lại đưa ra một dự đoán hoặc quyết định cụ thể." },
+            { question: "Một người dùng muốn thử nghiệm Amazon SageMaker miễn phí trong một môi trường dựa trên sổ tay Jupyter. Lựa chọn nào là tốt nhất?", options: ["SageMaker Studio", "SageMaker Canvas", "SageMaker Studio Lab", "Một phiên bản EC2 với SageMaker được cài đặt"], answer: "SageMaker Studio Lab", explanation: "Amazon SageMaker Studio Lab là một môi trường phát triển học máy miễn phí, không cần cấu hình, cung cấp cho mọi người quyền truy cập không giới hạn vào máy tính và lưu trữ để học và thử nghiệm với ML." },
+            { question: "Dịch vụ nào của AWS có thể dịch tài liệu với định dạng phức tạp như tệp .docx hoặc .pptx trong khi vẫn giữ nguyên bố cục ban đầu?", options: ["Amazon Translate", "Amazon Textract", "Amazon Comprehend", "Amazon SageMaker"], answer: "Amazon Translate", explanation: "Tính năng dịch tài liệu không đồng bộ (batch) của Amazon Translate có thể xử lý các tệp định dạng phổ biến như DOCX, PPTX, XLSX và giữ nguyên định dạng và kiểu dáng của tài liệu gốc." },
+            { question: "Một công ty đang triển khai một mô hình ML. Họ lo ngại rằng theo thời gian, mối quan hệ giữa các biến đầu vào và đầu ra có thể thay đổi, làm giảm hiệu suất của mô hình. Hiện tượng này được gọi là gì?", options: ["Data drift (Trôi dạt dữ liệu)", "Concept drift (Trôi dạt khái niệm)", "Overfitting (Quá khớp)", "Bias (Thiên vị)"], answer: "Concept drift (Trôi dạt khái niệm)", explanation: "Trôi dạt khái niệm xảy ra khi các thuộc tính thống kê của biến mục tiêu thay đổi theo thời gian. SageMaker Model Monitor có thể giúp phát hiện hiện tượng này." }
+        ];
+
+        // --- DOM Elements ---
+        const quizContainer = document.getElementById('quiz-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackText = document.getElementById('feedback-text');
+        const explanationText = document.getElementById('explanation-text');
+        const resultArea = document.getElementById('result-area');
+        const finalScore = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const scoreTracker = document.getElementById('score-tracker');
+        const questionArea = document.getElementById('question-area');
+        const questionCounter = document.getElementById('question-counter');
+        const progressBar = document.getElementById('progress-bar');
+        const resultMessage = document.getElementById('result-message');
+
+
+        // --- State ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let shuffledQuestions = [];
+
+        // --- Functions ---
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = shuffleArray([...questions]);
+            resultArea.classList.add('hidden');
+            questionArea.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            scoreTracker.textContent = `Điểm: 0`;
+            scoreTracker.classList.remove('hidden');
+            document.getElementById('progress-bar-container').classList.remove('hidden');
+            questionCounter.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            // Reset state from previous question
+            selectedAnswer = null;
+            feedbackArea.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+
+            // Update progress
+            questionCounter.textContent = `Câu ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
+            const progressPercentage = ((currentQuestionIndex) / shuffledQuestions.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
+
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionText.textContent = `${currentQuestion.question}`;
+
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            
+            shuffledOptions.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition-colors');
+                
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = 'option';
+                radioInput.value = option;
+                radioInput.id = option.replace(/\s+/g, '-'); // Create a valid ID
+                radioInput.classList.add('hidden');
+
+                const label = document.createElement('label');
+                label.htmlFor = option.replace(/\s+/g, '-');
+                label.textContent = option;
+                label.classList.add('block', 'w-full', 'cursor-pointer');
+
+                optionElement.appendChild(radioInput);
+                optionElement.appendChild(label);
+                
+                optionElement.addEventListener('click', () => {
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('border-blue-500', 'bg-blue-50'));
+                    optionElement.classList.add('border-blue-500', 'bg-blue-50');
+                    radioInput.checked = true;
+                    selectedAnswer = radioInput.value;
+                    submitBtn.disabled = false;
+                });
+
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function handleSubmit() {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+            
+            if (isCorrect) {
+                score++;
+                scoreTracker.textContent = `Điểm: ${score}`;
+            }
+
+            feedbackArea.classList.remove('hidden');
+            explanationText.innerHTML = `<b>Giải thích:</b> ${currentQuestion.explanation}`;
+            
+            document.querySelectorAll('.option').forEach(opt => {
+                const input = opt.querySelector('input');
+                opt.style.pointerEvents = 'none'; 
+                if (input.value === currentQuestion.answer) {
+                    opt.classList.add('correct');
+                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
+                }
+                if (input.value === selectedAnswer && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
+                }
+            });
+
+            if (isCorrect) {
+                feedbackText.textContent = "Chính xác! 🎉";
+                feedbackArea.classList.remove('bg-red-100');
+                feedbackArea.classList.add('bg-green-100');
+            } else {
+                feedbackText.textContent = "Không chính xác. 🙁";
+                feedbackArea.classList.remove('bg-green-100');
+                feedbackArea.classList.add('bg-red-100');
+            }
+
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+
+            // Update progress bar for the last question
+            if (currentQuestionIndex === shuffledQuestions.length - 1) {
+                 progressBar.style.width = `100%`;
+            }
+        }
+
+        function handleNext() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            questionArea.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            feedbackArea.classList.add('hidden');
+            scoreTracker.classList.add('hidden');
+            questionCounter.classList.add('hidden');
+            document.getElementById('progress-bar-container').classList.add('hidden');
+            
+            resultArea.classList.remove('hidden');
+            finalScore.textContent = `${score} / ${shuffledQuestions.length}`;
+
+            const percentage = (score / shuffledQuestions.length) * 100;
+            if (percentage >= 80) {
+                resultMessage.textContent = "Kết quả xuất sắc! Bạn đã sẵn sàng cho kỳ thi.";
+                resultMessage.className = 'text-md text-green-600 mt-2';
+            } else if (percentage >= 60) {
+                resultMessage.textContent = "Kết quả khá tốt! Hãy ôn tập thêm một chút nữa.";
+                 resultMessage.className = 'text-md text-yellow-600 mt-2';
+            } else {
+                resultMessage.textContent = "Cần cố gắng hơn! Hãy xem lại các phần giải thích để củng cố kiến thức.";
+                 resultMessage.className = 'text-md text-red-600 mt-2';
+            }
+        }
+
+        // --- Event Listeners ---
+        submitBtn.addEventListener('click', handleSubmit);
+        nextBtn.addEventListener('click', handleNext);
+        restartBtn.addEventListener('click', startQuiz);
+
+        // --- Initial Load ---
+        window.onload = startQuiz;
+
+    </script>
+</body>
+</html>

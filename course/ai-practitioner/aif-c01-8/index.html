@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luyện Tập Trắc Nghiệm - AWS AI Practitioner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .option.correct {
+            background-color: #d1fae5; /* green-100 */
+            border-color: #10b981; /* green-500 */
+        }
+        .option.incorrect {
+            background-color: #fee2e2; /* red-100 */
+            border-color: #ef4444; /* red-500 */
+        }
+        .option:hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <div id="quiz-container" class="bg-white w-full max-w-2xl rounded-xl shadow-lg p-6 md:p-8">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Luyện tập AWS AI Practitioner</h1>
+            <div id="score-tracker" class="text-lg font-semibold text-blue-600">Điểm: 0</div>
+        </div>
+        
+        <div id="question-area">
+            <h2 id="question-text" class="text-xl font-semibold text-gray-700 mb-6">Đang tải câu hỏi...</h2>
+            <div id="options-container" class="space-y-4">
+                <!-- Các lựa chọn sẽ được chèn vào đây bằng JavaScript -->
+            </div>
+        </div>
+
+        <div id="feedback-area" class="mt-6 p-4 rounded-lg text-gray-700 hidden">
+            <p id="feedback-text" class="font-semibold"></p>
+            <p id="explanation-text" class="mt-2 text-sm"></p>
+        </div>
+        
+        <div id="result-area" class="hidden text-center py-8">
+            <h2 class="text-3xl font-bold text-gray-800 mb-4">Hoàn thành!</h2>
+            <p class="text-xl text-gray-600">Điểm cuối cùng của bạn là <span id="final-score" class="font-bold"></span>.</p>
+            <button id="restart-btn" class="mt-8 bg-blue-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Làm lại
+            </button>
+        </div>
+
+        <div class="mt-8 flex justify-end">
+            <button id="submit-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50">
+                Kiểm tra
+            </button>
+            <button id="next-btn" class="hidden bg-gray-700 text-white font-bold py-2 px-6 rounded-lg hover:bg-gray-800 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-600 focus:ring-opacity-50">
+                Câu tiếp theo
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Ngân hàng câu hỏi ---
+        const questions = [
+            {
+                question: "Dịch vụ AWS nào sau đây được sử dụng để xây dựng, huấn luyện và triển khai các mô hình học máy (machine learning) một cách nhanh chóng?",
+                options: ["Amazon Lex", "Amazon Polly", "Amazon SageMaker", "Amazon Rekognition"],
+                answer: "Amazon SageMaker",
+                explanation: "Amazon SageMaker là một dịch vụ được quản lý hoàn toàn, cung cấp cho mọi nhà phát triển và nhà khoa học dữ liệu khả năng xây dựng, huấn luyện và triển khai các mô hình học máy (ML) trên quy mô lớn."
+            },
+            {
+                question: "Một công ty muốn phân tích hình ảnh và video để xác định các đối tượng, con người, văn bản, cảnh và hoạt động. Dịch vụ AWS AI nào phù hợp nhất cho yêu cầu này?",
+                options: ["Amazon Comprehend", "Amazon Rekognition", "Amazon Transcribe", "Amazon Textract"],
+                answer: "Amazon Rekognition",
+                explanation: "Amazon Rekognition giúp dễ dàng thêm phân tích hình ảnh và video vào ứng dụng của bạn bằng cách sử dụng công nghệ deep learning đã được chứng minh, có khả năng mở rộng cao mà không yêu cầu chuyên môn về học máy."
+            },
+            {
+                question: "Bạn cần chuyển đổi văn bản thành giọng nói tự nhiên. Dịch vụ AWS nào bạn nên sử dụng?",
+                options: ["Amazon Transcribe", "Amazon Polly", "Amazon Lex", "Amazon Translate"],
+                answer: "Amazon Polly",
+                explanation: "Amazon Polly là một dịch vụ chuyển văn bản thành giọng nói (Text-to-Speech), sử dụng công nghệ deep learning tiên tiến để tổng hợp giọng nói nghe như người thật."
+            },
+            {
+                question: "Một nhà phát triển muốn xây dựng một chatbot cho ứng dụng đặt pizza. Dịch vụ nào của AWS cho phép họ xây dựng giao diện đàm thoại bằng giọng nói và văn bản?",
+                options: ["Amazon Kendra", "Amazon Personalize", "Amazon Forecast", "Amazon Lex"],
+                answer: "Amazon Lex",
+                explanation: "Amazon Lex là một dịch vụ để xây dựng các giao diện đàm thoại vào bất kỳ ứng dụng nào bằng giọng nói và văn bản. Nó cung cấp công nghệ deep learning của nhận dạng giọng nói tự động (ASR) và hiểu ngôn ngữ tự nhiên (NLU)."
+            },
+            {
+                question: "Loại học máy nào liên quan đến việc huấn luyện một mô hình trên một tập dữ liệu có các cặp đầu vào-đầu ra đã được gán nhãn?",
+                options: ["Học không giám sát (Unsupervised learning)", "Học tăng cường (Reinforcement learning)", "Học có giám sát (Supervised learning)", "Học sâu (Deep learning)"],
+                answer: "Học có giám sát (Supervised learning)",
+                explanation: "Trong học có giám sát, thuật toán học từ một tập dữ liệu huấn luyện đã được gán nhãn, giúp thuật toán học cách dự đoán đầu ra từ dữ liệu đầu vào mới."
+            },
+            {
+                question: "Dịch vụ AWS nào sử dụng xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin chi tiết và mối quan hệ trong văn bản?",
+                options: ["Amazon Textract", "Amazon Translate", "Amazon Comprehend", "Amazon Rekognition"],
+                answer: "Amazon Comprehend",
+                explanation: "Amazon Comprehend là một dịch vụ xử lý ngôn ngữ tự nhiên (NLP) sử dụng học máy để tìm ra thông tin chi tiết và mối quan hệ trong văn bản. Nó xác định ngôn ngữ của văn bản; trích xuất các cụm từ chính, địa điểm, tên người, thương hiệu hoặc sự kiện."
+            },
+             {
+                question: "Một công ty bán lẻ trực tuyến muốn cung cấp các đề xuất sản phẩm được cá nhân hóa cho người dùng của mình. Dịch vụ AWS nào có thể giúp họ đạt được điều này?",
+                options: ["Amazon Forecast", "Amazon Personalize", "Amazon Kendra", "Amazon SageMaker"],
+                answer: "Amazon Personalize",
+                explanation: "Amazon Personalize là một dịch vụ học máy cho phép các nhà phát triển dễ dàng thêm các đề xuất được cá nhân hóa vào ứng dụng của họ. Nó dựa trên cùng một công nghệ được sử dụng tại Amazon.com."
+            },
+            {
+                question: "Dịch vụ nào của AWS có thể tự động trích xuất văn bản và dữ liệu từ các tài liệu được quét?",
+                options: ["Amazon Transcribe", "Amazon Polly", "Amazon Textract", "Amazon Comprehend"],
+                answer: "Amazon Textract",
+                explanation: "Amazon Textract tự động trích xuất văn bản, chữ viết tay và dữ liệu từ các tài liệu được quét. Nó vượt xa nhận dạng ký tự quang học (OCR) đơn giản để xác định nội dung của các trường trong biểu mẫu và thông tin được lưu trữ trong bảng."
+            }
+        ];
+
+        // --- DOM Elements ---
+        const quizContainer = document.getElementById('quiz-container');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const submitBtn = document.getElementById('submit-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackText = document.getElementById('feedback-text');
+        const explanationText = document.getElementById('explanation-text');
+        const resultArea = document.getElementById('result-area');
+        const finalScore = document.getElementById('final-score');
+        const restartBtn = document.getElementById('restart-btn');
+        const scoreTracker = document.getElementById('score-tracker');
+        const questionArea = document.getElementById('question-area');
+
+        // --- State ---
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedAnswer = null;
+        let shuffledQuestions = [];
+
+        // --- Functions ---
+
+        function shuffleArray(array) {
+            // Fisher-Yates shuffle algorithm
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        
+        function startQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            shuffledQuestions = shuffleArray([...questions]);
+            resultArea.classList.add('hidden');
+            questionArea.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+            scoreTracker.textContent = `Điểm: 0`;
+            scoreTracker.classList.remove('hidden');
+            loadQuestion();
+        }
+
+        function loadQuestion() {
+            // Reset state from previous question
+            selectedAnswer = null;
+            feedbackArea.classList.add('hidden');
+            optionsContainer.innerHTML = '';
+            submitBtn.disabled = true;
+            submitBtn.classList.remove('hidden');
+            nextBtn.classList.add('hidden');
+
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            questionText.textContent = `Câu ${currentQuestionIndex + 1}: ${currentQuestion.question}`;
+
+            // Shuffle options as well
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            
+            shuffledOptions.forEach(option => {
+                const optionElement = document.createElement('div');
+                optionElement.classList.add('option', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition-colors');
+                
+                const radioInput = document.createElement('input');
+                radioInput.type = 'radio';
+                radioInput.name = 'option';
+                radioInput.value = option;
+                radioInput.id = option;
+                radioInput.classList.add('hidden');
+
+                const label = document.createElement('label');
+                label.htmlFor = option;
+                label.textContent = option;
+                label.classList.add('block', 'w-full', 'cursor-pointer');
+
+                optionElement.appendChild(radioInput);
+                optionElement.appendChild(label);
+                
+                optionElement.addEventListener('click', () => {
+                    // Deselect previous
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('border-blue-500', 'bg-blue-50'));
+                    // Select current
+                    optionElement.classList.add('border-blue-500', 'bg-blue-50');
+                    radioInput.checked = true;
+                    selectedAnswer = radioInput.value;
+                    submitBtn.disabled = false;
+                });
+
+                optionsContainer.appendChild(optionElement);
+            });
+        }
+
+        function handleSubmit() {
+            const currentQuestion = shuffledQuestions[currentQuestionIndex];
+            const isCorrect = selectedAnswer === currentQuestion.answer;
+            
+            // Update score
+            if (isCorrect) {
+                score++;
+                scoreTracker.textContent = `Điểm: ${score}`;
+            }
+
+            // Show feedback
+            feedbackArea.classList.remove('hidden');
+            explanationText.textContent = `Giải thích: ${currentQuestion.explanation}`;
+            
+            // Style options based on correctness
+            document.querySelectorAll('.option').forEach(opt => {
+                const input = opt.querySelector('input');
+                opt.style.pointerEvents = 'none'; // Disable clicking
+                if (input.value === currentQuestion.answer) {
+                    opt.classList.add('correct');
+                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
+                }
+                if (input.value === selectedAnswer && !isCorrect) {
+                    opt.classList.add('incorrect');
+                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
+                }
+            });
+
+            // Update feedback text
+            if (isCorrect) {
+                feedbackText.textContent = "Chính xác! 🎉";
+                feedbackArea.classList.remove('bg-red-100');
+                feedbackArea.classList.add('bg-green-100');
+            } else {
+                feedbackText.textContent = "Không chính xác. 🙁";
+                feedbackArea.classList.remove('bg-green-100');
+                feedbackArea.classList.add('bg-red-100');
+            }
+
+            // Toggle buttons
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.remove('hidden');
+        }
+
+        function handleNext() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < shuffledQuestions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            questionArea.classList.add('hidden');
+            submitBtn.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            feedbackArea.classList.add('hidden');
+            scoreTracker.classList.add('hidden');
+            
+            resultArea.classList.remove('hidden');
+            finalScore.textContent = `${score} / ${shuffledQuestions.length}`;
+        }
+
+        // --- Event Listeners ---
+        submitBtn.addEventListener('click', handleSubmit);
+        nextBtn.addEventListener('click', handleNext);
+        restartBtn.addEventListener('click', startQuiz);
+
+        // --- Initial Load ---
+        window.onload = startQuiz;
+
+    </script>
+</body>
+</html>

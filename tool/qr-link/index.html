@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trình Quét Mã QR</title>
+    <!-- Thư viện jsQR để giải mã QR Code, được tải từ CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <style>
+        /* --- Cài đặt chung cho trang --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #f0f2f5;
+            margin: 0;
+            color: #333;
+            text-align: center;
+        }
+        /* --- Khung chứa nội dung chính --- */
+        .container {
+            background: #ffffff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+            max-width: 500px;
+            width: 90%;
+            transition: all 0.3s ease;
+        }
+        h1 {
+            color: #1c1e21;
+            margin-bottom: 15px;
+        }
+        p {
+            color: #606770;
+            margin-bottom: 25px;
+        }
+        /* --- Tùy chỉnh nút "Chọn ảnh" --- */
+        #qr-input-label {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #007bff;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+        #qr-input-label:hover {
+            background-color: #0056b3;
+        }
+        /* Ẩn đi input file mặc định của trình duyệt */
+        #qr-input {
+            display: none;
+        }
+        /* --- Khu vực hiển thị kết quả --- */
+        #result-container {
+            margin-top: 30px;
+            opacity: 0;
+            visibility: hidden;
+            max-height: 0;
+            transform: translateY(20px);
+            transition: opacity 0.4s ease, transform 0.4s ease, max-height 0.4s ease, visibility 0.4s;
+        }
+        /* Lớp 'visible' được thêm bằng JS để kích hoạt hiệu ứng */
+        #result-container.visible {
+            opacity: 1;
+            visibility: visible;
+            max-height: 200px; /* Chiều cao đủ lớn để chứa nội dung */
+            transform: translateY(0);
+        }
+        .url-output {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 5px 5px 5px 15px;
+            background-color: #f9f9f9;
+        }
+        #qr-url {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-right: 10px;
+            font-size: 16px;
+            color: #0056b3;
+            text-decoration: none;
+        }
+        #qr-url:hover {
+            text-decoration: underline;
+        }
+        /* --- Nút sao chép --- */
+        #copy-btn {
+            padding: 10px 15px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+            white-space: nowrap; /* Ngăn nút bị xuống dòng */
+        }
+        #copy-btn:hover {
+            background-color: #218838;
+        }
+        #copy-btn:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        /* --- Thông báo lỗi/trạng thái --- */
+        #status-message {
+            margin-top: 20px;
+            color: #dc3545;
+            font-weight: 500;
+            min-height: 20px; /* Giữ không gian để tránh nhảy layout */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>🔍 Trình Quét Mã QR</h1>
+        <p>Tải lên một hình ảnh để tự động phát hiện URL trong mã QR.</p>
+        
+        <!-- Nút bấm giả, được liên kết với input thật bằng 'for' -->
+        <label for="qr-input" id="qr-input-label">Chọn ảnh có mã QR</label>
+        <input type="file" id="qr-input" accept="image/*">
+
+        <!-- Vùng hiển thị thông báo trạng thái -->
+        <div id="status-message"></div>
+
+        <!-- Vùng này sẽ hiện ra khi có kết quả -->
+        <div id="result-container">
+            <p style="margin-bottom: 10px;"><strong>URL đã tìm thấy:</strong></p>
+            <div class="url-output">
+                <a id="qr-url" href="#" target="_blank" rel="noopener noreferrer"></a>
+                <button id="copy-btn" disabled>Sao chép</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Canvas được dùng để xử lý ảnh, không cần hiển thị cho người dùng -->
+    <canvas id="canvas" style="display: none;"></canvas>
+
+    <script>
+        // Lấy các phần tử trên trang để tương tác
+        const qrInput = document.getElementById('qr-input');
+        const resultContainer = document.getElementById('result-container');
+        const qrUrlLink = document.getElementById('qr-url');
+        const copyBtn = document.getElementById('copy-btn');
+        const statusMessage = document.getElementById('status-message');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+
+        // Lắng nghe sự kiện khi người dùng chọn một file
+        qrInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) {
+                return;
+            }
+
+            // Reset trạng thái giao diện
+            resultContainer.classList.remove('visible');
+            copyBtn.disabled = true;
+            statusMessage.textContent = 'Đang xử lý...';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = new Image();
+                img.onload = function() {
+                    // Vẽ ảnh lên canvas ẩn để lấy dữ liệu pixel
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    ctx.drawImage(img, 0, 0, img.width, img.height);
+                    
+                    const imageData = ctx.getImageData(0, 0, img.width, img.height);
+                    
+                    // Sử dụng thư viện jsQR để tìm mã trong ảnh
+                    const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                        inversionAttempts: "dontInvert",
+                    });
+
+                    if (code) {
+                        // Nếu tìm thấy mã QR
+                        statusMessage.textContent = ''; // Xóa thông báo xử lý
+                        qrUrlLink.textContent = code.data;
+                        qrUrlLink.href = code.data; // Gán URL để có thể click
+                        copyBtn.disabled = false; // Kích hoạt nút sao chép
+                        resultContainer.classList.add('visible'); // Hiển thị kết quả
+                        copyBtn.textContent = 'Sao chép'; // Reset lại chữ trên nút
+                    } else {
+                        // Nếu không tìm thấy
+                        statusMessage.textContent = "Không tìm thấy mã QR. Vui lòng thử ảnh khác rõ nét hơn.";
+                    }
+                };
+                // Bắt đầu quá trình tải ảnh
+                img.src = e.target.result;
+            };
+            // Đọc file ảnh dưới dạng Data URL
+            reader.readAsDataURL(file);
+        });
+
+        // Lắng nghe sự kiện khi người dùng nhấn nút "Sao chép"
+        copyBtn.addEventListener('click', () => {
+            // Sử dụng API Clipboard của trình duyệt để sao chép
+            navigator.clipboard.writeText(qrUrlLink.href).then(() => {
+                copyBtn.textContent = 'Đã sao chép!';
+                // Trở lại trạng thái cũ sau 2 giây để người dùng biết đã thành công
+                setTimeout(() => {
+                    copyBtn.textContent = 'Sao chép';
+                }, 2000);
+            }).catch(err => {
+                // Xử lý lỗi nếu không thể sao chép
+                statusMessage.textContent = 'Lỗi khi sao chép: ' + err;
+            });
+        });
+    </script>
+
+</body>
+</html>
