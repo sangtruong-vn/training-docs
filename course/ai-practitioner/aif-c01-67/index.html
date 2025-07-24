@@ -11,15 +11,23 @@
             font-family: 'Inter', sans-serif;
         }
         .option.correct {
-            background-color: #d1fae5; /* green-100 */
-            border-color: #10b981; /* green-500 */
+            background-color: #d1fae5 !important; /* green-100 */
+            border-color: #10b981 !important; /* green-500 */
         }
         .option.incorrect {
-            background-color: #fee2e2; /* red-100 */
-            border-color: #ef4444; /* red-500 */
+            background-color: #fee2e2 !important; /* red-100 */
+            border-color: #ef4444 !important; /* red-500 */
         }
-        .option:hover:not([style*="pointer-events: none"]) {
+        .option.selected-but-not-submitted {
+             background-color: #eff6ff; /* blue-50 */
+             border-color: #3b82f6; /* blue-500 */
+        }
+        .option:hover:not(.disabled) {
             background-color: #f3f4f6; /* gray-100 */
+        }
+        .disabled {
+            pointer-events: none;
+            cursor: not-allowed;
         }
         #progress-bar-container {
             width: 100%;
@@ -34,14 +42,31 @@
             border-radius: 9999px;
             transition: width 0.3s ease-in-out;
         }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+        }
     </style>
 </head>
 <body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
     <div id="quiz-container" class="bg-white w-full max-w-3xl rounded-xl shadow-lg p-6 md:p-8">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Luyện tập AWS AI Practitioner</h1>
-            <div id="score-tracker" class="text-lg font-semibold text-blue-600">Điểm: 0</div>
+        <div class="flex justify-between items-start mb-4">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Luyện tập AWS AI Practitioner</h1>
+                <div id="score-tracker" class="text-lg font-semibold text-blue-600 mt-1">Điểm: 0</div>
+            </div>
+            <button id="finish-btn" class="bg-red-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-red-600 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-opacity-50 text-sm">
+                Kết thúc
+            </button>
         </div>
         
         <div id="progress-bar-container">
@@ -70,7 +95,11 @@
             </button>
         </div>
 
-        <div class="mt-8 flex justify-end">
+        <div class="mt-8 flex justify-between items-center">
+            <button id="back-btn" class="hidden bg-gray-200 text-gray-700 font-bold py-2 px-6 rounded-lg hover:bg-gray-300 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50">
+                Quay lại
+            </button>
+            <div class="flex-grow"></div> <!-- Spacer -->
             <button id="submit-btn" class="bg-blue-600 text-white font-bold py-2 px-6 rounded-lg hover:bg-blue-700 transition-colors duration-300 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 disabled:opacity-50" disabled>
                 Kiểm tra
             </button>
@@ -79,11 +108,22 @@
             </button>
         </div>
     </div>
+    
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-overlay hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-sm text-center">
+            <h3 class="text-lg font-bold text-gray-800">Bạn chắc chắn muốn kết thúc?</h3>
+            <p class="text-sm text-gray-600 mt-2">Điểm của bạn sẽ được tính dựa trên các câu đã trả lời.</p>
+            <div class="mt-6 flex justify-center space-x-4">
+                <button id="confirm-finish-btn" class="bg-red-600 text-white font-semibold py-2 px-6 rounded-lg hover:bg-red-700">Có</button>
+                <button id="cancel-finish-btn" class="bg-gray-200 text-gray-800 font-semibold py-2 px-6 rounded-lg hover:bg-gray-300">Không</button>
+            </div>
+        </div>
+    </div>
 
     <script>
-        // --- Ngân hàng câu hỏi ---
         const questions = [
-            // 8 câu hỏi gốc
+            // Dán 65 câu hỏi từ phiên bản trước vào đây
             { question: "Dịch vụ AWS nào sau đây được sử dụng để xây dựng, huấn luyện và triển khai các mô hình học máy (machine learning) một cách nhanh chóng?", options: ["Amazon Lex", "Amazon Polly", "Amazon SageMaker", "Amazon Rekognition"], answer: "Amazon SageMaker", explanation: "Amazon SageMaker là một dịch vụ được quản lý hoàn toàn, cung cấp cho mọi nhà phát triển và nhà khoa học dữ liệu khả năng xây dựng, huấn luyện và triển khai các mô hình học máy (ML) trên quy mô lớn." },
             { question: "Một công ty muốn phân tích hình ảnh và video để xác định các đối tượng, con người, văn bản, cảnh và hoạt động. Dịch vụ AWS AI nào phù hợp nhất cho yêu cầu này?", options: ["Amazon Comprehend", "Amazon Rekognition", "Amazon Transcribe", "Amazon Textract"], answer: "Amazon Rekognition", explanation: "Amazon Rekognition giúp dễ dàng thêm phân tích hình ảnh và video vào ứng dụng của bạn bằng cách sử dụng công nghệ deep learning đã được chứng minh, có khả năng mở rộng cao mà không yêu cầu chuyên môn về học máy." },
             { question: "Bạn cần chuyển đổi văn bản thành giọng nói tự nhiên. Dịch vụ AWS nào bạn nên sử dụng?", options: ["Amazon Transcribe", "Amazon Polly", "Amazon Lex", "Amazon Translate"], answer: "Amazon Polly", explanation: "Amazon Polly là một dịch vụ chuyển văn bản thành giọng nói (Text-to-Speech), sử dụng công nghệ deep learning tiên tiến để tổng hợp giọng nói nghe như người thật." },
@@ -92,8 +132,6 @@
             { question: "Dịch vụ AWS nào sử dụng xử lý ngôn ngữ tự nhiên (NLP) để trích xuất thông tin chi tiết và mối quan hệ trong văn bản?", options: ["Amazon Textract", "Amazon Translate", "Amazon Comprehend", "Amazon Rekognition"], answer: "Amazon Comprehend", explanation: "Amazon Comprehend là một dịch vụ xử lý ngôn ngữ tự nhiên (NLP) sử dụng học máy để tìm ra thông tin chi tiết và mối quan hệ trong văn bản. Nó xác định ngôn ngữ của văn bản; trích xuất các cụm từ chính, địa điểm, tên người, thương hiệu hoặc sự kiện." },
             { question: "Một công ty bán lẻ trực tuyến muốn cung cấp các đề xuất sản phẩm được cá nhân hóa cho người dùng của mình. Dịch vụ AWS nào có thể giúp họ đạt được điều này?", options: ["Amazon Forecast", "Amazon Personalize", "Amazon Kendra", "Amazon SageMaker"], answer: "Amazon Personalize", explanation: "Amazon Personalize là một dịch vụ học máy cho phép các nhà phát triển dễ dàng thêm các đề xuất được cá nhân hóa vào ứng dụng của họ. Nó dựa trên cùng một công nghệ được sử dụng tại Amazon.com." },
             { question: "Dịch vụ nào của AWS có thể tự động trích xuất văn bản và dữ liệu từ các tài liệu được quét?", options: ["Amazon Transcribe", "Amazon Polly", "Amazon Textract", "Amazon Comprehend"], answer: "Amazon Textract", explanation: "Amazon Textract tự động trích xuất văn bản, chữ viết tay và dữ liệu từ các tài liệu được quét. Nó vượt xa nhận dạng ký tự quang học (OCR) đơn giản để xác định nội dung của các trường trong biểu mẫu và thông tin được lưu trữ trong bảng." },
-            
-            // 57 câu hỏi mới
             { question: "Hiện tượng nào xảy ra khi một mô hình học máy hoạt động rất tốt trên dữ liệu huấn luyện nhưng lại kém trên dữ liệu mới?", options: ["Underfitting (Dưới khớp)", "Overfitting (Quá khớp)", "Bias (Thiên vị)", "Variance (Phương sai)"], answer: "Overfitting (Quá khớp)", explanation: "Overfitting xảy ra khi mô hình học quá chi tiết các nhiễu và đặc điểm của tập dữ liệu huấn luyện, khiến nó không thể tổng quát hóa tốt cho dữ liệu chưa từng thấy." },
             { question: "Trong học máy, bài toán nào dự đoán một giá trị liên tục (ví dụ: giá nhà)?", options: ["Classification (Phân loại)", "Regression (Hồi quy)", "Clustering (Phân cụm)", "Reinforcement Learning (Học tăng cường)"], answer: "Regression (Hồi quy)", explanation: "Hồi quy là một loại bài toán học có giám sát nhằm dự đoán một kết quả có giá trị liên tục, chẳng hạn như giá cả, nhiệt độ hoặc doanh số." },
             { question: "Dịch vụ nào của AWS được thiết kế để cung cấp khả năng tìm kiếm thông minh cho các trang web và ứng dụng bằng cách sử dụng xử lý ngôn ngữ tự nhiên?", options: ["Amazon Lex", "Amazon Comprehend", "Amazon Kendra", "Amazon Textract"], answer: "Amazon Kendra", explanation: "Amazon Kendra là một dịch vụ tìm kiếm thông minh, được hỗ trợ bởi học máy. Kendra tái định hình tìm kiếm doanh nghiệp cho các trang web và ứng dụng của bạn để người dùng có thể dễ dàng tìm thấy nội dung họ đang tìm kiếm." },
@@ -106,7 +144,7 @@
             { question: "Mục đích chính của tập dữ liệu xác thực (validation set) trong vòng đời ML là gì?", options: ["Để huấn luyện mô hình", "Để đánh giá hiệu suất cuối cùng của mô hình", "Để tinh chỉnh các siêu tham số của mô hình", "Để thu thập dữ liệu mới"], answer: "Để tinh chỉnh các siêu tham-số của mô hình", explanation: "Tập xác thực được sử dụng để điều chỉnh các siêu tham số của mô hình (ví dụ: tốc độ học) và chọn ra mô hình hoạt động tốt nhất, tránh tình trạng quá khớp với tập kiểm tra (test set)." },
             { question: "Dịch vụ nào của AWS cho phép các nhà phát triển viết mã nhanh hơn bằng cách cung cấp các đề xuất mã nguồn theo thời gian thực?", options: ["AWS Cloud9", "Amazon CodeGuru", "Amazon CodeWhisperer", "AWS CodeCommit"], answer: "Amazon CodeWhisperer", explanation: "Amazon CodeWhisperer là một người bạn đồng hành mã hóa dựa trên AI, giúp cải thiện năng suất của nhà phát triển bằng cách tạo ra các đề xuất mã nguồn trong thời gian thực dựa trên các bình luận và mã hiện có của họ." },
             { question: "Loại học máy nào mà một tác nhân (agent) học cách hành xử trong một môi trường bằng cách thực hiện các hành động và nhận phần thưởng hoặc hình phạt?", options: ["Học có giám sát", "Học không giám sát", "Học bán giám sát", "Học tăng cường"], answer: "Học tăng cường", explanation: "Học tăng cường (Reinforcement Learning) là một lĩnh vực của học máy liên quan đến cách các tác nhân thông minh nên thực hiện các hành động trong một môi trường để tối đa hóa phần thưởng tích lũy." },
-            { question: "Amazon Rekognition có thể được sử dụng cho tác vụ nào sau đây?", options: ["Dịch văn bản giữa các ngôn ngữ", "Phát hiện các vật thể không an toàn trong hình ảnh (content moderation)", "Tạo dự báo tài chính", "Xây dựng chatbot"], answer: "Phát hiện các vật thể không an-toàn trong hình ảnh (content moderation)", explanation: "Amazon Rekognition có thể phân tích hình ảnh và video để phát hiện nội dung không phù hợp, không an toàn hoặc phản cảm, giúp cho việc kiểm duyệt nội dung trở nên dễ dàng hơn." },
+            { question: "Amazon Rekognition có thể được sử dụng cho tác vụ nào sau đây?", options: ["Dịch văn bản giữa các ngôn ngữ", "Phát hiện các vật thể không an toàn trong hình ảnh (content moderation)", "Tạo dự báo tài chính", "Xây dựng chatbot"], answer: "Phát hiện các vật thể không an toàn trong hình ảnh (content moderation)", explanation: "Amazon Rekognition có thể phân tích hình ảnh và video để phát hiện nội dung không phù hợp, không an toàn hoặc phản cảm, giúp cho việc kiểm duyệt nội dung trở nên dễ dàng hơn." },
             { question: "Thành phần nào của Amazon Lex định nghĩa một mục tiêu mà người dùng muốn đạt được (ví dụ: 'đặt pizza')?", options: ["Slot (Khe)", "Intent (Ý định)", "Utterance (Phát ngôn)", "Prompt (Lời nhắc)"], answer: "Intent (Ý định)", explanation: "Một ý định (Intent) đại diện cho một hành động mà người dùng muốn thực hiện. Mỗi ý định chứa các phát ngôn mẫu (sample utterances) và các khe (slots) để thu thập thông tin cần thiết." },
             { question: "Dịch vụ nào của SageMaker cung cấp một kho lưu trữ tập trung để lưu trữ, cập nhật, truy xuất và chia sẻ các đặc trưng (features) học máy?", options: ["SageMaker Data Wrangler", "SageMaker Feature Store", "SageMaker Ground Truth", "SageMaker Studio"], answer: "SageMaker Feature Store", explanation: "Amazon SageMaker Feature Store là một kho lưu trữ được quản lý hoàn toàn cho các đặc trưng ML, giúp các nhóm dễ dàng chia sẻ và tái sử dụng các đặc trưng, đảm bảo tính nhất quán giữa huấn luyện và suy luận." },
             { question: "Một công ty tài chính muốn phát hiện các giao dịch thẻ tín dụng có khả năng gian lận trong thời gian thực. Dịch vụ nào của AWS được thiết kế cho mục đích này?", options: ["Amazon GuardDuty", "Amazon Inspector", "Amazon Fraud Detector", "Amazon Comprehend"], answer: "Amazon Fraud Detector", explanation: "Amazon Fraud Detector là một dịch vụ được quản lý hoàn toàn giúp dễ dàng xác định các hoạt động trực tuyến có khả năng gian lận, chẳng hạn như thanh toán gian lận và tạo tài khoản giả." },
@@ -156,29 +194,36 @@
         ];
 
         // --- DOM Elements ---
-        const quizContainer = document.getElementById('quiz-container');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const submitBtn = document.getElementById('submit-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const feedbackArea = document.getElementById('feedback-area');
-        const feedbackText = document.getElementById('feedback-text');
-        const explanationText = document.getElementById('explanation-text');
-        const resultArea = document.getElementById('result-area');
-        const finalScore = document.getElementById('final-score');
-        const restartBtn = document.getElementById('restart-btn');
-        const scoreTracker = document.getElementById('score-tracker');
-        const questionArea = document.getElementById('question-area');
-        const questionCounter = document.getElementById('question-counter');
-        const progressBar = document.getElementById('progress-bar');
-        const resultMessage = document.getElementById('result-message');
-
+        const allDOMElements = {
+            quizContainer: document.getElementById('quiz-container'),
+            questionText: document.getElementById('question-text'),
+            optionsContainer: document.getElementById('options-container'),
+            submitBtn: document.getElementById('submit-btn'),
+            nextBtn: document.getElementById('next-btn'),
+            backBtn: document.getElementById('back-btn'),
+            finishBtn: document.getElementById('finish-btn'),
+            feedbackArea: document.getElementById('feedback-area'),
+            feedbackText: document.getElementById('feedback-text'),
+            explanationText: document.getElementById('explanation-text'),
+            resultArea: document.getElementById('result-area'),
+            finalScore: document.getElementById('final-score'),
+            restartBtn: document.getElementById('restart-btn'),
+            scoreTracker: document.getElementById('score-tracker'),
+            questionArea: document.getElementById('question-area'),
+            questionCounter: document.getElementById('question-counter'),
+            progressBar: document.getElementById('progress-bar'),
+            resultMessage: document.getElementById('result-message'),
+            confirmationModal: document.getElementById('confirmation-modal'),
+            confirmFinishBtn: document.getElementById('confirm-finish-btn'),
+            cancelFinishBtn: document.getElementById('cancel-finish-btn'),
+        };
 
         // --- State ---
         let currentQuestionIndex = 0;
         let score = 0;
         let selectedAnswer = null;
         let shuffledQuestions = [];
+        let userAnswers = {}; // Object to store user's answers: { questionIndex: "selectedOption" }
 
         // --- Functions ---
 
@@ -193,110 +238,120 @@
         function startQuiz() {
             currentQuestionIndex = 0;
             score = 0;
+            userAnswers = {};
             shuffledQuestions = shuffleArray([...questions]);
-            resultArea.classList.add('hidden');
-            questionArea.classList.remove('hidden');
-            submitBtn.classList.remove('hidden');
-            nextBtn.classList.add('hidden');
-            scoreTracker.textContent = `Điểm: 0`;
-            scoreTracker.classList.remove('hidden');
-            document.getElementById('progress-bar-container').classList.remove('hidden');
-            questionCounter.classList.remove('hidden');
+            
+            allDOMElements.resultArea.classList.add('hidden');
+            allDOMElements.questionArea.classList.remove('hidden');
+            allDOMElements.scoreTracker.textContent = `Điểm: 0`;
+            
+            document.querySelectorAll('#quiz-container > div, #quiz-container > button').forEach(el => {
+                if(el.id !== 'result-area') el.style.display = '';
+            });
+            allDOMElements.finishBtn.style.display = 'block';
+            allDOMElements.resultArea.style.display = 'none';
+
             loadQuestion();
         }
 
-        function loadQuestion() {
-            // Reset state from previous question
-            selectedAnswer = null;
-            feedbackArea.classList.add('hidden');
-            optionsContainer.innerHTML = '';
-            submitBtn.disabled = true;
-            submitBtn.classList.remove('hidden');
-            nextBtn.classList.add('hidden');
+        function renderAnsweredState(question, storedAnswer) {
+             // This function renders a question that has already been answered (for review purposes)
+            const isCorrect = storedAnswer === question.answer;
 
+            allDOMElements.feedbackArea.classList.remove('hidden');
+            allDOMElements.explanationText.innerHTML = `<b>Giải thích:</b> ${question.explanation}`;
+            if (isCorrect) {
+                allDOMElements.feedbackText.textContent = "Chính xác! 🎉";
+                allDOMElements.feedbackArea.className = 'mt-6 p-4 rounded-lg text-gray-700 bg-green-100';
+            } else {
+                allDOMElements.feedbackText.textContent = "Không chính xác. 🙁";
+                allDOMElements.feedbackArea.className = 'mt-6 p-4 rounded-lg text-gray-700 bg-red-100';
+            }
+
+            allDOMElements.optionsContainer.querySelectorAll('.option').forEach(opt => {
+                const input = opt.querySelector('input');
+                opt.classList.add('disabled');
+                if (input.value === question.answer) {
+                    opt.classList.add('correct');
+                }
+                if (input.value === storedAnswer && !isCorrect) {
+                    opt.classList.add('incorrect');
+                }
+            });
+
+            allDOMElements.submitBtn.classList.add('hidden');
+            allDOMElements.nextBtn.classList.remove('hidden');
+        }
+
+        function loadQuestion() {
+            selectedAnswer = null;
+            allDOMElements.feedbackArea.classList.add('hidden');
+            allDOMElements.optionsContainer.innerHTML = '';
+            
             // Update progress
-            questionCounter.textContent = `Câu ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
-            const progressPercentage = ((currentQuestionIndex) / shuffledQuestions.length) * 100;
-            progressBar.style.width = `${progressPercentage}%`;
+            allDOMElements.questionCounter.textContent = `Câu ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
+            const progressPercentage = (currentQuestionIndex / shuffledQuestions.length) * 100;
+            allDOMElements.progressBar.style.width = `${progressPercentage}%`;
+            
+            // Show/hide back button
+            allDOMElements.backBtn.classList.toggle('hidden', currentQuestionIndex === 0);
 
             const currentQuestion = shuffledQuestions[currentQuestionIndex];
-            questionText.textContent = `${currentQuestion.question}`;
-
-            const shuffledOptions = shuffleArray([...currentQuestion.options]);
+            allDOMElements.questionText.textContent = `${currentQuestion.question}`;
             
+            const shuffledOptions = shuffleArray([...currentQuestion.options]);
             shuffledOptions.forEach(option => {
                 const optionElement = document.createElement('div');
-                optionElement.classList.add('option', 'p-4', 'border-2', 'border-gray-300', 'rounded-lg', 'cursor-pointer', 'transition-colors');
+                optionElement.className = 'option p-4 border-2 border-gray-300 rounded-lg cursor-pointer transition-colors';
                 
                 const radioInput = document.createElement('input');
                 radioInput.type = 'radio';
                 radioInput.name = 'option';
                 radioInput.value = option;
-                radioInput.id = option.replace(/\s+/g, '-'); // Create a valid ID
-                radioInput.classList.add('hidden');
+                radioInput.id = `opt-${currentQuestionIndex}-${option.replace(/\s+/g, '-')}`;
+                radioInput.className = 'hidden';
 
                 const label = document.createElement('label');
-                label.htmlFor = option.replace(/\s+/g, '-');
+                label.htmlFor = radioInput.id;
                 label.textContent = option;
-                label.classList.add('block', 'w-full', 'cursor-pointer');
+                label.className = 'block w-full cursor-pointer';
 
                 optionElement.appendChild(radioInput);
                 optionElement.appendChild(label);
                 
                 optionElement.addEventListener('click', () => {
-                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('border-blue-500', 'bg-blue-50'));
-                    optionElement.classList.add('border-blue-500', 'bg-blue-50');
+                    document.querySelectorAll('.option').forEach(opt => opt.classList.remove('selected-but-not-submitted'));
+                    optionElement.classList.add('selected-but-not-submitted');
                     radioInput.checked = true;
                     selectedAnswer = radioInput.value;
-                    submitBtn.disabled = false;
+                    allDOMElements.submitBtn.disabled = false;
                 });
 
-                optionsContainer.appendChild(optionElement);
+                allDOMElements.optionsContainer.appendChild(optionElement);
             });
+
+            // Check if question was already answered
+            if (userAnswers.hasOwnProperty(currentQuestionIndex)) {
+                renderAnsweredState(currentQuestion, userAnswers[currentQuestionIndex]);
+            } else {
+                allDOMElements.submitBtn.classList.remove('hidden');
+                allDOMElements.submitBtn.disabled = true;
+                allDOMElements.nextBtn.classList.add('hidden');
+            }
         }
 
         function handleSubmit() {
+            if (!selectedAnswer) return;
+
+            userAnswers[currentQuestionIndex] = selectedAnswer;
             const currentQuestion = shuffledQuestions[currentQuestionIndex];
             const isCorrect = selectedAnswer === currentQuestion.answer;
             
             if (isCorrect) {
                 score++;
-                scoreTracker.textContent = `Điểm: ${score}`;
+                allDOMElements.scoreTracker.textContent = `Điểm: ${score}`;
             }
-
-            feedbackArea.classList.remove('hidden');
-            explanationText.innerHTML = `<b>Giải thích:</b> ${currentQuestion.explanation}`;
-            
-            document.querySelectorAll('.option').forEach(opt => {
-                const input = opt.querySelector('input');
-                opt.style.pointerEvents = 'none'; 
-                if (input.value === currentQuestion.answer) {
-                    opt.classList.add('correct');
-                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
-                }
-                if (input.value === selectedAnswer && !isCorrect) {
-                    opt.classList.add('incorrect');
-                    opt.classList.remove('border-gray-300', 'border-blue-500', 'bg-blue-50');
-                }
-            });
-
-            if (isCorrect) {
-                feedbackText.textContent = "Chính xác! 🎉";
-                feedbackArea.classList.remove('bg-red-100');
-                feedbackArea.classList.add('bg-green-100');
-            } else {
-                feedbackText.textContent = "Không chính xác. 🙁";
-                feedbackArea.classList.remove('bg-green-100');
-                feedbackArea.classList.add('bg-red-100');
-            }
-
-            submitBtn.classList.add('hidden');
-            nextBtn.classList.remove('hidden');
-
-            // Update progress bar for the last question
-            if (currentQuestionIndex === shuffledQuestions.length - 1) {
-                 progressBar.style.width = `100%`;
-            }
+            renderAnsweredState(currentQuestion, selectedAnswer);
         }
 
         function handleNext() {
@@ -307,40 +362,66 @@
                 showResults();
             }
         }
-
-        function showResults() {
-            questionArea.classList.add('hidden');
-            submitBtn.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            feedbackArea.classList.add('hidden');
-            scoreTracker.classList.add('hidden');
-            questionCounter.classList.add('hidden');
-            document.getElementById('progress-bar-container').classList.add('hidden');
-            
-            resultArea.classList.remove('hidden');
-            finalScore.textContent = `${score} / ${shuffledQuestions.length}`;
-
-            const percentage = (score / shuffledQuestions.length) * 100;
-            if (percentage >= 80) {
-                resultMessage.textContent = "Kết quả xuất sắc! Bạn đã sẵn sàng cho kỳ thi.";
-                resultMessage.className = 'text-md text-green-600 mt-2';
-            } else if (percentage >= 60) {
-                resultMessage.textContent = "Kết quả khá tốt! Hãy ôn tập thêm một chút nữa.";
-                 resultMessage.className = 'text-md text-yellow-600 mt-2';
-            } else {
-                resultMessage.textContent = "Cần cố gắng hơn! Hãy xem lại các phần giải thích để củng cố kiến thức.";
-                 resultMessage.className = 'text-md text-red-600 mt-2';
+        
+        function handleBack() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion();
             }
         }
 
+        function showResults() {
+            // Hide all quiz elements
+            allDOMElements.questionArea.style.display = 'none';
+            allDOMElements.scoreTracker.style.display = 'none';
+            allDOMElements.finishBtn.style.display = 'none';
+            allDOMElements.questionCounter.style.display = 'none';
+            allDOMElements.feedbackArea.style.display = 'none';
+            allDOMElements.backBtn.style.display = 'none';
+            allDOMElements.submitBtn.style.display = 'none';
+            allDOMElements.nextBtn.style.display = 'none';
+            document.getElementById('progress-bar-container').style.display = 'none';
+            allDOMElements.confirmationModal.classList.add('hidden');
+
+
+            // Show result area
+            allDOMElements.resultArea.style.display = 'block';
+            allDOMElements.finalScore.textContent = `${score} / ${shuffledQuestions.length}`;
+            allDOMElements.progressBar.style.width = `100%`;
+
+            const percentage = shuffledQuestions.length > 0 ? (score / shuffledQuestions.length) * 100 : 0;
+            if (percentage >= 80) {
+                allDOMElements.resultMessage.textContent = "Kết quả xuất sắc! Bạn đã sẵn sàng cho kỳ thi.";
+                allDOMElements.resultMessage.className = 'text-md text-green-600 mt-2';
+            } else if (percentage >= 60) {
+                allDOMElements.resultMessage.textContent = "Kết quả khá tốt! Hãy ôn tập thêm một chút nữa.";
+                allDOMElements.resultMessage.className = 'text-md text-yellow-600 mt-2';
+            } else {
+                allDOMElements.resultMessage.textContent = "Cần cố gắng hơn! Hãy xem lại các phần giải thích để củng cố kiến thức.";
+                allDOMElements.resultMessage.className = 'text-md text-red-600 mt-2';
+            }
+        }
+        
         // --- Event Listeners ---
-        submitBtn.addEventListener('click', handleSubmit);
-        nextBtn.addEventListener('click', handleNext);
-        restartBtn.addEventListener('click', startQuiz);
+        allDOMElements.submitBtn.addEventListener('click', handleSubmit);
+        allDOMElements.nextBtn.addEventListener('click', handleNext);
+        allDOMElements.backBtn.addEventListener('click', handleBack);
+        allDOMElements.restartBtn.addEventListener('click', startQuiz);
+        
+        // Modal listeners
+        allDOMElements.finishBtn.addEventListener('click', () => {
+            allDOMElements.confirmationModal.classList.remove('hidden');
+        });
+        allDOMElements.cancelFinishBtn.addEventListener('click', () => {
+            allDOMElements.confirmationModal.classList.add('hidden');
+        });
+        allDOMElements.confirmFinishBtn.addEventListener('click', showResults);
+
 
         // --- Initial Load ---
         window.onload = startQuiz;
 
     </script>
 </body>
+
 </html>
