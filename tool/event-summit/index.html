@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CIO Summit 2025</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- React & Babel for JSX -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff; /* White background */
+            color: #1f2937; /* Dark gray text */
+        }
+        .btn-primary {
+            @apply bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105;
+        }
+        /* Style for modal animation */
+        .modal-enter {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+        .modal-enter-active {
+            opacity: 1;
+            transform: scale(1);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .modal-exit {
+            opacity: 1;
+            transform: scale(1);
+        }
+        .modal-exit-active {
+            opacity: 0;
+            transform: scale(0.95);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .h-custom {
+            margin-top: 80px;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // Mock Data - Dữ liệu mẫu
+        const eventData = {
+            name: "CIO Summit 2025",
+            tagline: "Leadership in the Age of AI Transformation.",
+            date: "October 2, 2025",
+            location: "SECC, Ho Chi Minh City",
+            keyVisualUrl: "https://placehold.co/1920x1080/e11d48/ffffff?text=CIO+Summit+2025",
+            // keyVisualUrl: "https://www.antsomi.com/wp-content/uploads/2024/10/917a692046ff54c2e2e908ba8f4440d4.jpg",
+            // bannerUrl: "https://placehold.co/1920x1080/111827/f43f5e?text=CIO+Summit+2025",
+            // bannerUrl: "https://picsum.photos/1920/1080",
+            // bannerUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            // bannerUrl: "https://images.unsplash.com/photo-1727434032773-af3cd98375ba?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            bannerUrl: "https://images.unsplash.com/photo-1644088379091-d574269d422f?q=80&w=2293&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+            description: "CIO Summit 2025 is the premier gathering for Chief Information Officers and IT executives in Vietnam. This exclusive event focuses on strategic leadership, digital innovation, and navigating the complexities of AI-driven transformation. Connect with peers, gain insights from industry titans, and shape the future of enterprise technology."
+        };
+
+        const speakers = [
+            { id: 1, name: "Le Binh An", title: "Group CIO, Vingroup", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=An", bio: "An is a leading researcher in Natural Language Processing and Computer Vision. With over 10 years of experience, he has published numerous papers in top-tier conferences and is passionate about building intelligent systems that benefit society." },
+            { id: 2, name: "Tran Minh Viet", title: "Head of IT, Techcombank", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Viet", bio: "Viet is a software engineer at Google, working on large-scale distributed systems. He specializes in building reliable and efficient infrastructure that serves billions of users. He is an advocate for open-source and a frequent contributor to the Go community." },
+            { id: 3, name: "Pham Thi Mai", title: "Cybersecurity Director, FPT", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Mai", bio: "Mai has over 15 years of experience in the cybersecurity field. She is an expert in penetration testing, threat intelligence, and incident response. She has helped numerous organizations secure their digital assets against sophisticated attacks." },
+            { id: 4, name: "Hoang Duc Trung", title: "Head of Cloud, Viettel", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Trung", bio: "Trung is a certified AWS Solutions Architect Professional with a deep understanding of cloud-native technologies. He helps businesses design and implement scalable, cost-effective, and resilient solutions on the AWS platform." },
+            { id: 5, name: "Do Huynh Nam", title: "Lead of Security, Gemadept", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Nam", bio: "Nam is a certified AWS Solutions Architect Professional with a deep understanding of cloud-native technologies. He helps businesses design and implement scalable, cost-effective, and resilient solutions on the AWS platform." },
+            { id: 6, name: "Ngo Van Thai", title: "Head of IT, CMC", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Thai", bio: "Thai is a certified AWS Solutions Architect Professional with a deep understanding of cloud-native technologies. He helps businesses design and implement scalable, cost-effective, and resilient solutions on the AWS platform." },
+            { id: 7, name: "Ly Thanh Nghia", title: "CIO, FSoft", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Nghia", bio: "Nghia is a certified AWS Solutions Architect Professional with a deep understanding of cloud-native technologies. He helps businesses design and implement scalable, cost-effective, and resilient solutions on the AWS platform." },
+            { id: 8, name: "Nguyen Quoc Tuan", title: "COO, FTI", img: "https://placehold.co/400x400/1e293b/f5f5f5?text=Tuan", bio: "Tuan is a certified AWS Solutions Architect Professional with a deep understanding of cloud-native technologies. He helps businesses design and implement scalable, cost-effective, and resilient solutions on the AWS platform." },
+        ];
+
+        const agenda = [
+            { time: "09:00 - 10:00", title: "Keynote: The CIO's Role in AI Governance", speaker: "Le Binh An" },
+            { time: "10:15 - 11:15", title: "Modernizing Core Banking Systems", speaker: "Tran Minh Viet" },
+            { time: "11:30 - 12:30", title: "Building a Resilient Cybersecurity Posture", speaker: "Pham Thi Mai" },
+            { time: "14:00 - 15:00", title: "Cloud Strategy for the Modern Enterprise", speaker: "Hoang Duc Trung" },
+            { time: "15:15 - 16:15", title: "Panel: Leading Digital Transformation", speaker: "Le Binh An" },
+        ];
+
+        const ticketTiers = [
+            { name: "Student Pass", price: "1,000,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor."], popular: false },
+            { name: "Standard Access", price: "1,200,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore."], popular: false },
+            { name: "Premium Access", price: "1,500,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim."], popular: true },
+            { name: "VIP Package", price: "2,000,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim.", "Veniam, quis nostrud exercitation."], popular: false },
+            { name: "Corporate Package", price: "Contact Us", currency: "", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim.", "Veniam, quis nostrud exercitation.", "Ullamco laboris nisi ut aliquip."], popular: false },
+        ];
+
+        const sponsorTiers = [
+            {
+                title: "Strategic Partner",
+                sponsors: [ { name: "Sponsor A", logo: "https://placehold.co/240x120/1f2937/f9fafb?text=STRATEGIC" } ],
+                sizeClass: 'h-16'
+            },
+            {
+                title: "Platinum Sponsor",
+                sponsors: [
+                    { name: "Sponsor B", logo: "https://placehold.co/200x100/1f2937/f9fafb?text=PLATINUM+1" },
+                    { name: "Sponsor C", logo: "https://placehold.co/200x100/1f2937/f9fafb?text=PLATINUM+2" },
+                ],
+                sizeClass: 'h-14'
+            },
+            {
+                title: "Gold Sponsor",
+                sponsors: [
+                    { name: "Sponsor D", logo: "https://placehold.co/180x90/1f2937/f9fafb?text=GOLD+1" },
+                    { name: "Sponsor E", logo: "https://placehold.co/180x90/1f2937/f9fafb?text=GOLD+2" },
+                    { name: "Sponsor F", logo: "https://placehold.co/180x90/1f2937/f9fafb?text=GOLD+3" },
+                ],
+                sizeClass: 'h-12'
+            },
+            {
+                title: "Silver Sponsor",
+                sponsors: [
+                    { name: "Sponsor G", logo: "https://placehold.co/160x80/1f2937/f9fafb?text=SILVER" },
+                    { name: "Sponsor H", logo: "https://placehold.co/160x80/1f2937/f9fafb?text=SILVER" },
+                ],
+                sizeClass: 'h-10'
+            },
+            {
+                title: "Media Partner",
+                sponsors: [
+                    { name: "Media A", logo: "https://placehold.co/150x75/1f2937/f9fafb?text=MEDIA" },
+                    { name: "Media B", logo: "https://placehold.co/150x75/1f2937/f9fafb?text=MEDIA" },
+                ],
+                sizeClass: 'h-9'
+            },
+            {
+                title: "Event Solution Partner",
+                sponsors: [
+                     { name: "Solution A", logo: "https://placehold.co/150x75/1f2937/f9fafb?text=SOLUTION" },
+                ],
+                sizeClass: 'h-9'
+            }
+        ];
+
+
+        // Define icons as local React components using SVG
+        const Icon = ({ size = 24, className = '', children }) => {
+            return (
+                <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                    {children}
+                </svg>
+            );
+        };
+        const CalendarIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <rect width="18" height="18" x="3" y="4" rx="2" ry="2" />
+                    <line x1="16" x2="16" y1="2" y2="6" />
+                    <line x1="8" x2="8" y1="2" y2="6" />
+                    <line x1="3" x2="21" y1="10" y2="10" />
+                </Icon>
+            );
+        };
+        const MapPinIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                </Icon>
+            );
+        };
+        const MicIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z" />
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2" />
+                    <line x1="12" x2="12" y1="19" y2="22" />
+                </Icon>
+            );
+        };
+        const ShieldCheckIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                    <path d="m9 12 2 2 4-4" />
+                </Icon>
+            );
+        };
+        const XIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </Icon>
+            );
+        };
+        const ChevronLeftIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <polyline points="15 18 9 12 15 6"></polyline>
+                </Icon>
+            );
+        };
+        const ChevronRightIcon = (props) => {
+            return (
+                <Icon {...props}>
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                </Icon>
+            );
+        };
+
+        // Component for section titles
+        const SectionTitle = ({ children }) => (
+            <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-4xl font-extrabold tracking-tight uppercase">
+                    {children}
+                </h2>
+                <div className="w-24 h-1 bg-rose-600 mx-auto mt-4 rounded"></div>
+            </div>
+        );
+
+        // Components
+        const Header = () => {
+            const [isScrolled, setIsScrolled] = useState(false);
+
+            useEffect(() => {
+                const handleScroll = () => {
+                    setIsScrolled(window.scrollY > 50);
+                };
+                window.addEventListener('scroll', handleScroll);
+                return () => window.removeEventListener('scroll', handleScroll);
+            }, []);
+
+            return (
+                <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm' : 'bg-transparent'}`}>
+                    <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                        <h1 className={`text-xl font-bold transition-colors ${isScrolled ? 'text-gray-900' : 'text-white-'}`}>CIO<span className="text-rose-600">Summit</span></h1>
+                        <nav className="hidden md:flex space-x-8 items-center">
+                            <a href="#about" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>About</a>
+                            <a href="#speakers" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>Speakers</a>
+                            <a href="#agenda" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>Agenda</a>
+                            <a href="#tickets" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>Tickets</a>
+                            <a href="#contact" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>Contact</a>
+                        </nav>
+                        <a href="#tickets" className="hidden md:block bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">Register Now</a>
+                        <button className={`md:hidden ${isScrolled ? 'text-gray-800' : 'text-white'}`}><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
+                    </div>
+                </header>
+            );
+        };
+        
+        const SliderSection = () => {
+            const [activeSlide, setActiveSlide] = useState(0);
+            const timeoutRef = useRef(null);
+            const slides = [
+                { type: 'image', url: eventData.keyVisualUrl },
+                { type: 'content', url: eventData.bannerUrl }
+            ];
+
+            const resetTimeout = () => {
+                if (timeoutRef.current) {
+                    clearTimeout(timeoutRef.current);
+                }
+            };
+
+            useEffect(() => {
+                resetTimeout();
+                timeoutRef.current = setTimeout(
+                    () => setActiveSlide((prev) => (prev === slides.length - 1 ? 0 : prev + 1)),
+                    5000
+                );
+                return () => {
+                    resetTimeout();
+                };
+            }, [activeSlide]);
+
+            return (
+                <section className="relative h-screen w-full overflow-hidden h-custom">
+                    <div className="w-full h-full flex transition-transform duration-700 ease-in-out" style={{ transform: `translateX(-${activeSlide * 100}%)` }}>
+                        {/* Slide 1: Key Visual */}
+                        <div className="w-full h-full flex-shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${slides[0].url})` }}></div>
+                        
+                        {/* Slide 2: Content */}
+                        <div className="w-full h-full flex-shrink-0 bg-cover bg-center" style={{ backgroundImage: `url(${slides[1].url})` }}>
+                             <div className="w-full h-full bg-black/30 flex flex-col items-center justify-center text-center">
+                                <div className="relative container mx-auto px-6">
+                                    <h1 className="text-4xl md:text-6xl font-black text-white leading-tight mb-4" style={{textShadow: '0 2px 10px rgba(0,0,0,0.5)'}}>{eventData.name}</h1>
+                                    <p className="text-xl md:text-2xl text-rose-300 mb-8">{eventData.tagline}</p>
+                                    <div className="flex justify-center items-center space-x-6 text-gray-200 mb-10">
+                                        <div className="flex items-center space-x-2"><CalendarIcon size={20} className="text-rose-400"/><span>{eventData.date}</span></div>
+                                        <div className="flex items-center space-x-2"><MapPinIcon size={20} className="text-rose-400"/><span>{eventData.location}</span></div>
+                                    </div>
+                                    <a href="#tickets" className="text-lg bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">Register Now</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Navigation Dots */}
+                    <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-2">
+                        {slides.map((_, index) => (
+                            <button key={index} onClick={() => setActiveSlide(index)} className={`w-3 h-3 rounded-full transition-all ${activeSlide === index ? 'bg-white scale-125' : 'bg-white/50'}`}></button>
+                        ))}
+                    </div>
+                </section>
+            );
+        };
+        
+        const DescriptionSection = () => {
+            return (
+                <section id="about" className="py-20">
+                    <div className="container mx-auto px-6 max-w-4xl text-center">
+                         <SectionTitle>About The <span className="text-rose-600">Summit</span></SectionTitle>
+                         <p className="text-lg text-gray-600 leading-relaxed">{eventData.description}</p>
+                    </div>
+                </section>
+            );
+        };
+
+        const SpeakersSection = ({ onSpeakerClick }) => {
+            return (
+                <section id="speakers" className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Meet The <span className="text-rose-600">Speakers</span></SectionTitle>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+                            {speakers.map((speaker, index) => (
+                                <div key={speaker.id} onClick={() => onSpeakerClick(index)} className="bg-white border border-gray-200 rounded-lg p-6 text-center group hover:-translate-y-2 transition-transform duration-300 cursor-pointer shadow-sm hover:shadow-xl">
+                                    <img src={speaker.img} alt={speaker.name} className="w-32 h-32 rounded-full mx-auto mb-4 border-4 border-gray-200 group-hover:border-rose-500 transition-colors" />
+                                    <h3 className="text-xl font-bold text-gray-900">{speaker.name}</h3>
+                                    <p className="text-rose-600">{speaker.title}</p>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+        
+        const AgendaSection = () => {
+            return (
+                <section id="agenda" className="py-20">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Event <span className="text-rose-600">Agenda</span></SectionTitle>
+                        <div className="max-w-3xl mx-auto">
+                            <div className="space-y-8">
+                                {agenda.map((item, index) => (
+                                    <div key={index} className="flex items-center space-x-4 md:space-x-8">
+                                        <div className="text-right w-36 flex-shrink-0">
+                                            <p className="font-bold text-rose-600 text-lg">{item.time}</p>
+                                        </div>
+                                        <div className="flex-shrink-0 w-4 h-4 rounded-full bg-rose-500"></div>
+                                        <div className="bg-gray-50 p-4 rounded-lg flex-1 border-l-4 border-rose-500">
+                                            <h3 className="font-bold text-gray-900 text-lg">{item.title}</h3>
+                                            <p className="text-gray-500 flex items-center mt-1"><MicIcon size={16} className="mr-2"/>{item.speaker}</p>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+        
+        const TicketsSection = () => {
+            return (
+                <section id="tickets" className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Registration <span className="text-rose-600">Packages</span></SectionTitle>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto justify-center">
+                            {ticketTiers.map(tier => (
+                                <div key={tier.name} className={`relative bg-white border border-gray-200 rounded-lg p-8 flex flex-col shadow-sm ${tier.popular ? 'border-rose-500 border-2' : ''}`}>
+                                    {tier.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</div>}
+                                    <h3 className="text-2xl font-bold text-center mb-2 text-gray-900">{tier.name}</h3>
+                                    <p className="text-4xl font-black text-center text-gray-900 mb-6">
+                                        {tier.price} 
+                                        {tier.currency && <span className="text-xl font-medium text-gray-500"> {tier.currency}</span>}
+                                    </p>
+                                    <ul className="space-y-4 mb-8 flex-grow">
+                                        {tier.features.map(feature => (<li key={feature} className="flex items-start"><ShieldCheckIcon size={20} className="text-green-500 mr-3 flex-shrink-0 mt-1"/><span className="text-gray-600">{feature}</span></li>))}
+                                    </ul>
+                                    <button className="w-full mt-auto bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">
+                                        Đăng ký ngay
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const LocationSection = () => {
+            return (
+                <section id="location" className="py-20">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Event <span className="text-rose-600">Location</span></SectionTitle>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div>
+                                <h3 className="text-2xl font-bold mb-2 text-gray-900">SECC - Saigon Exhibition and Convention Center</h3>
+                                <p className="text-gray-500 mb-4">799 Nguyen Van Linh, Tan Phu Ward, District 7, Ho Chi Minh City, Vietnam</p>
+                                <p className="text-gray-700 leading-relaxed">Located in the heart of the new urban area, SECC is one of the most modern and largest convention centers in Vietnam, providing a world-class experience for all attendees.</p>
+                            </div>
+                            <div className="h-80 rounded-lg overflow-hidden border-2 border-gray-200">
+                                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3920.023532970103!2d106.71192531526805!3d10.73269646288348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f659c0433d7%3A0x8424523106411539!2sSaigon%20Exhibition%20and%20Convention%20Center%20(SECC)!5e0!3m2!1sen!2s!4v1663000000000!5m2!1sen!2s" width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const ContactSection = () => {
+            return (
+                <section id="contact" className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-6 max-w-2xl">
+                        <SectionTitle>Contact <span className="text-rose-600">Us</span></SectionTitle>
+                        <form className="space-y-6">
+                            <div>
+                                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                                <input type="text" id="name" className="w-full bg-white border-gray-300 text-gray-900 rounded-md p-3 focus:ring-rose-500 focus:border-rose-500" />
+                            </div>
+                            <div>
+                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
+                                <input type="email" id="email" className="w-full bg-white border-gray-300 text-gray-900 rounded-md p-3 focus:ring-rose-500 focus:border-rose-500" />
+                            </div>
+                            <div>
+                                <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">Message</label>
+                                <textarea id="message" rows="4" className="w-full bg-white border-gray-300 text-gray-900 rounded-md p-3 focus:ring-rose-500 focus:border-rose-500"></textarea>
+                            </div>
+                            <div className="text-center"><button type="submit" className="w-full md:w-auto bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105">Send Message</button></div>
+                        </form>
+                    </div>
+                </section>
+            );
+        };
+        
+        const SponsorsSection = () => {
+            return (
+                <section id="sponsors" className="py-20">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Our Esteemed <span className="text-rose-600">Partners</span></SectionTitle>
+                        <div className="space-y-16">
+                            {sponsorTiers.map(tier => (
+                                <div key={tier.title}>
+                                    <h3 className="text-2xl font-bold text-center text-gray-500 mb-8 tracking-wider uppercase">{tier.title}</h3>
+                                    <div className="flex flex-wrap justify-center items-center gap-8 md:gap-12">
+                                        {tier.sponsors.map(sponsor => (
+                                            <img 
+                                                key={sponsor.name} 
+                                                src={sponsor.logo} 
+                                                alt={sponsor.name} 
+                                                className={`${tier.sizeClass} opacity-80 hover:opacity-100 transition-opacity duration-300`} 
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+
+        const Footer = () => {
+            return (
+                <footer className="border-t border-gray-200">
+                    <div className="container mx-auto px-6 py-8 text-center text-gray-500">
+                        <p>&copy; {new Date().getFullYear()} CIO Vietnam. All rights reserved.</p>
+                        <div className="flex justify-center space-x-4 mt-4">
+                            <a href="#" className="hover:text-rose-600">Facebook</a>
+                            <a href="#" className="hover:text-rose-600">LinkedIn</a>
+                            <a href="#" className="hover:text-rose-600">Twitter</a>
+                        </div>
+                    </div>
+                </footer>
+            );
+        };
+
+        const SpeakerModal = ({ speaker, onClose, onNext, onPrev, agenda }) => {
+            if (!speaker) return null;
+            const speakerSessions = agenda.filter(session => session.speaker === speaker.name);
+
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm" onClick={onClose}>
+                    <div className="bg-white border border-gray-200 rounded-lg shadow-xl w-full max-w-2xl m-4 relative modal-enter-active" onClick={e => e.stopPropagation()}>
+                        <button onClick={onClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-800 z-10"><XIcon size={24} /></button>
+                        
+                        {/* Navigation Buttons */}
+                        <button onClick={onPrev} className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-gray-100 rounded-full p-2 text-gray-800"><ChevronLeftIcon size={24} /></button>
+                        <button onClick={onNext} className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/50 hover:bg-gray-100 rounded-full p-2 text-gray-800"><ChevronRightIcon size={24} /></button>
+
+                        <div className="p-8">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-8 mb-6">
+                                <img src={speaker.img} alt={speaker.name} className="w-40 h-40 rounded-full flex-shrink-0 border-4 border-rose-500" />
+                                <div className="text-center sm:text-left">
+                                    <h2 className="text-3xl font-bold text-gray-900">{speaker.name}</h2>
+                                    <p className="text-xl text-rose-600 mb-4">{speaker.title}</p>
+                                    <p className="text-gray-600">{speaker.bio}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 className="text-2xl font-bold text-gray-900 mb-4 border-b-2 border-rose-500 pb-2">Sessions</h3>
+                                <ul className="space-y-4">
+                                    {speakerSessions.length > 0 ? speakerSessions.map(session => (
+                                        <li key={session.title} className="bg-gray-100 p-4 rounded-md">
+                                            <p className="font-bold text-lg text-gray-900">{session.title}</p>
+                                            <p className="text-rose-600">{session.time}</p>
+                                        </li>
+                                    )) : <p className="text-gray-500">Session details will be updated soon.</p>}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const App = () => {
+            const [currentSpeakerIndex, setCurrentSpeakerIndex] = useState(null);
+
+            const handleOpenSpeakerModal = (index) => {
+                setCurrentSpeakerIndex(index);
+            };
+
+            const handleCloseSpeakerModal = () => {
+                setCurrentSpeakerIndex(null);
+            };
+
+            const handleNextSpeaker = () => {
+                if (currentSpeakerIndex === null) return;
+                const nextIndex = (currentSpeakerIndex + 1) % speakers.length;
+                setCurrentSpeakerIndex(nextIndex);
+            };
+
+            const handlePrevSpeaker = () => {
+                if (currentSpeakerIndex === null) return;
+                const prevIndex = (currentSpeakerIndex - 1 + speakers.length) % speakers.length;
+                setCurrentSpeakerIndex(prevIndex);
+            };
+            
+            const selectedSpeaker = currentSpeakerIndex !== null ? speakers[currentSpeakerIndex] : null;
+
+            return (
+                <div>
+                    <Header />
+                    <main>
+                        <SliderSection />
+                        <DescriptionSection />
+                        <SpeakersSection onSpeakerClick={handleOpenSpeakerModal} />
+                        <AgendaSection />
+                        <TicketsSection />
+                        <LocationSection />
+                        <ContactSection />
+                        <SponsorsSection />
+                    </main>
+                    <Footer />
+                    <SpeakerModal 
+                        speaker={selectedSpeaker} 
+                        onClose={handleCloseSpeakerModal} 
+                        onNext={handleNextSpeaker}
+                        onPrev={handlePrevSpeaker}
+                        agenda={agenda} 
+                    />
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
