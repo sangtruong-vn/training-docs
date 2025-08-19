@@ -65,13 +65,13 @@
             date: "October 2, 2025",
             location: "SECC, Ho Chi Minh City",
             // keyVisualUrl: "https://placehold.co/1920x1080/e11d48/ffffff?text=CIO+Summit+2025",
-            keyVisualUrl: "https://scontent.fsgn2-11.fna.fbcdn.net/v/t39.30808-6/535067985_1225346089637565_4773885729923202637_n.jpg?_nc_cat=105&ccb=1-7&_nc_sid=75d36f&_nc_ohc=KhnrT2Mjji8Q7kNvwFQdHQ_&_nc_oc=AdlubeeJihmjgsenxcvHVLE9S-zn6k2P5ou-wDUJBnYZ1KChfnIYyfUu1RetvTfDo-k&_nc_zt=23&_nc_ht=scontent.fsgn2-11.fna&_nc_gid=EVlfoTxsielOZmOU76qUmg&oh=00_AfWJm-gCo2W32erga8AuqgeXSyL5DhJV9g2W9W1LeAHukA&oe=68A9F69D",
+            keyVisualUrl: "https://ucarecdn.com/cb73ae31-85c4-4fbb-9dc2-b48b5b91f6ba/LandingPageDesk_CIOSUMMIT2025_1440x680_Speakers.jpg",
             // bannerUrl: "https://placehold.co/1920x1080/111827/f43f5e?text=CIO+Summit+2025",
             // bannerUrl: "https://picsum.photos/1920/1080",
             // bannerUrl: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?q=80&w=3270&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             // bannerUrl: "https://images.unsplash.com/photo-1727434032773-af3cd98375ba?q=80&w=2232&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
             bannerUrl: "https://images.unsplash.com/photo-1644088379091-d574269d422f?q=80&w=2293&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
-            description: "CIO Summit 2025 is the premier gathering for Chief Information Officers and IT executives in Vietnam. This exclusive event focuses on strategic leadership, digital innovation, and navigating the complexities of AI-driven transformation. Connect with peers, gain insights from industry titans, and shape the future of enterprise technology."
+            description: "CIO Summit 2025 | AI-Driven Leadership in Action is created by the Vietnamese technology leadership community, where 500+ CIOs, CTOs, CDOs and industry-leading business leaders come together to: Update the latest trends, Discuss & share practices, Shape IT for 2026+"
         };
 
         const speakers = [
@@ -94,11 +94,16 @@
         ];
 
         const ticketTiers = [
-            { name: "Student Pass", price: "1,000,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor."], popular: false },
-            { name: "Standard Access", price: "1,200,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore."], popular: false },
-            { name: "Premium Access", price: "1,500,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim."], popular: true },
-            { name: "VIP Package", price: "2,000,000", currency: "VND", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim.", "Veniam, quis nostrud exercitation."], popular: false },
-            { name: "Corporate Package", price: "Contact Us", currency: "", features: ["Lorem ipsum dolor sit amet.", "Consectetur adipiscing elit.", "Sed do eiusmod tempor.", "Incididunt ut labore et dolore.", "Magna aliqua ut enim ad minim.", "Veniam, quis nostrud exercitation.", "Ullamco laboris nisi ut aliquip."], popular: false },
+            { name: "Essential Pass", option: "|", price: "799.000", currency: "VNĐ", features: ["Trải nghiệm trọn vẹn chương trình (08h–17h: keynote & panel)", "Bộ tài liệu sự kiện độc quyền", "Tea-break & networking chất lượng"], popular: false },
+            { name: "Premium Access", option: "Lunch Networking", price: "1.290.000", currency: "VNĐ", features: ["Tất cả quyền lợi Essential Pass (08h-17h00)", "Tham gia Lunch Networking cùng lãnh đạo cấp cao"], popular: true },
+            { name: "Premium Access", option: "Gala Awards", price: "1.290.000", currency: "VNĐ", features: ["Tất cả quyền lợi Essential Pass (08h-21h00)", "Tham gia Dinner Networking & Lễ vinh danh CIO Awards"], popular: false },
+            { name: "🏆 Platinum Pass", option: "|", price: "0", currency: "VNĐ", features: ["Full quyền lợi Premium Pass", "8h00- 21h00 (Tea Break - Lunch Networking - Gala Awards)"], popular: false },
+        ];
+
+        const nonMemberTicketTiers = [
+            { name: "Essential Pass", option: "|", price: "1.050.000", currency: "VNĐ", features: ["Trải nghiệm trọn vẹn chương trình (08h–17h: keynote & panel)", "Bộ tài liệu sự kiện độc quyền", "Tea-break & networking chất lượng", "Tặng ngay 01 năm Membership CIO Vietnam - Hạng Community Member"], popular: false },
+            { name: "Premium Access", option: "Lunch Networking", price: "1.400.000", currency: "VNĐ", features: ["Tất cả quyền lợi Essential Pass (08h-17h00)", "Tham gia Lunch Networking cùng lãnh đạo cấp cao", "Tặng ngay 01 năm Membership CIO Vietnam- Hạng Professional Member"], popular: true },
+            { name: "Premium Access", option: "Gala Awards", price: "1.400.000", currency: "VNĐ", features: ["Tất cả quyền lợi <b>Essential Pass</b> (08h-21h00)", "Tham gia Dinner Networking & Lễ vinh danh CIO Awards", "Tặng ngay 01 năm Membership CIO Vietnam- Hạng Professonal Member"], popular: false },
         ];
 
         const sponsorTiers = [
@@ -241,7 +246,7 @@
             return (
                 <header className={`fixed top-0 w-full z-50 transition-all duration-300 ${isScrolled ? 'bg-white/80 backdrop-blur-lg border-b border-gray-200 shadow-sm' : 'bg-transparent'}`}>
                     <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                        <h1 className={`text-xl font-bold transition-colors ${isScrolled ? 'text-gray-900' : 'text-white-'}`}>CIO<span className="text-rose-600">Summit</span></h1>
+                        <h1 className={`text-xl font-bold transition-colors ${isScrolled ? 'text-gray-900' : 'text-white-'}`}>CIO <span className="text-rose-600">Summit</span></h1>
                         <nav className="hidden md:flex space-x-8 items-center">
                             <a href="#about" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>About</a>
                             <a href="#speakers" className={`transition-colors ${isScrolled ? 'text-gray-600- hover:text-rose-600' : 'text-gray-200- hover:text-white-'}`}>Speakers</a>
@@ -373,12 +378,42 @@
             return (
                 <section id="tickets" className="py-20 bg-gray-50">
                     <div className="container mx-auto px-6">
-                        <SectionTitle>Registration <span className="text-rose-600">Packages</span></SectionTitle>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto justify-center">
+                        <SectionTitle>Member <span className="text-rose-600">Packages</span></SectionTitle>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 max-w-7xl mx-auto justify-center">
                             {ticketTiers.map(tier => (
                                 <div key={tier.name} className={`relative bg-white border border-gray-200 rounded-lg p-8 flex flex-col shadow-sm ${tier.popular ? 'border-rose-500 border-2' : ''}`}>
                                     {tier.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</div>}
                                     <h3 className="text-2xl font-bold text-center mb-2 text-gray-900">{tier.name}</h3>
+                                    <div className="text-xl text-center  text-rose-600 mb-6">{tier.option}</div>
+                                    <p className="text-4xl font-black text-center text-gray-900 mb-6">
+                                        {tier.price} 
+                                        {tier.currency && <span className="text-xl font-medium text-gray-500"> {tier.currency}</span>}
+                                    </p>
+                                    <ul className="space-y-4 mb-8 flex-grow">
+                                        {tier.features.map(feature => (<li key={feature} className="flex items-start"><ShieldCheckIcon size={20} className="text-green-500 mr-3 flex-shrink-0 mt-1"/><span className="text-gray-600">{feature}</span></li>))}
+                                    </ul>
+                                    <a href="https://forms.gle/g7mQJG52iKvrgQmQ6" target="_register" className="w-full mt-auto bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-300 transform hover:scale-105 text-center">
+                                        Register Now
+                                    </a>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
+            );
+        };
+        
+        const NonMemberTicketsSection = () => {
+            return (
+                <section id="nonmember-tickets" className="py-20 bg-gray-50">
+                    <div className="container mx-auto px-6">
+                        <SectionTitle>Non-Memeber <span className="text-rose-600">Packages</span></SectionTitle>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto justify-center">
+                            {nonMemberTicketTiers.map(tier => (
+                                <div key={tier.name} className={`relative bg-white border border-gray-200 rounded-lg p-8 flex flex-col shadow-sm ${tier.popular ? 'border-rose-500 border-2' : ''}`}>
+                                    {tier.popular && <div className="absolute top-0 -translate-y-1/2 left-1/2 -translate-x-1/2 bg-rose-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase">Popular</div>}
+                                    <h3 className="text-2xl font-bold text-center mb-2 text-gray-900">{tier.name}</h3>
+                                    <div className="text-xl text-center  text-rose-600 mb-6">{tier.option}</div>
                                     <p className="text-4xl font-black text-center text-gray-900 mb-6">
                                         {tier.price} 
                                         {tier.currency && <span className="text-xl font-medium text-gray-500"> {tier.currency}</span>}
@@ -404,9 +439,9 @@
                         <SectionTitle>Event <span className="text-rose-600">Location</span></SectionTitle>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
                             <div>
-                                <h3 className="text-2xl font-bold mb-2 text-gray-900">SECC - Saigon Exhibition and Convention Center</h3>
-                                <p className="text-gray-500 mb-4">799 Nguyen Van Linh, Tan Phu Ward, District 7, Ho Chi Minh City, Vietnam</p>
-                                <p className="text-gray-700 leading-relaxed">Located in the heart of the new urban area, SECC is one of the most modern and largest convention centers in Vietnam, providing a world-class experience for all attendees.</p>
+                                <h3 className="text-2xl font-bold mb-2 text-gray-900">Riverside Palace</h3>
+                                <p className="text-gray-500 mb-4">360D Ben Van Don Street, Vinh Hoi Ward, Ho Chi Minh City, Vietnam</p>
+                                <p className="text-gray-700 leading-relaxed">Situated on Ben Van Don Street in Vinh Hoi Ward, Ho Chi Minh City, Riverside Palace is a premier convention center renowned for its elegant European-inspired architecture and picturesque riverside setting. It offers convenient access from the city center, making it an ideal venue for a wide array of prestigious events.</p>
                             </div>
                             <div className="h-80 rounded-lg overflow-hidden border-2 border-gray-200">
                                 <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3920.023532970103!2d106.71192531526805!3d10.73269646288348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x31752f659c0433d7%3A0x8424523106411539!2sSaigon%20Exhibition%20and%20Convention%20Center%20(SECC)!5e0!3m2!1sen!2s!4v1663000000000!5m2!1sen!2s" width="100%" height="100%" style={{ border: 0 }} allowFullScreen="" loading="lazy" referrerPolicy="no-referrer-when-downgrade"></iframe>
@@ -557,6 +592,7 @@
                         <SpeakersSection onSpeakerClick={handleOpenSpeakerModal} />
                         <AgendaSection />
                         <TicketsSection />
+                        <NonMemberTicketsSection />
                         <LocationSection />
                         <ContactSection />
                         <SponsorsSection />
