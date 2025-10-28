@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Software Department AI Using Guideline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        .filter-btn {
+            transition: all 0.3s ease;
+        }
+        .filter-btn.active {
+            background-color: #0d9488; /* teal-600 */
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        details summary {
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background-color: #f5f5f4; /* stone-100 */
+            border-radius: 0.375rem;
+            transition: background-color 0.2s ease;
+        }
+        details summary:hover {
+            background-color: #e7e5e4; /* stone-200 */
+        }
+        details summary::after {
+            content: '►';
+            font-size: 0.75rem;
+            transition: transform 0.2s ease;
+        }
+        details[open] summary::after {
+            transform: rotate(90deg);
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 350px;
+            max-height: 400px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body class="bg-amber-50 text-stone-800 antialiased">
+
+    <header class="bg-white shadow-md py-6">
+        <div class="container mx-auto px-4 text-center">
+            <h1 class="text-4xl font-bold text-teal-700">Software Department AI Guideline</h1>
+            <p class="text-lg text-stone-600 mt-2">An interactive guide to leveraging AI safely and effectively.</p>
+        </div>
+    </header>
+
+    <nav class="sticky top-0 z-10 bg-white/90 backdrop-blur-sm shadow-lg py-4">
+        <div class="container mx-auto px-4">
+            <div class="flex flex-wrap justify-center gap-2 md:gap-3">
+                <button data-filter="all" class="filter-btn active text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">Show All</button>
+                <button data-filter="general" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">🏛️ Core Principles</button>
+                <button data-filter="security" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-red-100 text-red-700 hover:bg-red-200">🛡️ Security</button>
+                <button data-filter="developer" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">👨‍💻 Developer</button>
+                <button data-filter="qc" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">🧪 QC</button>
+                <button data-filter="leader" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">👔 Leader</button>
+                <button data-filter="itcomm" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">✍️ IT Comm</button>
+                <button data-filter="prompting" class="filter-btn text-sm md:text-base font-medium py-2 px-3 md:px-5 rounded-full bg-stone-100 text-stone-700 hover:bg-stone-200">💡 Prompting</button>
+            </div>
+        </div>
+    </nav>
+
+    <main id="content-container" class="container mx-auto px-4 py-8 md:py-12">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+            <!-- Part 1: General Rules -->
+            <section data-category="general" class="guideline-card md:col-span-2 lg:col-span-3 bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-teal-700 mb-4">🏛️ Core Principles (Applicable to All)</h2>
+                <p class="text-stone-600 mb-6">These are the foundational rules and mindsets for everyone in the software department. Selecting a role-specific filter (like 'Developer') will show these rules *plus* the role-specific ones.</p>
+                
+                <h3 class="text-xl font-semibold text-stone-700 mb-3">Mandatory Rules</h3>
+                <ul class="list-disc list-inside space-y-2 mb-6 pl-2 text-stone-700">
+                    <li><strong>Read First, Act Second:</strong> Thoroughly understand the context before starting any task.</li>
+                    <li><strong>Small, Iterative Steps:</strong> Break down large tasks into small, manageable, reviewable units.</li>
+                    <li><strong>Document Assumptions:</strong> If you make an assumption, record it in the relevant ticket or document.</li>
+                    <li><strong>Security is Everyone's Job:</strong> Never commit or share secrets. Validate inputs.</li>
+                    <li><strong>Clarity Over Premature Optimization:</strong> Prioritize clear, understandable work.</li>
+                    <li><strong>Informed Decisions:</strong> Evaluate at least two viable options before making a significant decision.</li>
+                </ul>
+
+                <h3 class="text-xl font-semibold text-stone-700 mb-3">Core Mindset</h3>
+                <ul class="list-disc list-inside space-y-2 pl-2 text-stone-700">
+                    <li><strong>Act with Ownership:</strong> Think like a senior stakeholder in the company's success.</li>
+                    <li><strong>Data-Driven, Not Guess-Driven:</strong> Base your actions and conclusions on evidence and analysis.</li>
+                    <li><strong>Simplicity and Pragmatism:</strong> Choose the simplest, most effective solution.</li>
+                    <li><strong>You Are 100% Accountable for AI Output:</strong> AI is a tool. You are responsible for all output.</li>
+                    <li><strong>Verify, Never Blindly Trust:</strong> Critically review all AI-generated output. Test code, validate cases, fact-check docs.</li>
+                    <li><strong>Ensure License Compliance:</strong> You are responsible for verifying that any used AI-generated code complies with its original license.</li>
+                </ul>
+            </section>
+
+            <!-- Guideline Chart -->
+            <section data-category="general" class="guideline-card md:col-span-3 bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-teal-700 mb-4">Guideline Distribution</h2>
+                <p class="text-stone-600 mb-6">This chart shows the total number of specific guideline cards for each category. It provides a visual overview of how the guidelines are structured. (Note: Cards tagged with multiple categories, like 'Security' and 'General', are counted in each.)</p>
+                <div class="chart-container">
+                    <canvas id="guidelineChart"></canvas>
+                </div>
+            </section>
+
+            <!-- Part 1: Security Rules -->
+            <section data-category="general security" class="guideline-card md:col-span-3 bg-red-50 border-2 border-red-500 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-red-700 mb-4">🛡️ The #1 Rule: Data Security</h2>
+                <p class="text-red-900 mb-6 text-lg">
+                    <strong>Zero Sensitive Data in Public AI.</strong> Never input, upload, or paste proprietary code, customer data, PII, API keys, credentials, internal documentation, or company secrets into public-facing AI models (e.g., free versions of ChatGPT, Claude, etc.). Use only company-sanctioned, private AI environments for sensitive work.
+                </p>
+
+                <h3 class="text-xl font-semibold text-red-800 mb-3">AI Environment Policy</h3>
+                <div class="overflow-x-auto mb-6">
+                    <table class="w-full text-left border-collapse table-auto">
+                        <thead class="bg-red-100">
+                            <tr>
+                                <th class="border border-red-300 p-3 font-semibold">Environment</th>
+                                <th class="border border-red-300 p-3 font-semibold">Allowed Data</th>
+                                <th class="border border-red-300 p-3 font-semibold">Tools</th>
+                                <th class="border border-red-300 p-3 font-semibold">Terms of Use</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white">
+                                <td class="border border-red-300 p-3 font-medium"><strong>Public AI</strong> (Unregulated)</td>
+                                <td class="border border-red-300 p-3">
+                                    <strong class="text-red-700">ABSOLUTELY PROHIBITED:</strong>
+                                    <ul class="list-disc pl-5 mt-1">
+                                        <li>Source Code, PII (Personal Data)</li>
+                                        <li>Credentials (API keys, passwords)</li>
+                                        <li>Internal Documents, Company Secrets</li>
+                                    </ul>
+                                </td>
+                                <td class="border border-red-300 p-3">ChatGPT (Free), Claude (Free), Google Gemini (Free), etc.</td>
+                                <td class="border border-red-300 p-3"><strong class="text-red-700">NEVER</strong> use for work data. Only for 100% public info or personal study.</td>
+                            </tr>
+                            <tr class="bg-green-50">
+                                <td class="border border-red-300 p-3 font-medium"><strong>Private AI</strong> (Company-Sanctioned)</td>
+                                <td class="border border-red-300 p-3">
+                                    <strong class="text-green-800">ALLOWED:</strong>
+                                    <ul class="list-disc pl-5 mt-1">
+                                        <li>Work data, source code, company data</li>
+                                        <li>Must be declared to management</li>
+                                    </ul>
+                                </td>
+                                <td class="border border-red-300 p-3">Gemini Pro, Cursor, ClickUp (Company Accounts), Internal Tools</td>
+                                <td class="border border-red-300 p-3"><strong class="text-green-800">REQUIRED ENVIRONMENT</strong> for handling any sensitive or internal data.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <h3 class="text-xl font-semibold text-red-800 mb-3">Data Classification & Handling</h3>
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse table-auto">
+                        <thead class="bg-red-100">
+                            <tr>
+                                <th class="border border-red-300 p-3 font-semibold">Data Level</th>
+                                <th class="border border-red-300 p-3 font-semibold">Input to Prompt?</th>
+                                <th class="border border-red-300 p-3 font-semibold">Masking/Sanitizing Required?</th>
+                                <th class="border border-red-300 p-3 font-semibold">Allow Storage (by 3rd party)?</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="bg-white">
+                                <td class="border border-red-300 p-3 font-medium"><strong>Confidential</strong> (PII, API Keys, Passwords)</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-red-700 text-xl">❌ NO</strong></td>
+                                <td class="border border-red-300 p-3 text-center">(N/A)</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-red-700 text-xl">❌ NO</strong></td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="border border-red-300 p-3 font-medium"><strong>Company Internals</strong> (Source Code, Project Names, Design Docs)</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-yellow-600 text-xl">⚠️ RESTRICTIONS</strong></td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-green-800 text-xl">✅ REQUIRED</strong> (Must be anonymized)</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-yellow-600 text-xl">⚠️ HIGH RISK</strong> (Only if sanitized)</td>
+                            </tr>
+                            <tr class="bg-white">
+                                <td class="border border-red-300 p-3 font-medium"><strong>Public Information</strong> (Press Releases, Blog Posts)</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-green-800 text-xl">✅ ALLOWED</strong></td>
+                                <td class="border border-red-300 p-3 text-center">No</td>
+                                <td class="border border-red-300 p-3 text-center"><strong class="text-green-800 text-xl">✅ ACCEPTED</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Part 2: Developer Team -->
+            <section data-category="developer" class="guideline-card bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-blue-700 mb-4">👨‍💻 Developer Guidelines</h2>
+                <h3 class="text-lg font-semibold text-stone-700 mb-3">Mindset & Principles</h3>
+                <ul class="list-disc list-inside space-y-2 mb-4 pl-2 text-stone-700">
+                    <li><strong>AI is your Pair Programmer:</strong> Use it for boilerplate, debugging, and brainstorming.</li>
+                    <li><strong>Write for Others:</strong> Write clean, readable, and maintainable code.</li>
+                    <li><strong>Pragmatic Craftsmanship:</strong> Balance quality with delivering value.</li>
+                    <li><strong>Consistency is Key:</strong> Follow all team coding rules and project patterns.</li>
+                    <li><strong>Understand Every Line:</strong> You must be able to explain any AI-generated code you commit.</li>
+                    <li><strong>Always Run and Test:</strong> Never commit code that hasn’t been executed and validated.</li>
+                </ul>
+                <div class="space-y-3">
+                    <details>
+                        <summary>Key Rules & Responsibilities</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Thorough Context:</strong> Use approved IDE integrations (Copilot, Gemini, Cursor) that securely access your codebase. Anonymize examples for external tools.</li>
+                            <li><strong>Test-Driven Approach:</strong> All features must have new tests. All bug fixes must have a regression test. Use AI to generate unit tests and mock data.</li>
+                            <li><strong>Security First:</strong> Never hardcode secrets. Validate and sanitize all user inputs. Be **extra skeptical** of AI-generated security code (auth, encryption, validation).</li>
+                            <li><strong>Effective Version Control:</strong> Keep commits small, focused, and atomic with clear messages.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>❌ Anti-Patterns to Avoid</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Avoid "Prompt-Driven Development":</strong> Do not let AI dictate your architecture. Design your system first, then use AI to implement small, defined components.</li>
+                            <li><strong>Don’t Outsource Understanding:</strong> If you get a fix, ask the AI to *explain* the root cause and the principles behind the solution.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>💡 Example Prompts</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Code Gen:</strong> "Act as a senior TypeScript developer. Write a function using Axios that posts a JSON payload to an endpoint and handles retries with exponential backoff."</li>
+                            <li><strong>Regex:</strong> "Generate a regex to validate a username that must be 6-16 characters long, start with a letter, and can contain letters, numbers, and underscores."</li>
+                            <li><strong>Refactor:</strong> (Paste function) "Refactor this code to be more functional and immutable. Explain the changes."</li>
+                            <li><strong>Debug:</strong> (Paste code + error) "What are the likely causes of this error? Suggest debugging steps."</li>
+                        </ul>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Part 3: Quality Control Team -->
+            <section data-category="qc" class="guideline-card bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-purple-700 mb-4">🧪 Quality Control (QC) Guidelines</h2>
+                <h3 class="text-lg font-semibold text-stone-700 mb-3">Mindset & Principles</h3>
+                <ul class="list-disc list-inside space-y-2 mb-4 pl-2 text-stone-700">
+                    <li><strong>AI is your Test Case Generator:</strong> Use it to think of scenarios you might miss and create test data.</li>
+                    <li><strong>Be the User's Advocate:</strong> Ensure a stable, reliable, and intuitive experience.</li>
+                    <li><strong>Destructive and Curious:</strong> Try to "break" the system in creative ways. Explore edge cases and invalid inputs.</li>
+                    <li><strong>Quality is a Process, Not a Gate:</strong> Collaborate with developers early and often.</li>
+                </ul>
+                <div class="space-y-3">
+                    <details>
+                        <summary>Key Rules & Responsibilities</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Understand Requirements:</strong> Fully grasp acceptance criteria and user stories before testing.</li>
+                            <li><strong>Systematic Test Case Creation:</strong> Develop comprehensive test plans (happy path, negative path, boundary cases).</li>
+                            <li><strong>Regression Testing:</strong> Test related areas to ensure a fix didn't introduce new issues.</li>
+                            <li><strong>Effective Bug Reporting:</strong> Log bugs with precise titles, detailed steps, and environmental details.</li>
+                            <li><strong>Sanitize Inputs:</strong> Remove any customer-specific information before pasting user stories into AI tools.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>❌ Anti-Patterns to Avoid</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Avoid Blind Acceptance:</strong> Never assume an AI-generated test plan is complete. It often misses nuanced business logic.</li>
+                            <li><strong>Don’t Only Test the Happy Path:</strong> Actively prompt the AI for negative test cases, boundary conditions, and destructive testing ideas.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>💡 Example Prompts</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Test Cases:</strong> (Paste sanitized user story) "Act as a meticulous QA engineer. Generate a list of positive, negative, and edge-case test scenarios for this feature."</li>
+                            <li><strong>Test Data:</strong> "Generate a CSV file with 20 rows of sample product data, including some with missing fields, special characters, and zero/negative values."</li>
+                            <li><strong>SQL:</strong> "Write an SQL query to find all users who have not logged in for over 90 days and have not made a purchase."</li>
+                            <li><strong>Brainstorm:</strong> "What are common security vulnerabilities for a file upload feature? Create a list of test cases to check for them."</li>
+                        </ul>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Part 4: Leaders & Managers -->
+            <section data-category="leader" class="guideline-card bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-green-700 mb-4">👔 Leader & Manager Guidelines</h2>
+                <h3 class="text-lg font-semibold text-stone-700 mb-3">Mindset & Principles</h3>
+                <ul class="list-disc list-inside space-y-2 mb-4 pl-2 text-stone-700">
+                    <li><strong>AI is a Strategic Tool:</strong> Use it to enhance productivity, summarize information, and identify risks, not to micromanage.</li>
+                    <li><strong>Enable Your Team:</strong> Your responsibility is to ensure the team understands and adheres to these guidelines.</li>
+                    <li><strong>Procure Safe Tools:</strong> Provide enterprise-grade AI tools to prevent staff from using insecure public alternatives.</li>
+                    <li><strong>Sanitize All Inputs:</strong> Always remove sensitive financial, personnel, or strategic data before inputting.</li>
+                </ul>
+                <div class="space-y-3">
+                    <details>
+                        <summary>❌ Anti-Patterns to Avoid</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Don’t Use AI for Performance Reviews:</strong> Never use AI to write reviews or make HR decisions.</li>
+                            <li><strong>Avoid AI-based Productivity Metrics:</strong> Do not measure performance by "lines of AI-generated code." This encourages bad behavior.</li>
+                            <li><strong>Don’t Let AI Make Strategic Decisions:</strong> Use AI to provide data and summaries to *inform* your decisions, not to make them for you.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>💡 Example Prompts</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Summarization:</strong> (Paste sanitized status updates) "Act as a project manager. Summarize these updates into three bullet points highlighting progress, blockers, and next steps."</li>
+                            <li><strong>Communication:</strong> "Draft a clear and concise email to stakeholders explaining that the project timeline is at risk due to an unforeseen technical dependency. Propose two potential solutions."</li>
+                            <li><strong>Planning:</strong> "Given these three high-level features [list features], break them down into smaller, actionable user stories for a development team."</li>
+                            <li><strong>Risk Analysis:</strong> (Paste a project plan) "Review this plan and identify the top 5 potential risks or single points of failure."</li>
+                        </ul>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Part 6: IT Communicators -->
+            <section data-category="itcomm" class="guideline-card bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-orange-700 mb-4">✍️ IT Communicator Guidelines</h2>
+                <h3 class="text-lg font-semibold text-stone-700 mb-3">Mindset & Principles</h3>
+                <ul class="list-disc list-inside space-y-2 mb-4 pl-2 text-stone-700">
+                    <li><strong>AI is your First-Draft Generator:</strong> Use it to overcome writer's block, research, and structure content.</li>
+                    <li><strong>Fact-Check Everything:</strong> AI can "hallucinate" and invent technical details. Verify every command and explanation.</li>
+                    <li><strong>Own the Voice:</strong> Heavily edit all AI-generated text to match the company's official style guide and tone.</li>
+                    <li><strong>Simplify Complexity:</strong> Use AI to rewrite jargon-filled paragraphs into clear, concise language.</li>
+                </ul>
+                <div class="space-y-3">
+                    <details>
+                        <summary>❌ Anti-Patterns to Avoid</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Never Publish Raw Output:</strong> Unedited AI text is generic, repetitive, and lacks a human touch. It must always be reviewed and refined.</li>
+                            <li><strong>Don’t Lose Your Audience:</strong> Always define the target audience in your prompt. Generic explanations are rarely helpful.</li>
+                            <li><strong>Sanitize Examples:</strong> Do not document internal security procedures or infrastructure details in a way that could be useful to an attacker.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>💡 Example Prompts</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Explanation:</strong> (Paste a sanitized function) "Act as a technical writer. Explain what this function does for a non-technical audience. Use an analogy."</li>
+                            <li><strong>Editing:</strong> (Paste text) "Rewrite this paragraph to be in the active voice and make it more concise."</li>
+                            <li><strong>Structuring:</strong> "Create a document outline for a 'Getting Started' guide for a new REST API. Include sections for Authentication, Rate Limiting, and key endpoints."</li>
+                            <li><strong>Audience Adapter:</strong> "Take this technical explanation for an engineer and rewrite it for a sales manager, focusing on the business benefits."</li>
+                        </ul>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Part 7: Prompting Strategy -->
+            <section data-category="prompting" class="guideline-card md:col-span-2 bg-white rounded-lg shadow-sm p-6">
+                <h2 class="text-2xl font-bold text-indigo-700 mb-4">💡 Prompting Strategy (For Everyone)</h2>
+                <h3 class="text-lg font-semibold text-stone-700 mb-3">The Persona Pattern</h3>
+                <p class="text-stone-700 mb-4">Start your prompt by giving the AI a role. This focuses its output dramatically.</p>
+                <ul class="list-disc list-inside space-y-2 mb-4 pl-2 text-stone-700">
+                    <li>"<strong>Act as a senior PHP developer...</strong> Write a function that..."</li>
+                    <li>"<strong>Act as a meticulous QA engineer...</strong> Generate a list of test scenarios for..."</li>
+                    <li>"<strong>Act as a technical writer...</strong> Explain this concept in simple terms..."</li>
+                    <li>"<strong>Act as a project manager...</strong> Identify potential risks for..."</li>
+                </ul>
+                <div class="space-y-3">
+                    <details>
+                        <summary>Guiding Principles</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Principle of Iteration:</strong> Your first prompt is rarely perfect. Treat the interaction as a conversation and refine your prompts.</li>
+                            <li><strong>Principle of Specificity:</strong> The more context and detail you provide (code snippets, error messages, constraints), the better the output.</li>
+                        </ul>
+                    </details>
+                    <details>
+                        <summary>❌ Key Anti-Patterns to Avoid</summary>
+                        <ul class="list-disc list-inside space-y-2 mt-3 pl-4 text-stone-700 border-l-2 border-stone-200 ml-2">
+                            <li><strong>Don't Ask for Too Much at Once:</strong> Avoid huge prompts (e.g., "Write the entire login system"). Ask for small, specific, well-defined functions.</li>
+                            <li><strong>Don't Outsource Understanding:</strong> If you don't understand the answer, ask the AI to explain the underlying concepts, causes, and trade-offs.</li>
+                            <li><strong>Avoid "Prompt-Driven Development":</strong> Don't let the AI dictate your architecture. Start with a clear plan.</li>
+                        </ul>
+                    </details>
+                </div>
+            </section>
+
+            <!-- Part 7: Security (Prompting) -->
+            <section data-category="prompting security" class="guideline-card bg-red-50 border-2 border-red-500 rounded-lg shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-red-700 mb-4">🛡️ Security & Prompting</h2>
+                <p class="text-red-900 mb-4">Security is paramount. Use AI as a tool to enhance security, not introduce new vulnerabilities.</p>
+                <ul class="list-disc list-inside space-y-2 pl-2 text-red-900">
+                    <li><strong>Never Trust AI with Secrets:</strong> Do not ask the AI to generate or manage secrets, keys, or credentials.</li>
+                    <li><strong>Scrutinize Security-Related Code:</strong> Be **extra critical** of AI-generated code for authentication, authorization, encryption, and data validation. These are high-risk areas.</li>
+                    <li><strong>Guard Against Insecure Suggestions:</strong> AI models are trained on public code, some of which is insecure. Watch for vulnerabilities like SQL injection, XSS, or insecure direct object references.</li>
+                    <li><strong>Use AI for Security Scanning:</strong> Use AI-powered SAST tools to scan code (both human and AI-written) for potential vulnerabilities.</li>
+                </ul>
+            </section>
+
+        </div>
+    </main>
+
+    <footer class="bg-white mt-16 border-t">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const nav = document.querySelector('nav');
+            const filterButtons = nav.querySelectorAll('.filter-btn');
+            const contentCards = document.querySelectorAll('.guideline-card');
+            const chartCanvas = document.getElementById('guidelineChart');
+
+            const filterContent = (filter) => {
+                filterButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    if (btn.dataset.filter === filter) {
+                        btn.classList.add('active');
+                    }
+                });
+
+                contentCards.forEach(card => {
+                    const category = card.dataset.category;
+                    
+                    if (filter === 'all') {
+                        card.style.display = 'block';
+                    } else if (filter === 'general') {
+                        if (category.includes('general')) card.style.display = 'block';
+                        else card.style.display = 'none';
+                    } else if (filter === 'security') {
+                        if (category.includes('security')) card.style.display = 'block';
+                        else card.style.display = 'none';
+                    } else {
+                        if (category.includes('general') || category.includes(filter)) card.style.display = 'block';
+                        else card.style.display = 'none';
+                    }
+                });
+            };
+
+            nav.addEventListener('click', (e) => {
+                if (e.target.classList.contains('filter-btn')) {
+                    const filter = e.target.dataset.filter;
+                    filterContent(filter);
+                }
+            });
+
+            const renderGuidelineChart = () => {
+                const counts = {
+                    general: 0,
+                    security: 0,
+                    developer: 0,
+                    qc: 0,
+                    leader: 0,
+                    itcomm: 0,
+                    prompting: 0
+                };
+
+                contentCards.forEach(card => {
+                    const categories = card.dataset.category.split(' ');
+                    categories.forEach(cat => {
+                        if (counts.hasOwnProperty(cat)) {
+                            counts[cat]++;
+                        }
+                    });
+                });
+
+                const chartData = Object.values(counts);
+                const chartLabels = Object.keys(counts).map(k => {
+                    const labelsMap = {
+                        general: 'Core Principles',
+                        security: 'Security',
+                        developer: 'Developer',
+                        qc: 'QC',
+                        leader: 'Leader',
+                        itcomm: 'IT Comm',
+                        prompting: 'Prompting'
+                    };
+                    return labelsMap[k] || k;
+                });
+                
+                const backgroundColors = [
+                    'rgba(120, 113, 108, 0.6)', // stone-500
+                    'rgba(220, 38, 38, 0.6)',   // red-600
+                    'rgba(59, 130, 246, 0.6)',  // blue-500
+                    'rgba(168, 85, 247, 0.6)',  // purple-500
+                    'rgba(22, 163, 74, 0.6)',   // green-600
+                    'rgba(234, 88, 12, 0.6)',   // orange-600
+                    'rgba(79, 70, 229, 0.6)'    // indigo-600
+                ];
+
+                const borderColors = [
+                    'rgb(120, 113, 108)',
+                    'rgb(220, 38, 38)',
+                    'rgb(59, 130, 246)',
+                    'rgb(168, 85, 247)',
+                    'rgb(22, 163, 74)',
+                    'rgb(234, 88, 12)',
+                    'rgb(79, 70, 229)'
+                ];
+
+                if (chartCanvas) {
+                    new Chart(chartCanvas.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: chartLabels,
+                            datasets: [{
+                                label: 'Number of Guideline Cards',
+                                data: chartData,
+                                backgroundColor: backgroundColors,
+                                borderColor: borderColors,
+                                borderWidth: 1
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        stepSize: 1
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += context.parsed.y + ' cards';
+                                            }
+                                            return label;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+            };
+            
+            filterContent('all');
+            renderGuidelineChart();
+        });
+    </script>
+</body>
+</html>
