@@ -295,83 +295,83 @@
         });
 
         // Gemini API Logic
-        const apiKey = ""; // Runtime environment provides key
+        // const apiKey = ""; // Runtime environment provides key
 
-        async function callGemini(prompt, resultElementId, buttonId, loadingText) {
-            const resultDiv = document.getElementById(resultElementId);
-            const button = document.getElementById(buttonId);
-            const originalButtonText = button.innerHTML;
+        // async function callGemini(prompt, resultElementId, buttonId, loadingText) {
+        //     const resultDiv = document.getElementById(resultElementId);
+        //     const button = document.getElementById(buttonId);
+        //     const originalButtonText = button.innerHTML;
 
-            // Loading state
-            button.disabled = true;
-            button.innerHTML = `<span class="coffee-loader w-4 h-4 border-2 border-white/50 border-b-transparent mr-2"></span> ${loadingText}`;
-            resultDiv.classList.remove('hidden');
-            resultDiv.innerHTML = '<p class="animate-pulse">Đang pha chế câu trả lời...</p>';
+        //     // Loading state
+        //     button.disabled = true;
+        //     button.innerHTML = `<span class="coffee-loader w-4 h-4 border-2 border-white/50 border-b-transparent mr-2"></span> ${loadingText}`;
+        //     resultDiv.classList.remove('hidden');
+        //     resultDiv.innerHTML = '<p class="animate-pulse">Đang pha chế câu trả lời...</p>';
 
-            try {
-                // Exponential backoff retry logic
-                let retries = 0;
-                let delay = 1000;
-                let responseData = null;
+        //     try {
+        //         // Exponential backoff retry logic
+        //         let retries = 0;
+        //         let delay = 1000;
+        //         let responseData = null;
 
-                while (retries < 3) {
-                    try {
-                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                contents: [{
-                                    parts: [{ text: prompt }]
-                                }]
-                            })
-                        });
+        //         while (retries < 3) {
+        //             try {
+        //                 const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+        //                     method: 'POST',
+        //                     headers: {
+        //                         'Content-Type': 'application/json'
+        //                     },
+        //                     body: JSON.stringify({
+        //                         contents: [{
+        //                             parts: [{ text: prompt }]
+        //                         }]
+        //                     })
+        //                 });
 
-                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-                        responseData = await response.json();
-                        break; // Success, exit loop
-                    } catch (e) {
-                        retries++;
-                        if (retries >= 3) throw e;
-                        await new Promise(resolve => setTimeout(resolve, delay));
-                        delay *= 2;
-                    }
-                }
+        //                 if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        //                 responseData = await response.json();
+        //                 break; // Success, exit loop
+        //             } catch (e) {
+        //                 retries++;
+        //                 if (retries >= 3) throw e;
+        //                 await new Promise(resolve => setTimeout(resolve, delay));
+        //                 delay *= 2;
+        //             }
+        //         }
 
-                const text = responseData.candidates[0].content.parts[0].text;
-                resultDiv.innerHTML = marked.parse(text); // Use marked for formatting
+        //         const text = responseData.candidates[0].content.parts[0].text;
+        //         resultDiv.innerHTML = marked.parse(text); // Use marked for formatting
 
-            } catch (error) {
-                console.error("Gemini Error:", error);
-                resultDiv.innerHTML = `<p class="text-red-400">Xin lỗi, máy pha cà phê đang kẹt! Vui lòng thử lại sau. (${error.message})</p>`;
-            } finally {
-                button.disabled = false;
-                button.innerHTML = originalButtonText;
-            }
-        }
+        //     } catch (error) {
+        //         console.error("Gemini Error:", error);
+        //         resultDiv.innerHTML = `<p class="text-red-400">Xin lỗi, máy pha cà phê đang kẹt! Vui lòng thử lại sau. (${error.message})</p>`;
+        //     } finally {
+        //         button.disabled = false;
+        //         button.innerHTML = originalButtonText;
+        //     }
+        // }
 
-        function askExpert() {
-            const question = document.getElementById('qaInput').value;
-            if (!question.trim()) return;
+        // function askExpert() {
+        //     const question = document.getElementById('qaInput').value;
+        //     if (!question.trim()) return;
             
-            const prompt = `Bạn là một chuyên gia am hiểu sâu sắc về văn hóa, lịch sử và kỹ thuật pha chế cà phê Việt Nam. Hãy trả lời câu hỏi sau của người dùng một cách thân thiện, ngắn gọn và đầy cảm hứng bằng tiếng Việt. Sử dụng định dạng Markdown nhẹ nhàng. Câu hỏi: "${question}"`;
+        //     const prompt = `Bạn là một chuyên gia am hiểu sâu sắc về văn hóa, lịch sử và kỹ thuật pha chế cà phê Việt Nam. Hãy trả lời câu hỏi sau của người dùng một cách thân thiện, ngắn gọn và đầy cảm hứng bằng tiếng Việt. Sử dụng định dạng Markdown nhẹ nhàng. Câu hỏi: "${question}"`;
             
-            callGemini(prompt, 'qaResult', 'qaButton', 'Đang suy nghĩ...');
-        }
+        //     callGemini(prompt, 'qaResult', 'qaButton', 'Đang suy nghĩ...');
+        // }
 
-        function generateRecipe() {
-            const ingredients = document.getElementById('recipeInput').value;
-            if (!ingredients.trim()) return;
+        // function generateRecipe() {
+        //     const ingredients = document.getElementById('recipeInput').value;
+        //     if (!ingredients.trim()) return;
 
-            const prompt = `Bạn là một Barista sáng tạo chuyên về cà phê Việt Nam. Người dùng có các nguyên liệu sau: "${ingredients}". Hãy sáng tạo ra một công thức đồ uống cà phê độc đáo (hoặc đồ uống kết hợp) từ những nguyên liệu này. 
-            1. Đặt một cái tên thật hay và kêu cho món nước.
-            2. Liệt kê nguyên liệu cần thiết.
-            3. Hướng dẫn pha chế từng bước ngắn gọn.
-            Trả lời bằng tiếng Việt, dùng Markdown.`;
+        //     const prompt = `Bạn là một Barista sáng tạo chuyên về cà phê Việt Nam. Người dùng có các nguyên liệu sau: "${ingredients}". Hãy sáng tạo ra một công thức đồ uống cà phê độc đáo (hoặc đồ uống kết hợp) từ những nguyên liệu này. 
+        //     1. Đặt một cái tên thật hay và kêu cho món nước.
+        //     2. Liệt kê nguyên liệu cần thiết.
+        //     3. Hướng dẫn pha chế từng bước ngắn gọn.
+        //     Trả lời bằng tiếng Việt, dùng Markdown.`;
 
-            callGemini(prompt, 'recipeResult', 'recipeButton', 'Đang sáng tạo...');
-        }
+        //     callGemini(prompt, 'recipeResult', 'recipeButton', 'Đang sáng tạo...');
+        // }
     </script>
 </body>
 </html>
