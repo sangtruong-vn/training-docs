@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khám Phá Cà Phê Việt Nam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:ital,wght@0,300;0,400;0,700;1,300&family=Work+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <!-- Updated Lucide script loading -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Markdown Parser for AI responses -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <style>
+        body {
+            font-family: 'Work Sans', sans-serif;
+            background-color: #fdfbf7;
+            color: #3e3228;
+        }
+        h1, h2, h3, h4, .serif {
+            font-family: 'Merriweather', serif;
+        }
+        .drop-cap::first-letter {
+            font-size: 3.5rem;
+            font-weight: bold;
+            float: left;
+            margin-right: 0.5rem;
+            line-height: 0.8;
+            color: #78350f;
+        }
+        /* Custom Loader */
+        .coffee-loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid #78350f;
+            border-bottom-color: transparent;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .ai-response ul {
+            list-style-type: disc;
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .ai-response ol {
+            list-style-type: decimal;
+            margin-left: 1.5rem;
+            margin-top: 0.5rem;
+            margin-bottom: 0.5rem;
+        }
+        .ai-response strong {
+            color: #78350f;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-amber-200 selection:text-amber-900">
+
+    <!-- Hero Section -->
+    <header class="relative bg-stone-900 text-amber-50 py-20 px-6 overflow-hidden">
+        <div class="absolute inset-0 opacity-20">
+            <!-- Pattern overlay simulates coffee beans texture -->
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="beans" width="40" height="40" patternUnits="userSpaceOnUse">
+                        <circle cx="20" cy="20" r="2" fill="#d6d3d1" />
+                    </pattern>
+                </defs>
+                <rect width="100%" height="100%" fill="url(#beans)" />
+            </svg>
+        </div>
+        <div class="max-w-4xl mx-auto relative z-10 text-center">
+            <span class="uppercase tracking-widest text-sm font-semibold text-amber-500 mb-4 block">Cẩm nang văn hóa</span>
+            <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">Khám Phá Cà Phê Việt Nam</h1>
+            <p class="text-xl md:text-2xl font-light text-stone-300 italic serif">Thuật Ngữ và Các Loại Cà Phê Đặc Trưng</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-12">
+        
+        <!-- Intro -->
+        <section class="mb-16">
+            <h2 class="text-3xl font-bold text-amber-900 mb-6 border-b-2 border-amber-200 pb-2">Giới thiệu: Cà Phê Không Chỉ Là Thức Uống</h2>
+            <div class="prose prose-stone prose-lg max-w-none text-stone-700">
+                <p class="drop-cap mb-4">
+                    Nhiều người trong chúng ta nghĩ rằng mình đã biết về cà phê Việt Nam—chiếc phin lọc, vị ngọt của sữa đặc, hay thậm chí là cà phê trứng. Nhưng đằng sau những hình ảnh quen thuộc ấy là cả một câu chuyện về sự thích nghi, một phản ứng trước sự khan hiếm, nhu cầu sinh tồn và cơ hội. 
+                </p>
+                <p class="mb-4">
+                    Tại Việt Nam, cà phê không chỉ đơn thuần là một thức uống; nó là một cuốn biên niên sử ghi lại tất cả những thăng trầm mà đất nước đã trải qua. Hướng dẫn này sẽ giới thiệu những khái niệm nền tảng và các loại đồ uống nổi tiếng, giúp bạn hiểu sâu hơn về câu chuyện phong phú đằng sau mỗi tách cà phê.
+                </p>
+            </div>
+        </section>
+
+        <!-- Section 1 -->
+        <section class="mb-16">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="bg-amber-800 text-white p-2 rounded-full">
+                    <i data-lucide="coffee" class="w-6 h-6"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-stone-800">1. Nền Tảng Của Một Tách Cà Phê Việt</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-12">
+                <div class="bg-white p-8 rounded-lg shadow-sm border border-stone-200">
+                    <h3 class="text-xl font-bold text-amber-800 mb-3 serif">1.1. Phin Lọc: Nghi Thức Chậm Lại</h3>
+                    <p class="text-stone-600 leading-relaxed mb-4">
+                        Phin lọc là một dụng cụ pha chế có từ thời Pháp thuộc, hoạt động dựa trên nguyên lý trọng lực để nước nóng chảy từ từ qua lớp bột cà phê. Quá trình này diễn ra rất chậm, có thể mất vài phút.
+                    </p>
+                    <p class="text-stone-600 leading-relaxed italic border-l-4 border-amber-500 pl-4 bg-amber-50 py-2">
+                        "Khoảng thời gian chờ đợi ấy không phải là một khuyết điểm, mà chính là một phần trung tâm của nghi thức thưởng thức cà phê."
+                    </p>
+                </div>
+                <div class="relative h-64 md:h-auto bg-stone-200 rounded-lg overflow-hidden flex items-center justify-center">
+                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Ly_c%C3%A0_ph%C3%AA_nguy%C3%AAn_ch%E1%BA%A5t_m%C3%A0u_c%C3%A1nh_d%C3%A1n.jpg/330px-Ly_c%C3%A0_ph%C3%AA_nguy%C3%AAn_ch%E1%BA%A5t_m%C3%A0u_c%C3%A1nh_d%C3%A1n.jpg" alt="Phin cà phê Việt Nam đang nhỏ giọt" class="w-full h-full object-cover">
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-stone-800 mb-6 serif">1.2. Ba Loại Hạt Cà Phê Chính</h3>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse bg-white rounded-lg overflow-hidden shadow-sm">
+                    <thead>
+                        <tr class="bg-stone-800 text-amber-50">
+                            <th class="p-4 font-semibold w-1/4">Hạt Cà Phê</th>
+                            <th class="p-4 font-semibold w-1/2">Đặc Điểm & Lịch Sử</th>
+                            <th class="p-4 font-semibold w-1/4">Hương Vị</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-stone-200">
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="p-4 font-bold text-amber-900">Arabica</td>
+                            <td class="p-4 text-sm text-stone-600">Được người Pháp giới thiệu đầu tiên tại Ninh Bình và Quảng Bình. Từng bị tàn phá bởi bệnh gỉ sắt.</td>
+                            <td class="p-4 text-sm italic text-stone-700">Đắng ngạc nhiên, mùi khói, hạt dẻ.</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="p-4 font-bold text-amber-900">Robusta</td>
+                            <td class="p-4 text-sm text-stone-600">Xương sống của ngành cà phê sau chiến tranh. Được tái thiết nhờ sự hợp tác với Đông Đức để đổi lấy sản lượng.</td>
+                            <td class="p-4 text-sm italic text-stone-700">Đắng hơn Arabica, mạnh mẽ, đậm đà.</td>
+                        </tr>
+                        <tr class="hover:bg-amber-50 transition-colors">
+                            <td class="p-4 font-bold text-amber-900">Liberica (Mít)</td>
+                            <td class="p-4 text-sm text-stone-600">Giống hiếm, cây cao tới 20m, kháng bệnh tốt. Hiện đang được tái khám phá.</td>
+                            <td class="p-4 text-sm italic text-stone-700">Nhẹ, hương trái cây, cỏ và gỗ.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- Section 2 -->
+        <section class="mb-16 bg-white p-8 rounded-2xl shadow-sm border border-stone-100">
+            <div class="flex items-center gap-4 mb-6">
+                 <div class="bg-amber-800 text-white p-2 rounded-full">
+                    <i data-lucide="cup-soda" class="w-6 h-6"></i>
+                </div>
+                <h2 class="text-2xl md:text-3xl font-bold text-stone-800">2. Những Ly Cà Phê Biểu Tượng</h2>
+            </div>
+
+            <div class="mb-8">
+                <h3 class="text-xl font-bold text-amber-900 mb-2 serif">2.1. Cà Phê Sữa</h3>
+                <p class="text-stone-600 mb-4">Vào thời Pháp thuộc, sữa tươi khan hiếm nên sữa đặc có đường trở thành lựa chọn mặc định. Vị ngọt đậm giúp cân bằng vị đắng gắt của Robusta rang đậm, tạo nên hương vị caramel hoặc sô cô la đặc trưng.</p>
+            </div>
+
+            <h3 class="text-lg font-bold text-stone-700 mb-4 uppercase tracking-wider text-sm">2.2. Các Biến Tấu Độc Đáo</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <!-- Egg Coffee -->
+                <div class="bg-amber-50 p-6 rounded-xl border border-amber-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-2 mb-3">
+                         <i data-lucide="egg" class="text-amber-600"></i>
+                        <h4 class="font-bold text-stone-800">Cà Phê Trứng</h4>
+                    </div>
+                    <p class="text-sm text-stone-600">Ra đời năm 1940. Lòng đỏ trứng tạo lớp kem bông xốp như bánh meringue, béo ngậy và ngọt ngào.</p>
+                </div>
+                <!-- Salt Coffee -->
+                <div class="bg-stone-50 p-6 rounded-xl border border-stone-200 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-2 mb-3">
+                         <i data-lucide="droplets" class="text-blue-900"></i>
+                        <h4 class="font-bold text-stone-800">Cà Phê Muối</h4>
+                    </div>
+                    <p class="text-sm text-stone-600">Đặc sản xứ Huế. Sự kết hợp giữa espresso, sữa và chút muối mặn mà đầy tinh tế.</p>
+                </div>
+                <!-- Coconut Coffee -->
+                <div class="bg-green-50 p-6 rounded-xl border border-green-100 hover:shadow-md transition-shadow">
+                    <div class="flex items-center gap-2 mb-3">
+                         <i data-lucide="palmtree" class="text-green-700"></i>
+                        <h4 class="font-bold text-stone-800">Cà Phê Cốt Dừa</h4>
+                    </div>
+                    <p class="text-sm text-stone-600">Sáng tạo miền Nam. Espresso pha trộn cùng kem dừa hoặc sữa dừa đông lạnh mát lạnh.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- AI Feature Section -->
+        <section class="mb-16 bg-gradient-to-br from-amber-900 to-stone-900 text-amber-50 p-8 rounded-3xl shadow-xl relative overflow-hidden">
+             <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-amber-500 rounded-full blur-3xl opacity-20"></div>
+             
+             <div class="relative z-10">
+                <div class="flex items-center gap-3 mb-8">
+                    <div class="bg-amber-500 text-stone-900 p-2 rounded-full shadow-[0_0_15px_rgba(245,158,11,0.5)]">
+                        <i data-lucide="sparkles" class="w-6 h-6"></i>
+                    </div>
+                    <h2 class="text-3xl font-bold text-white serif">Trải Nghiệm Cà Phê Số ✨</h2>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8">
+                    <!-- AI Q&A -->
+                    <div class="bg-stone-800/50 backdrop-blur-sm p-6 rounded-xl border border-stone-700">
+                        <h3 class="text-xl font-bold text-amber-300 mb-2 flex items-center gap-2">
+                            <i data-lucide="message-circle-question" class="w-5 h-5"></i>
+                            Hỏi Chuyên Gia Cà Phê
+                        </h3>
+                        <p class="text-stone-300 text-sm mb-4">Thắc mắc về cách pha phin? Hay lịch sử hạt Robusta? Hãy hỏi ngay!</p>
+                        <div class="space-y-3">
+                            <textarea id="qaInput" class="w-full bg-stone-900/80 border border-stone-600 rounded-lg p-3 text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 transition-colors" rows="3" placeholder="Ví dụ: Làm sao để pha cà phê phin ngon nhất?"></textarea>
+                            <button onclick="askExpert()" id="qaButton" class="w-full bg-amber-600 hover:bg-amber-500 text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2 group">
+                                <span>Gửi câu hỏi</span>
+                                <i data-lucide="send" class="w-4 h-4 group-hover:translate-x-1 transition-transform"></i>
+                            </button>
+                        </div>
+                        <div id="qaResult" class="mt-4 hidden bg-stone-900/60 p-4 rounded-lg border border-stone-700 text-stone-200 text-sm ai-response max-h-60 overflow-y-auto"></div>
+                    </div>
+
+                    <!-- AI Recipe Generator -->
+                    <div class="bg-stone-800/50 backdrop-blur-sm p-6 rounded-xl border border-stone-700">
+                        <h3 class="text-xl font-bold text-amber-300 mb-2 flex items-center gap-2">
+                            <i data-lucide="flask-conical" class="w-5 h-5"></i>
+                            Barista Sáng Tạo
+                        </h3>
+                        <p class="text-stone-300 text-sm mb-4">Nhập nguyên liệu bạn có, AI sẽ tạo công thức đồ uống độc đáo.</p>
+                        <div class="space-y-3">
+                            <input type="text" id="recipeInput" class="w-full bg-stone-900/80 border border-stone-600 rounded-lg p-3 text-white placeholder-stone-500 focus:outline-none focus:border-amber-500 transition-colors" placeholder="Ví dụ: Sữa đặc, sữa chua, xoài...">
+                            <button onclick="generateRecipe()" id="recipeButton" class="w-full bg-gradient-to-r from-purple-700 to-indigo-700 hover:from-purple-600 hover:to-indigo-600 text-white font-semibold py-2 px-4 rounded-lg transition-all flex items-center justify-center gap-2 shadow-lg">
+                                <span>Sáng tạo công thức ✨</span>
+                            </button>
+                        </div>
+                         <div id="recipeResult" class="mt-4 hidden bg-stone-900/60 p-4 rounded-lg border border-stone-700 text-stone-200 text-sm ai-response max-h-60 overflow-y-auto"></div>
+                    </div>
+                </div>
+             </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section class="mb-16">
+            <div class="flex flex-col md:flex-row gap-8 items-start">
+                <div class="md:w-2/3">
+                    <h2 class="text-2xl md:text-3xl font-bold text-stone-800 mb-4">3. Sự Tiến Hóa: Từ Số Lượng Đến Chất Lượng</h2>
+                    <p class="text-stone-700 mb-4">
+                        Sau Đổi Mới năm 1986, Việt Nam vươn lên thành cường quốc xuất khẩu cà phê thứ 2 thế giới. Tuy nhiên, trọng tâm đã chuyển dịch từ đầu những năm 2000.
+                    </p>
+                    <p class="text-stone-700 mb-4">
+                        Làn sóng mới ("Third Wave") với các thương hiệu như Oryberry hay Refined tập trung vào tính <strong>minh bạch</strong> và <strong>nghệ thuật thủ công</strong>. Sứ mệnh cốt lõi là nâng tầm hạt Robusta, chứng minh nó có thể cạnh tranh sòng phẳng với Arabica về độ phức tạp của hương vị.
+                    </p>
+                </div>
+                <div class="md:w-1/3 bg-stone-800 text-amber-50 p-6 rounded-lg text-center">
+                    <span class="text-4xl font-bold block mb-2 text-amber-400">#2</span>
+                    <span class="text-sm uppercase tracking-wide">Thế giới về xuất khẩu cà phê</span>
+                    <div class="mt-4 border-t border-stone-600 pt-4">
+                        <span class="text-xs text-stone-400">Trọng tâm mới:</span>
+                        <p class="font-serif italic text-lg mt-1">"Nâng tầm hạt Robusta"</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Conclusion -->
+        <footer class="text-center border-t-2 border-stone-200 pt-12 pb-20">
+            <h3 class="text-2xl font-bold text-amber-900 mb-4 serif">Kết luận: Một Di Sản Sống</h3>
+            <p class="text-stone-600 max-w-2xl mx-auto mb-8">
+                Văn hóa cà phê Việt Nam là câu chuyện về sự đổi mới không ngừng. Hơn một thế kỷ trước, Việt Nam đã học về cà phê từ thế giới. Giờ đây, có lẽ thế giới có thể học được một hoặc hai điều về cà phê từ Việt Nam.
+            </p>
+            <a href="https://trungnguyenlegend.com/" target="_cafe" class="bg-amber-900 text-white px-8 py-3 rounded-full font-semibold hover:bg-amber-800 transition-colors shadow-lg">
+                Thưởng thức ngay
+            </a>
+        </footer>
+
+    </main>
+
+    <script>
+        // Ensure Lucide is loaded before creating icons
+        document.addEventListener("DOMContentLoaded", () => {
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            } else {
+                console.warn("Lucide library not loaded yet, retrying on window load.");
+                window.onload = () => {
+                     if (typeof lucide !== 'undefined') {
+                        lucide.createIcons();
+                    }
+                }
+            }
+        });
+
+        // Gemini API Logic
+        const apiKey = ""; // Runtime environment provides key
+
+        async function callGemini(prompt, resultElementId, buttonId, loadingText) {
+            const resultDiv = document.getElementById(resultElementId);
+            const button = document.getElementById(buttonId);
+            const originalButtonText = button.innerHTML;
+
+            // Loading state
+            button.disabled = true;
+            button.innerHTML = `<span class="coffee-loader w-4 h-4 border-2 border-white/50 border-b-transparent mr-2"></span> ${loadingText}`;
+            resultDiv.classList.remove('hidden');
+            resultDiv.innerHTML = '<p class="animate-pulse">Đang pha chế câu trả lời...</p>';
+
+            try {
+                // Exponential backoff retry logic
+                let retries = 0;
+                let delay = 1000;
+                let responseData = null;
+
+                while (retries < 3) {
+                    try {
+                        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                contents: [{
+                                    parts: [{ text: prompt }]
+                                }]
+                            })
+                        });
+
+                        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                        responseData = await response.json();
+                        break; // Success, exit loop
+                    } catch (e) {
+                        retries++;
+                        if (retries >= 3) throw e;
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        delay *= 2;
+                    }
+                }
+
+                const text = responseData.candidates[0].content.parts[0].text;
+                resultDiv.innerHTML = marked.parse(text); // Use marked for formatting
+
+            } catch (error) {
+                console.error("Gemini Error:", error);
+                resultDiv.innerHTML = `<p class="text-red-400">Xin lỗi, máy pha cà phê đang kẹt! Vui lòng thử lại sau. (${error.message})</p>`;
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalButtonText;
+            }
+        }
+
+        function askExpert() {
+            const question = document.getElementById('qaInput').value;
+            if (!question.trim()) return;
+            
+            const prompt = `Bạn là một chuyên gia am hiểu sâu sắc về văn hóa, lịch sử và kỹ thuật pha chế cà phê Việt Nam. Hãy trả lời câu hỏi sau của người dùng một cách thân thiện, ngắn gọn và đầy cảm hứng bằng tiếng Việt. Sử dụng định dạng Markdown nhẹ nhàng. Câu hỏi: "${question}"`;
+            
+            callGemini(prompt, 'qaResult', 'qaButton', 'Đang suy nghĩ...');
+        }
+
+        function generateRecipe() {
+            const ingredients = document.getElementById('recipeInput').value;
+            if (!ingredients.trim()) return;
+
+            const prompt = `Bạn là một Barista sáng tạo chuyên về cà phê Việt Nam. Người dùng có các nguyên liệu sau: "${ingredients}". Hãy sáng tạo ra một công thức đồ uống cà phê độc đáo (hoặc đồ uống kết hợp) từ những nguyên liệu này. 
+            1. Đặt một cái tên thật hay và kêu cho món nước.
+            2. Liệt kê nguyên liệu cần thiết.
+            3. Hướng dẫn pha chế từng bước ngắn gọn.
+            Trả lời bằng tiếng Việt, dùng Markdown.`;
+
+            callGemini(prompt, 'recipeResult', 'recipeButton', 'Đang sáng tạo...');
+        }
+    </script>
+</body>
+</html>
