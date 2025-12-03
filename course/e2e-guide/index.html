@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Testing & Playwright Interactive Guide</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Chosen Palette: Warm Neutrals & Professional Blue -->
+    <!-- Background: Stone-50 (#fafaf9) -->
+    <!-- Card/Content: White (#ffffff) -->
+    <!-- Text: Stone-800 (#292524) -->
+    <!-- Primary Accent: Sky-600 (#0284c7) -->
+    <!-- Secondary Accent: Orange-500 (#f97316) for highlights -->
+
+    <!-- Application Structure Plan: 
+         Designed as a vertical storytelling dashboard.
+         1. Hero Section: Immediate hook and definition.
+         2. The Testing Pyramid (Interactive Funnel): Users click levels to understand context.
+         3. Playwright Core (Feature Grid): Icons and brief text for key features.
+         4. The Showdown (Comparison Radar & Table): Visualizing the strengths against competitors.
+         5. Architecture Explorer (Interactive Tree & Timeline): Hands-on exploration of file structure and test lifecycle.
+         6. CI/CD & Demo (Terminal Simulation): A 'live' feel to the demo steps described in the report.
+         Why this structure? It moves from abstract concepts (E2E) to specific tool benefits (Playwright), then deep dives into technical implementation, ending with practical application.
+    -->
+
+    <!-- Visualization & Content Choices:
+         1. Testing Pyramid -> Goal: Organize/Hierarchy -> Method: Plotly Funnel (Canvas) -> Interaction: Click to show details -> Justification: Funnel shape perfectly matches the 'Pyramid' concept; Plotly handles this well without SVG.
+         2. Tool Comparison -> Goal: Compare -> Method: Chart.js Radar (Canvas) -> Interaction: Hover for values -> Justification: Best for multi-attribute comparison (Speed, Stability, etc.).
+         3. Test Structure -> Goal: Organize -> Method: HTML/CSS Interactive Tree -> Interaction: Expand/Collapse folders -> Justification: Native HTML is best for text/folder structures, no need for heavy chart libs.
+         4. Test Lifecycle -> Goal: Process -> Method: HTML/CSS Vertical Timeline -> Interaction: Hover to highlight steps -> Justification: CSS borders create clean timelines without SVG complexity.
+         5. Icons -> Goal: Visual cues -> Method: Unicode characters -> Justification: No SVG allowed.
+    -->
+
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #fafaf9; /* stone-50 */
+            color: #292524; /* stone-800 */
+        }
+        
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            height: 400px;
+            max-height: 400px;
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1);
+        }
+
+        /* Interactive Tree Styles */
+        .tree-item {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .tree-item:hover {
+            background-color: #f0f9ff; /* sky-50 */
+        }
+        .tree-children {
+            margin-left: 20px;
+            border-left: 1px solid #e5e7eb;
+            display: none;
+        }
+        .tree-children.expanded {
+            display: block;
+        }
+        
+        /* Terminal Simulation */
+        .terminal {
+            background-color: #1e293b; /* slate-800 */
+            color: #10b981; /* emerald-500 */
+            font-family: monospace;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .terminal-line {
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            animation: fadeIn 0.3s forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #fafaf9; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #d6d3d1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a29e; 
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-white/90 backdrop-blur-md shadow-sm border-b border-stone-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <span class="text-2xl font-bold text-sky-600">Playwright<span class="text-stone-800">Guide</span></span>
+                </div>
+                <div class="hidden md:flex space-x-8 items-center">
+                    <a href="#intro" class="text-stone-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition">Tổng Quan</a>
+                    <a href="#pyramid" class="text-stone-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition">Mô Hình</a>
+                    <a href="#comparison" class="text-stone-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition">So Sánh</a>
+                    <a href="#structure" class="text-stone-600 hover:text-sky-600 px-3 py-2 rounded-md text-sm font-medium transition">Cấu Trúc</a>
+                    <a href="#demo" class="bg-sky-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-sky-700 transition shadow-sm">Xem Demo</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 1. Hero Section -->
+    <section id="intro" class="pt-20 pb-16 px-4 bg-gradient-to-b from-stone-50 to-stone-100">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-extrabold text-stone-900 mb-6 tracking-tight">
+                Kiểm thử End-to-End <br class="hidden md:inline">với <span class="text-sky-600">Playwright</span>
+            </h1>
+            <p class="text-xl text-stone-600 mb-8 max-w-2xl mx-auto leading-relaxed">
+                Giải pháp Automation Testing hiện đại của Microsoft. Loại bỏ flaky test, chạy đa trình duyệt và tích hợp CI/CD mạnh mẽ.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-12">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 hover:shadow-md transition duration-300">
+                    <div class="text-orange-500 text-3xl mb-3">🎯</div>
+                    <h3 class="font-bold text-lg mb-2">Mô phỏng User thật</h3>
+                    <p class="text-stone-500 text-sm">Đảm bảo trải nghiệm người dùng (UX) liền mạch, không bị gãy vỡ do lỗi ngầm.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 hover:shadow-md transition duration-300">
+                    <div class="text-sky-500 text-3xl mb-3">🔗</div>
+                    <h3 class="font-bold text-lg mb-2">Kiểm tra Tích hợp</h3>
+                    <p class="text-stone-500 text-sm">Xác nhận các module và bên thứ 3 (Payment, Email) kết nối chính xác.</p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 hover:shadow-md transition duration-300">
+                    <div class="text-emerald-500 text-3xl mb-3">⚡</div>
+                    <h3 class="font-bold text-lg mb-2">Auto Regression</h3>
+                    <p class="text-stone-500 text-sm">Tự động hóa các luồng test lặp đi lặp lại, giảm thiểu công sức con người.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. Testing Pyramid Section -->
+    <section id="pyramid" class="py-16 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="mb-6">
+                        <h2 class="text-3xl font-bold text-stone-800 mb-4">Mô Hình Kim Tự Tháp Testing</h2>
+                        <p class="text-stone-600 leading-relaxed">
+                            Để hiểu rõ vị trí của E2E, chúng ta cần nhìn vào bức tranh tổng thể. E2E Testing nằm ở đỉnh tháp: số lượng ít nhất, nhưng độ tin cậy về business flow là cao nhất.
+                        </p>
+                    </div>
+                    
+                    <div id="pyramid-details" class="bg-stone-50 p-6 rounded-lg border border-stone-200">
+                        <h3 class="font-bold text-sky-700 text-lg mb-2" id="detail-title">Hãy chọn một tầng tháp</h3>
+                        <p class="text-stone-600 text-sm" id="detail-desc">Click vào biểu đồ bên phải để xem chi tiết từng loại kiểm thử.</p>
+                    </div>
+                </div>
+
+                <div class="bg-stone-50 rounded-xl p-4 shadow-inner">
+                    <!-- Plotly Chart Container -->
+                    <div id="pyramidChart" class="chart-container" style="background: transparent; box-shadow: none;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. Comparison Section -->
+    <section id="comparison" class="py-16 px-4 bg-stone-50">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-stone-800 mb-4">Playwright vs Các Đối Thủ</h2>
+                <p class="text-stone-600 max-w-2xl mx-auto">
+                    Tại sao Playwright đang trở thành lựa chọn hàng đầu thay thế cho các công cụ truyền thống?
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Comparison Radar Chart -->
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-lg font-bold mb-4 text-center">Biểu Đồ Sức Mạnh</h3>
+                    <div class="chart-container">
+                        <canvas id="comparisonRadar"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-stone-400 mt-2">*Điểm số dựa trên phân tích tính năng</p>
+                </div>
+
+                <!-- Comparison Details -->
+                <div class="space-y-4">
+                    <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-sky-500 transition hover:translate-x-1">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-sky-700">Playwright</h4>
+                            <span class="text-xs bg-sky-100 text-sky-800 px-2 py-1 rounded">Hiện đại</span>
+                        </div>
+                        <ul class="text-sm text-stone-600 space-y-1">
+                            <li>✅ <strong>Kiến trúc:</strong> WebSocket trực tiếp (Nhanh).</li>
+                            <li>✅ <strong>Driver:</strong> Tự động tải, không cần cài thủ công.</li>
+                            <li>✅ <strong>Flakiness:</strong> Auto-wait loại bỏ lỗi chờ element.</li>
+                            <li>⚠️ <strong>Cộng đồng:</strong> Đang phát triển, nhỏ hơn Selenium.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-stone-400 transition hover:translate-x-1 opacity-80 hover:opacity-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-stone-700">Selenium</h4>
+                            <span class="text-xs bg-stone-200 text-stone-800 px-2 py-1 rounded">Lão làng</span>
+                        </div>
+                        <ul class="text-sm text-stone-600 space-y-1">
+                            <li>ℹ️ <strong>Kiến trúc:</strong> WebDriver protocol (Chậm hơn).</li>
+                            <li>❌ <strong>Driver:</strong> Phải quản lý version driver thủ công.</li>
+                            <li>✅ <strong>Ngôn ngữ:</strong> Hỗ trợ hầu hết ngôn ngữ.</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-lg shadow-sm border-l-4 border-emerald-500 transition hover:translate-x-1 opacity-80 hover:opacity-100">
+                        <div class="flex justify-between items-center mb-2">
+                            <h4 class="font-bold text-emerald-700">Cypress</h4>
+                            <span class="text-xs bg-emerald-100 text-emerald-800 px-2 py-1 rounded">All-in-one</span>
+                        </div>
+                        <ul class="text-sm text-stone-600 space-y-1">
+                            <li>ℹ️ <strong>Kiến trúc:</strong> Chạy cùng run loop với browser.</li>
+                            <li>❌ <strong>Hạn chế:</strong> Khó test multi-tab, bị sandbox.</li>
+                            <li>✅ <strong>Cài đặt:</strong> Đóng gói sẵn, cực dễ.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Architecture & Concepts -->
+    <section id="structure" class="py-16 px-4 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-stone-800 mb-4 text-center">Cấu Trúc & Vòng Đời</h2>
+            <p class="text-stone-600 text-center mb-12 max-w-2xl mx-auto">
+                Hiểu rõ cách tổ chức file và thứ tự chạy hook là chìa khóa để viết test case hiệu quả.
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <!-- Interactive File Tree -->
+                <div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-4 flex items-center">
+                        <span class="mr-2">📂</span> Cấu Trúc Dự Án
+                    </h3>
+                    <div class="bg-stone-50 border border-stone-200 rounded-xl p-4 font-mono text-sm h-full shadow-inner">
+                        <div class="tree-root">
+                            <div class="tree-item font-bold text-stone-700">my-project/</div>
+                            <div class="tree-children expanded" style="display:block">
+                                <div class="tree-item text-sky-600" onclick="showInfo('tests')">
+                                    <span class="text-stone-400">├──</span> tests/ <span class="text-xs text-stone-400 italic">// Click me</span>
+                                </div>
+                                <div class="tree-children" id="info-tests">
+                                    <div class="pl-6 text-xs text-stone-500 py-1 bg-white border-l-2 border-sky-400 mb-1">
+                                        Chứa các file test chính (*.spec.ts). Playwright sẽ scan thư mục này.
+                                    </div>
+                                </div>
+                                
+                                <div class="tree-item" onclick="showInfo('config')">
+                                    <span class="text-stone-400">├──</span> playwright.config.ts <span class="text-xs text-stone-400 italic">// Click me</span>
+                                </div>
+                                <div class="tree-children" id="info-config">
+                                    <div class="pl-6 text-xs text-stone-500 py-1 bg-white border-l-2 border-orange-400 mb-1">
+                                        Trái tim của dự án: Config browser, base URL, workers, report...
+                                    </div>
+                                </div>
+
+                                <div class="tree-item" onclick="showInfo('setup')">
+                                    <span class="text-stone-400">├──</span> global.setup.ts
+                                </div>
+                                <div class="tree-children" id="info-setup">
+                                    <div class="pl-6 text-xs text-stone-500 py-1 bg-white border-l-2 border-emerald-400 mb-1">
+                                        Chạy 1 lần duy nhất trước khi test. Dùng để Login lấy token/state.
+                                    </div>
+                                </div>
+
+                                <div class="tree-item">
+                                    <span class="text-stone-400">└──</span> package.json
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hooks Visualization -->
+                <div>
+                    <h3 class="text-xl font-bold text-stone-800 mb-4 flex items-center">
+                        <span class="mr-2">🔄</span> Vòng Đời Hooks
+                    </h3>
+                    <div class="relative pl-8 border-l-2 border-stone-200 space-y-6">
+                        <!-- Global Setup -->
+                        <div class="relative group cursor-default">
+                            <div class="absolute -left-[41px] bg-stone-200 rounded-full w-6 h-6 flex items-center justify-center text-stone-600 text-xs font-bold border-2 border-white">1</div>
+                            <div class="bg-stone-100 p-3 rounded-lg border border-stone-200 group-hover:border-sky-400 group-hover:bg-sky-50 transition">
+                                <span class="font-bold text-sm text-stone-700">Global Setup</span>
+                                <p class="text-xs text-stone-500 mt-1">Chạy 1 lần cho toàn bộ dự án (VD: Init DB).</p>
+                            </div>
+                        </div>
+
+                        <!-- Before All -->
+                        <div class="relative group cursor-default">
+                            <div class="absolute -left-[41px] bg-stone-200 rounded-full w-6 h-6 flex items-center justify-center text-stone-600 text-xs font-bold border-2 border-white">2</div>
+                            <div class="bg-stone-100 p-3 rounded-lg border border-stone-200 group-hover:border-sky-400 group-hover:bg-sky-50 transition ml-4">
+                                <span class="font-bold text-sm text-stone-700">beforeAll</span>
+                                <p class="text-xs text-stone-500 mt-1">Chạy 1 lần trước suite trong file.</p>
+                            </div>
+                        </div>
+
+                        <!-- Loop Block -->
+                        <div class="border-l-2 border-dashed border-sky-300 ml-8 pl-6 py-2 rounded-l-lg bg-sky-50/30">
+                            <div class="relative mb-4 group cursor-default">
+                                <span class="absolute -left-[34px] text-sky-500 font-bold text-xs rotate-90 top-1/2 -translate-y-1/2 origin-center">LOOP</span>
+                                <div class="bg-white p-2 rounded border border-sky-100 shadow-sm">
+                                    <span class="font-bold text-xs text-sky-700">beforeEach</span>
+                                </div>
+                            </div>
+                            <div class="relative mb-4">
+                                <div class="bg-sky-600 text-white p-3 rounded shadow-md text-center font-bold">
+                                    TEST CASE
+                                </div>
+                            </div>
+                            <div class="relative group cursor-default">
+                                <div class="bg-white p-2 rounded border border-sky-100 shadow-sm">
+                                    <span class="font-bold text-xs text-sky-700">afterEach</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- After All -->
+                        <div class="relative group cursor-default">
+                            <div class="absolute -left-[41px] bg-stone-200 rounded-full w-6 h-6 flex items-center justify-center text-stone-600 text-xs font-bold border-2 border-white">3</div>
+                            <div class="bg-stone-100 p-3 rounded-lg border border-stone-200 group-hover:border-sky-400 group-hover:bg-sky-50 transition ml-4">
+                                <span class="font-bold text-sm text-stone-700">afterAll</span>
+                                <p class="text-xs text-stone-500 mt-1">Dọn dẹp sau khi chạy xong suite.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. CI/CD & Demo Section -->
+    <section id="demo" class="py-16 px-4 bg-stone-900 text-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Info Column -->
+                <div>
+                    <h2 class="text-3xl font-bold mb-6">CI/CD & Live Demo</h2>
+                    <p class="text-stone-300 mb-6 leading-relaxed">
+                        Playwright tích hợp hoàn hảo với GitHub Actions, GitLab CI. Hỗ trợ chạy <strong>Headless</strong> (không giao diện) cực nhanh và tính năng <strong>Sharding</strong> chia nhỏ test case.
+                    </p>
+                    
+                    <div class="space-y-4">
+                        <h3 class="font-bold text-sky-400 text-lg">Các bước Demo:</h3>
+                        <div class="flex items-start">
+                            <span class="bg-stone-700 text-sky-400 w-6 h-6 rounded flex items-center justify-center mr-3 text-sm font-mono">1</span>
+                            <div>
+                                <strong class="text-stone-200">Codegen:</strong>
+                                <p class="text-sm text-stone-400">Ghi lại thao tác user -> Sinh code tự động.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-stone-700 text-sky-400 w-6 h-6 rounded flex items-center justify-center mr-3 text-sm font-mono">2</span>
+                            <div>
+                                <strong class="text-stone-200">Trace Viewer:</strong>
+                                <p class="text-sm text-stone-400">Debug "Time Travel", xem lại DOM/Network.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start">
+                            <span class="bg-stone-700 text-sky-400 w-6 h-6 rounded flex items-center justify-center mr-3 text-sm font-mono">3</span>
+                            <div>
+                                <strong class="text-stone-200">Parallel Run:</strong>
+                                <p class="text-sm text-stone-400">Chạy song song nhiều worker giảm thời gian.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button onclick="runSimulation()" class="mt-8 bg-sky-600 hover:bg-sky-500 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition transform hover:-translate-y-1">
+                        ▶ Chạy Mô Phỏng Demo
+                    </button>
+                </div>
+
+                <!-- Terminal Simulation -->
+                <div class="relative">
+                    <div class="absolute top-0 left-0 w-full h-8 bg-stone-800 rounded-t-lg flex items-center px-4 space-x-2 border-b border-stone-700">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-yellow-500"></div>
+                        <div class="w-3 h-3 rounded-full bg-green-500"></div>
+                        <span class="ml-4 text-xs text-stone-400 font-mono">user@playwright-demo:~/project</span>
+                    </div>
+                    <div id="terminal" class="terminal mt-8 border border-stone-700 font-mono text-sm">
+                        <div class="text-stone-500 italic">>> Click 'Chạy Mô Phỏng Demo' để bắt đầu...</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="bg-stone-900 text-stone-500 border-t border-stone-800">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript Logic -->
+    <script>
+        // --- HELPER FUNCTIONS ---
+        // Label wrapping for Chart.js
+        function splitLabel(label, maxLength = 16) {
+            if (label.length <= maxLength) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + ' ' + words[i]).length <= maxLength) {
+                    currentLine += ' ' + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // --- TREE VIEW INTERACTION ---
+        function showInfo(id) {
+            const el = document.getElementById('info-' + id);
+            // Toggle display
+            if (el.style.display === 'block') {
+                el.style.display = 'none';
+            } else {
+                el.style.display = 'block';
+            }
+        }
+
+        // --- CHART INITIALIZATION ---
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // 1. PYRAMID CHART (Plotly Funnel)
+            const pyramidData = [{
+                type: 'funnel',
+                y: ["E2E Tests", "Integration Tests", "Unit Tests"],
+                x: [20, 50, 100],
+                textinfo: "label+text",
+                textposition: "inside",
+                hoverinfo: "y+text",
+                marker: {
+                    color: ["#0284c7", "#7dd3fc", "#e0f2fe"], // Sky palette
+                    line: { width: 0 }
+                },
+                connector: { line: { color: "#fafaf9" } }
+            }];
+
+            const pyramidLayout = {
+                margin: { l: 20, r: 20, t: 20, b: 20 },
+                funnelmode: "stack",
+                showlegend: false,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { family: 'Inter, sans-serif', color: '#44403c' },
+                clickmode: 'event'
+            };
+
+            const pyramidConfig = { responsive: true, displayModeBar: false, renderer: 'canvas' }; // Force Canvas
+            
+            Plotly.newPlot('pyramidChart', pyramidData, pyramidLayout, pyramidConfig);
+
+            // Pyramid Interaction
+            const pyramidChart = document.getElementById('pyramidChart');
+            pyramidChart.on('plotly_click', function(data){
+                const point = data.points[0];
+                const titleEl = document.getElementById('detail-title');
+                const descEl = document.getElementById('detail-desc');
+                
+                if (point.y === 'E2E Tests') {
+                    titleEl.textContent = 'E2E Testing (End-to-End)';
+                    descEl.innerHTML = 'Kiểm tra toàn bộ luồng người dùng trên giao diện. <br><strong>Ưu:</strong> Tin cậy cao nhất. <strong>Nhược:</strong> Chậm, tốn chi phí.';
+                } else if (point.y === 'Integration Tests') {
+                    titleEl.textContent = 'Integration Testing';
+                    descEl.textContent = 'Kiểm tra sự tương tác giữa các module hoặc service (VD: API gọi Database). Nằm giữa tháp.';
+                } else {
+                    titleEl.textContent = 'Unit Testing';
+                    descEl.textContent = 'Kiểm tra từng hàm/class riêng lẻ. Chạy rất nhanh, chi phí thấp, số lượng nhiều nhất.';
+                }
+            });
+
+            // 2. COMPARISON RADAR (Chart.js)
+            const radarCtx = document.getElementById('comparisonRadar').getContext('2d');
+            const radarLabels = ["Tốc độ (Speed)", "Dễ cài đặt", "Đa tab/window", "Ổn định (Auto-wait)", "Cộng đồng"];
+            const wrappedLabels = radarLabels.map(l => splitLabel(l));
+
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: wrappedLabels,
+                    datasets: [
+                        {
+                            label: 'Playwright',
+                            data: [95, 80, 100, 100, 70],
+                            backgroundColor: 'rgba(2, 132, 199, 0.2)', // Sky-600
+                            borderColor: '#0284c7',
+                            pointBackgroundColor: '#0284c7',
+                        },
+                        {
+                            label: 'Selenium',
+                            data: [60, 50, 70, 60, 100],
+                            backgroundColor: 'rgba(168, 162, 158, 0.2)', // Stone-400
+                            borderColor: '#a8a29e',
+                            pointBackgroundColor: '#a8a29e',
+                        },
+                        {
+                            label: 'Cypress',
+                            data: [70, 95, 40, 85, 80],
+                            backgroundColor: 'rgba(16, 185, 129, 0.2)', // Emerald-500
+                            borderColor: '#10b981',
+                            pointBackgroundColor: '#10b981',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: '#e5e7eb' },
+                            grid: { color: '#e5e7eb' },
+                            suggestedMin: 0,
+                            suggestedMax: 100,
+                            pointLabels: {
+                                font: { size: 11, family: 'Inter' }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                title: function(tooltipItems) {
+                                    const item = tooltipItems[0];
+                                    let label = item.chart.data.labels[item.dataIndex];
+                                    if (Array.isArray(label)) return label.join(' ');
+                                    return label;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+
+        // --- TERMINAL SIMULATION LOGIC ---
+        function runSimulation() {
+            const terminal = document.getElementById('terminal');
+            terminal.innerHTML = '';
+            
+            const steps = [
+                { text: "$ npx playwright codegen demo.playwright.dev/todomvc", delay: 500, color: "text-stone-300" },
+                { text: "> Opening browser...", delay: 1500, color: "text-stone-400" },
+                { text: "> Recording actions: Click input, Type 'Learn Playwright'...", delay: 2500, color: "text-emerald-400" },
+                { text: "> Code generated in inspector window.", delay: 3500, color: "text-emerald-400" },
+                { text: "$ npx playwright test login.spec.ts --trace on", delay: 4500, color: "text-stone-300" },
+                { text: "> Running 1 test using 1 worker", delay: 5500, color: "text-stone-400" },
+                { text: "✓ tests/login.spec.ts:5:1 › Demo Login (1.2s)", delay: 7000, color: "text-green-500 font-bold" },
+                { text: "$ npx playwright show-report", delay: 8000, color: "text-stone-300" },
+                { text: "> Serving HTML report at http://localhost:9323", delay: 9000, color: "text-blue-400" },
+                { text: "Simulation Complete. Ready for real testing!", delay: 10000, color: "text-white font-bold" }
+            ];
+
+            let currentTime = 0;
+
+            steps.forEach(step => {
+                setTimeout(() => {
+                    const line = document.createElement('div');
+                    line.className = `terminal-line ${step.color}`;
+                    line.textContent = step.text;
+                    terminal.appendChild(line);
+                    terminal.scrollTop = terminal.scrollHeight;
+                }, step.delay);
+            });
+        }
+    </script>
+</body>
+</html>

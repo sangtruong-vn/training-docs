@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E2E Testing & Playwright: Kỷ Nguyên Mới Của Automation</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Plotly.js -->
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+
+    <!-- 
+        Palette Selected: "Energetic & Playful / Tech Vibrant"
+        Source: Derived from "colour combinations" request for professional yet vibrant tech feel.
+        Primary Blue: #2563EB (Tailwind blue-600)
+        Accent Cyan: #06B6D4 (Tailwind cyan-500)
+        Accent Pink: #EC4899 (Tailwind pink-500)
+        Background: #F3F4F6 (Tailwind gray-100)
+        Card Bg: #FFFFFF
+        Text: #1F2937 (gray-800)
+    -->
+
+    <!-- 
+        NARRATIVE PLAN:
+        1. Hook/Intro: Define E2E Testing and its importance.
+        2. The Pyramid: Visualize where E2E fits vs Unit/Integration (Plotly Funnel).
+        3. Playwright Intro: Radar chart showing its core strengths (Speed, Stability, etc.).
+        4. The Showdown: Bar chart comparing Playwright vs Selenium vs Cypress.
+        5. Core Concepts: HTML-based visualization of File Structure and Testing Lifecycle (Hooks).
+        6. Demo/Conclusion: Summary of the workflow and key takeaways.
+        
+        VISUALIZATION CHOICES (NO SVG, NO MERMAID):
+        - Pyramid: Plotly Funnel (Canvas). Best for hierarchical data.
+        - Features: Chart.js Radar. Best for multivariate scoring.
+        - Comparison: Chart.js Grouped Bar. Best for comparing categories.
+        - Lifecycle: CSS/HTML Flowchart (Flexbox/Grid with Unicode arrows).
+        - Structure: CSS/HTML Tree.
+    -->
+
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #F3F4F6;
+            color: #1F2937;
+        }
+
+        /* Responsive Chart Container Styles */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+            background-color: white;
+            border-radius: 0.5rem;
+            overflow: hidden; /* Prevent overflow */
+        }
+
+        .chart-height-sm {
+            height: 300px;
+            max-height: 300px;
+        }
+
+        .chart-height-md {
+            height: 400px;
+            max-height: 400px;
+        }
+
+        .chart-height-lg {
+            height: 500px;
+            max-height: 500px;
+        }
+        
+        /* Utility for Text selection */
+        ::selection {
+            background: #2563EB;
+            color: white;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
+        }
+
+        /* Flowchart Connector Line */
+        .flow-line {
+            width: 2px;
+            background-color: #CBD5E1;
+            height: 20px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body class="bg-gray-100">
+
+    <!-- HEADER SECTION -->
+    <header class="bg-gradient-to-r from-blue-700 to-cyan-600 text-white shadow-lg p-8 mb-8">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4">Chinh Phục E2E Testing với Playwright</h1>
+            <p class="text-xl md:text-2xl font-light opacity-90">Từ Lý Thuyết Đến Thực Chiến: Giải Pháp Automation Hiện Đại</p>
+            <div class="mt-6 flex justify-center gap-4">
+                <span class="bg-white/20 px-4 py-1 rounded-full text-sm font-semibold backdrop-blur-sm">Fast</span>
+                <span class="bg-white/20 px-4 py-1 rounded-full text-sm font-semibold backdrop-blur-sm">Reliable</span>
+                <span class="bg-white/20 px-4 py-1 rounded-full text-sm font-semibold backdrop-blur-sm">Modern</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 pb-12 grid grid-cols-1 md:grid-cols-12 gap-8">
+
+        <!-- SECTION 1: E2E DEFINITION & PYRAMID -->
+        <div class="md:col-span-12 lg:col-span-6 flex flex-col">
+            <div class="bg-white rounded-xl shadow-md p-6 h-full border-t-4 border-blue-600">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">1. E2E Testing Là Gì?</h2>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    <strong>End-to-End (E2E) Testing</strong> không chỉ là kiểm tra code, mà là kiểm tra <strong>trải nghiệm</strong>. Nó mô phỏng hành vi của người dùng thật từ lúc mở ứng dụng đến khi hoàn tất công việc, đảm bảo Database, Network, API và UI hoạt động trơn tru cùng nhau.
+                </p>
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <h3 class="font-bold text-blue-800 mb-2">3 Lý Do Cần E2E:</h3>
+                    <ul class="space-y-2 text-sm text-blue-900">
+                        <li>🎯 <strong>Mô phỏng User thật:</strong> Đảm bảo UX không bị "gãy" dù API có lỗi ngầm.</li>
+                        <li>🔗 <strong>Kiểm tra tích hợp:</strong> Xác nhận Payment, Email service kết nối đúng.</li>
+                        <li>🤖 <strong>Auto Regression:</strong> Giảm sức người khi test lại các luồng chính trước release.</li>
+                    </ul>
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-700 mb-2">Mô Hình Kim Tự Tháp Testing</h3>
+                <p class="text-xs text-gray-500 mb-2">E2E nằm ở đỉnh: Số lượng ít nhất nhưng độ tin cậy business cao nhất.</p>
+                <!-- PLOTLY CHART CONTAINER -->
+                <div id="pyramidChart" class="chart-container chart-height-md"></div>
+                <p class="text-center text-xs text-gray-400 mt-2">Dữ liệu mô phỏng tỷ lệ số lượng/chi phí test</p>
+            </div>
+        </div>
+
+        <!-- SECTION 2: WHY PLAYWRIGHT? (RADAR) -->
+        <div class="md:col-span-12 lg:col-span-6 flex flex-col">
+            <div class="bg-white rounded-xl shadow-md p-6 h-full border-t-4 border-cyan-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">2. Tại Sao Chọn Playwright?</h2>
+                <p class="text-gray-600 mb-4 leading-relaxed">
+                    Phát triển bởi <strong>Microsoft</strong>, Playwright giải quyết nỗi đau lớn nhất của Automation: <strong>Sự thiếu ổn định (Flakiness)</strong>. Với cơ chế <em>Auto-wait</em>, test tự động chờ element sẵn sàng mà không cần `sleep`.
+                </p>
+                
+                <!-- CHART JS RADAR CONTAINER -->
+                <div class="chart-container chart-height-md flex items-center justify-center">
+                    <canvas id="featuresRadar"></canvas>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-4 mt-6">
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <div class="text-2xl mb-1">⚡</div>
+                        <h4 class="font-bold text-gray-800">Tốc Độ</h4>
+                        <p class="text-xs text-gray-500">Chạy song song mặc định</p>
+                    </div>
+                    <div class="text-center p-3 bg-gray-50 rounded-lg">
+                        <div class="text-2xl mb-1">🎥</div>
+                        <h4 class="font-bold text-gray-800">Trace Viewer</h4>
+                        <p class="text-xs text-gray-500">Debug như "Time Machine"</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 3: COMPARISON BAR CHART -->
+        <div class="md:col-span-12">
+            <div class="bg-white rounded-xl shadow-md p-6 border-t-4 border-pink-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">3. So Sánh: Playwright vs Selenium vs Cypress</h2>
+                <p class="text-gray-600 mb-6">
+                    Mỗi công cụ có thế mạnh riêng, nhưng Playwright đang dẫn đầu về tốc độ và khả năng xử lý đa tab/đa trình duyệt mà không cần driver trung gian.
+                </p>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- Text Comparison Cards -->
+                    <div class="lg:col-span-1 space-y-4">
+                        <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-blue-600">
+                            <h4 class="font-bold text-blue-800">Playwright</h4>
+                            <p class="text-sm text-gray-700 mt-1">Giao tiếp qua WebSocket. Không cần Driver. Hỗ trợ Multi-tab tuyệt vời.</p>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border-l-4 border-green-600">
+                            <h4 class="font-bold text-green-800">Selenium</h4>
+                            <p class="text-sm text-gray-700 mt-1">Cần WebDriver trung gian. Cộng đồng lớn nhưng cài đặt phức tạp hơn.</p>
+                        </div>
+                        <div class="bg-gray-50 p-4 rounded-lg border-l-4 border-gray-600">
+                            <h4 class="font-bold text-gray-800">Cypress</h4>
+                            <p class="text-sm text-gray-700 mt-1">Chạy trong trình duyệt. Dễ dùng nhưng giới hạn Sandbox và Multi-tab.</p>
+                        </div>
+                    </div>
+
+                    <!-- Chart Container -->
+                    <div class="lg:col-span-2 chart-container chart-height-md">
+                        <canvas id="comparisonChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 4: STRUCTURE & LIFECYCLE (HTML DIAGRAMS) -->
+        <div class="md:col-span-12 lg:col-span-7">
+            <div class="bg-white rounded-xl shadow-md p-6 h-full border-t-4 border-indigo-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">4. Vòng Đời & Cấu Trúc</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Tree Structure -->
+                    <div>
+                        <h3 class="text-lg font-bold text-indigo-700 mb-4">📂 Cấu Trúc Project Chuẩn</h3>
+                        <div class="bg-gray-900 text-gray-300 p-5 rounded-lg font-mono text-sm leading-relaxed shadow-inner">
+                            <div class="text-yellow-400">my-project/</div>
+                            <div class="pl-4">├── <span class="text-blue-400">tests/</span> <span class="text-gray-500"># Chứa test chính</span></div>
+                            <div class="pl-8">├── login.spec.ts</div>
+                            <div class="pl-8">└── checkout.spec.ts</div>
+                            <div class="pl-4">├── <span class="text-blue-400">playwright.config.ts</span> <span class="text-gray-500"># Config chính</span></div>
+                            <div class="pl-4">├── global.setup.ts <span class="text-gray-500"># Login 1 lần</span></div>
+                            <div class="pl-4">├── package.json</div>
+                            <div class="pl-4">└── <span class="text-orange-400">playwright-report/</span></div>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-2 italic">*Config file điều khiển Browser, BaseURL, Workers, Video...</p>
+                    </div>
+
+                    <!-- Hooks Flowchart -->
+                    <div>
+                        <h3 class="text-lg font-bold text-indigo-700 mb-4">🔄 Vòng Đời Hooks</h3>
+                        <div class="flex flex-col items-center text-sm font-medium">
+                            <div class="bg-gray-200 px-4 py-2 rounded-md w-full text-center border border-gray-300 text-gray-600">Global Setup (1 lần)</div>
+                            <div class="text-gray-400 text-lg">↓</div>
+                            <div class="bg-indigo-100 px-4 py-2 rounded-md w-full text-center border border-indigo-200 text-indigo-800">beforeAll (Theo file)</div>
+                            <div class="text-gray-400 text-lg">↓</div>
+                            <div class="bg-blue-100 px-4 py-2 rounded-md w-full text-center border border-blue-200 text-blue-800">beforeEach (Mỗi test)</div>
+                            <div class="text-blue-500 text-xl font-bold animate-pulse">↓ TEST CASE ↓</div>
+                            <div class="bg-blue-100 px-4 py-2 rounded-md w-full text-center border border-blue-200 text-blue-800">afterEach (Cleanup)</div>
+                            <div class="text-gray-400 text-lg">↓</div>
+                            <div class="bg-indigo-100 px-4 py-2 rounded-md w-full text-center border border-indigo-200 text-indigo-800">afterAll</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION 5: CI/CD & DEMO (CARDS) -->
+        <div class="md:col-span-12 lg:col-span-5">
+            <div class="bg-white rounded-xl shadow-md p-6 h-full flex flex-col border-t-4 border-green-500">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">5. CI/CD & Demo</h2>
+                
+                <div class="mb-6">
+                    <h3 class="font-bold text-green-700 mb-2">Tích Hợp CI/CD</h3>
+                    <div class="bg-gray-50 p-4 rounded-lg">
+                        <ul class="space-y-3">
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✅</span>
+                                <span class="text-sm text-gray-700"><strong>Docker Image:</strong> Microsoft cung cấp sẵn, full environment.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✅</span>
+                                <span class="text-sm text-gray-700"><strong>Sharding:</strong> Chia nhỏ test chạy trên nhiều máy, giảm thời gian build.</span>
+                            </li>
+                            <li class="flex items-start">
+                                <span class="text-green-500 mr-2">✅</span>
+                                <span class="text-sm text-gray-700"><strong>Artifacts:</strong> Tải Trace Viewer zip về debug ngay khi CI fail.</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex-grow">
+                    <h3 class="font-bold text-green-700 mb-2">Kịch Bản Demo</h3>
+                    <div class="space-y-3">
+                        <div class="flex items-center p-3 bg-white border rounded shadow-sm hover:shadow-md transition">
+                            <span class="text-2xl mr-3">📹</span>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">Codegen</h4>
+                                <p class="text-xs text-gray-500">Ghi lại thao tác user -> Code</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-white border rounded shadow-sm hover:shadow-md transition">
+                            <span class="text-2xl mr-3">🕵️</span>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">Trace Viewer</h4>
+                                <p class="text-xs text-gray-500">Xem lại từng click, network call</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-3 bg-white border rounded shadow-sm hover:shadow-md transition">
+                            <span class="text-2xl mr-3">🚀</span>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">Parallel Run</h4>
+                                <p class="text-xs text-gray-500">Chạy song song nhiều workers</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="bg-stone-900 text-stone-500 border-t border-stone-800">
+        <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
+            <p id="footer-text">&copy; 2025 <span class="font-semibold">ST</span>. All rights reserved.</p>
+            <p class="text-indigo-400 font-semibold">Keep Learning, Keep Growing!</p>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // --- HELPER FUNCTION: Label Wrapping ---
+        function splitLabel(label, maxLength = 16) {
+            if (label.length <= maxLength) return label;
+            const words = label.split(' ');
+            const lines = [];
+            let currentLine = words[0];
+
+            for (let i = 1; i < words.length; i++) {
+                if ((currentLine + ' ' + words[i]).length <= maxLength) {
+                    currentLine += ' ' + words[i];
+                } else {
+                    lines.push(currentLine);
+                    currentLine = words[i];
+                }
+            }
+            lines.push(currentLine);
+            return lines;
+        }
+
+        // --- HELPER FUNCTION: Tooltip Config ---
+        const commonTooltipConfig = {
+            callbacks: {
+                title: function(tooltipItems) {
+                    const item = tooltipItems[0];
+                    let label = item.chart.data.labels[item.dataIndex];
+                    if (Array.isArray(label)) {
+                        return label.join(' ');
+                    } else {
+                        return label;
+                    }
+                }
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // ---------------------------------------------------------
+            // CHART 1: TESTING PYRAMID (PLOTLY FUNNEL)
+            // Goal: Compare/Organize Hierarchy
+            // ---------------------------------------------------------
+            const pyramidData = [{
+                type: 'funnel',
+                y: ["E2E Tests", "Integration Tests", "Unit Tests"],
+                x: [20, 50, 100], // Representing quantity
+                textposition: "inside",
+                textinfo: "label",
+                hoverinfo: "y+text+name",
+                hovertext: [
+                    "Độ tin cậy cao nhất, Chạy chậm, User flow", 
+                    "Kiểm tra giao tiếp API/DB", 
+                    "Số lượng nhiều nhất, Chạy nhanh, Isolated"
+                ],
+                marker: {
+                    color: ["#2563EB", "#06B6D4", "#93C5FD"], // Blue Palette
+                    line: { width: 0 }
+                },
+                connector: { line: { color: "white", width: 3 } }
+            }];
+
+            const pyramidLayout = {
+                margin: { l: 120, r: 20, t: 20, b: 20 },
+                funnelmode: "stack",
+                showlegend: false,
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: 'rgba(0,0,0,0)',
+                font: { family: 'Roboto, sans-serif' }
+            };
+
+            const pyramidConfig = { responsive: true, displayModeBar: false, renderer: 'canvas' }; // Force Canvas/WebGL
+            Plotly.newPlot('pyramidChart', pyramidData, pyramidLayout, pyramidConfig);
+
+            // ---------------------------------------------------------
+            // CHART 2: PLAYWRIGHT FEATURES (CHART.JS RADAR)
+            // Goal: Inform/Strengths
+            // ---------------------------------------------------------
+            const radarCtx = document.getElementById('featuresRadar').getContext('2d');
+            const featureLabels = ["Tốc độ (Speed)", "Đa trình duyệt (Cross-browser)", "Ổn định (Auto-wait)", "Debug (Trace Viewer)", "Cài đặt (Setup)"];
+            const wrappedFeatureLabels = featureLabels.map(l => splitLabel(l));
+
+            new Chart(radarCtx, {
+                type: 'radar',
+                data: {
+                    labels: wrappedFeatureLabels,
+                    datasets: [{
+                        label: 'Playwright',
+                        data: [95, 90, 100, 98, 85],
+                        fill: true,
+                        backgroundColor: 'rgba(37, 99, 235, 0.2)', // Blue
+                        borderColor: '#2563EB',
+                        pointBackgroundColor: '#2563EB',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#2563EB'
+                    }, {
+                        label: 'Công cụ cũ (Selenium)',
+                        data: [60, 80, 50, 60, 40],
+                        fill: true,
+                        backgroundColor: 'rgba(236, 72, 153, 0.2)', // Pink for contrast
+                        borderColor: '#EC4899',
+                        pointBackgroundColor: '#EC4899',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#EC4899'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    elements: { line: { borderWidth: 3 } },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: commonTooltipConfig
+                    },
+                    scales: {
+                        r: {
+                            angleLines: { display: false },
+                            suggestedMin: 0,
+                            suggestedMax: 100
+                        }
+                    }
+                }
+            });
+
+            // ---------------------------------------------------------
+            // CHART 3: TOOL COMPARISON (CHART.JS GROUPED BAR)
+            // Goal: Compare
+            // ---------------------------------------------------------
+            const comparisonCtx = document.getElementById('comparisonChart').getContext('2d');
+            const compLabels = ["Tốc độ thực thi", "Dễ dàng Setup", "Hỗ trợ Multi-tab", "Độ ổn định (Flakiness)"];
+            // Note: Flakiness score inverted (Higher is better/more stable) for visual consistency
+            const wrappedCompLabels = compLabels.map(l => splitLabel(l));
+
+            new Chart(comparisonCtx, {
+                type: 'bar',
+                data: {
+                    labels: wrappedCompLabels,
+                    datasets: [
+                        {
+                            label: 'Playwright',
+                            data: [9, 8, 10, 10], // High stability
+                            backgroundColor: '#2563EB' // Primary Blue
+                        },
+                        {
+                            label: 'Selenium',
+                            data: [6, 5, 7, 6],
+                            backgroundColor: '#9CA3AF' // Grey
+                        },
+                        {
+                            label: 'Cypress',
+                            data: [7, 9, 4, 8],
+                            backgroundColor: '#06B6D4' // Cyan
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: commonTooltipConfig
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 10,
+                            title: { display: true, text: 'Điểm số (Thang 10)' }
+                        }
+                    }
+                }
+            });
+
+        });
+    </script>
+</body>
+</html>
