@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>E2E Testing & Playwright Interactive Guide</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.tailwindcss.com" defer></script>
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
     <!-- Plotly.js -->
-    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js"></script>
+    <script src="https://cdn.plot.ly/plotly-2.27.0.min.js" defer></script>
     <!-- Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     
@@ -148,7 +148,7 @@
             
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mt-12">
                 <div class="bg-white p-6 rounded-xl shadow-sm border border-stone-100 hover:shadow-md transition duration-300">
-                    <div class="text-orange-500 text-3xl mb-3">🎯</div>
+                    <div class="text-orange-500 text-3xl mb-3" role="img" aria-label="Mục tiêu">🎯</div>
                     <h3 class="font-bold text-lg mb-2">Mô phỏng User thật</h3>
                     <p class="text-stone-500 text-sm">Đảm bảo trải nghiệm người dùng (UX) liền mạch, không bị gãy vỡ do lỗi ngầm.</p>
                 </div>
@@ -186,7 +186,7 @@
 
                 <div class="bg-stone-50 rounded-xl p-4 shadow-inner">
                     <!-- Plotly Chart Container -->
-                    <div id="pyramidChart" class="chart-container" style="background: transparent; box-shadow: none;"></div>
+                    <div id="pyramidChart" class="chart-container bg-transparent shadow-none"></div>
                 </div>
             </div>
         </div>
