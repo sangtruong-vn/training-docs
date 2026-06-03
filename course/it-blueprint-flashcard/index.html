@@ -60,6 +60,12 @@
             margin-bottom: 24px;
         }
 
+        .card-container:focus-visible {
+            outline: 2px solid var(--primary);
+            outline-offset: 4px;
+            border-radius: 16px;
+        }
+
         .card-inner {
             position: relative;
             width: 100%;
@@ -79,6 +85,7 @@
             width: 100%;
             height: 100%;
             backface-visibility: hidden;
+            -webkit-backface-visibility: hidden;
             border-radius: 16px;
             padding: 30px;
             display: flex;
@@ -200,7 +207,7 @@
             <p>IT Blueprint</p>
         </div>
 
-        <div class="card-container" id="cardContainer">
+        <div class="card-container" id="cardContainer" tabindex="0" role="button" aria-label="Thẻ ghi nhớ. Nhấn Enter hoặc Space để lật thẻ.">
             <div class="card-inner" id="cardInner">
                 <!-- Mặt trước -->
                 <div class="card-face card-front">
@@ -311,7 +318,7 @@
             }
         }
 
-        function changeCard(offset) {
+        function changeCard2(offset) {
             isFlipped = false;
             elements.cardInner.classList.remove('flipped');
             
@@ -322,8 +329,30 @@
             }, 200);
         }
 
+        function changeCard(offset) {
+            if (isFlipped) {
+                isFlipped = false;
+                elements.cardInner.classList.remove('flipped');
+                
+                // Wait 250ms (half of the 0.5s transition) to change content when the card is edge-on
+                setTimeout(() => {
+                    currentIndex = (currentIndex + offset + flashcardsData.length) % flashcardsData.length;
+                    renderCard();
+                }, 250);
+            } else {
+                currentIndex = (currentIndex + offset + flashcardsData.length) % flashcardsData.length;
+                renderCard();
+            }
+        }
+
         // Event Listeners
         elements.cardContainer.addEventListener('click', flipCard);
+        elements.cardContainer.addEventListener('keydown', (e) => {
+            if (e.key === ' ' || e.key === 'Enter') {
+                e.preventDefault();
+                flipCard();
+            }
+        });
         elements.btnNext.addEventListener('click', () => changeCard(1));
         elements.btnPrev.addEventListener('click', () => changeCard(-1));
 
