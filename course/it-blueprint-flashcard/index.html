@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>&copy; 2026 ST - IT Team Blueprint Flashcards</title>
+    <style>
+        :root {
+            --primary: #3b82f6; /* Blue 500 */
+            --primary-dark: #2563eb; /* Blue 600 */
+            --bg-color: #f8fafc; /* Slate 50 */
+            --text-dark: #1e293b; /* Slate 800 */
+            --text-light: #64748b; /* Slate 500 */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: var(--text-dark);
+            font-size: 24px;
+            margin-bottom: 8px;
+        }
+
+        .header p {
+            color: var(--text-light);
+            font-size: 16px;
+        }
+
+        /* Flashcard Styles */
+        .card-container {
+            perspective: 1000px;
+            width: 100%;
+            height: 320px;
+            cursor: pointer;
+            margin-bottom: 24px;
+        }
+
+        .card-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transition: transform 0.5s ease;
+            transform-style: preserve-3d;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-inner.flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 16px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .card-front {
+            background-color: white;
+            border: 2px solid #f1f5f9;
+        }
+
+        .card-back {
+            background-color: var(--primary-dark);
+            color: white;
+            transform: rotateY(180deg);
+        }
+
+        .label {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .card-front .label { color: var(--primary); }
+        .card-back .label { color: #bfdbfe; }
+
+        .content {
+            font-size: 20px;
+            line-height: 1.5;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .card-back .content {
+            color: white;
+        }
+
+        .hint {
+            position: absolute;
+            bottom: 20px;
+            font-size: 13px;
+            color: #94a3b8;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-back .hint { color: #bfdbfe; }
+
+        /* Controls */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        button {
+            background: white;
+            border: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-dark);
+            transition: all 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+
+        button:hover {
+            background: #f8fafc;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        .counter {
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        /* Progress Bar */
+        .progress-bg {
+            width: 100%;
+            height: 6px;
+            background-color: #e2e8f0;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            transition: width 0.3s ease;
+            border-radius: 10px;
+        }
+
+        @media (min-width: 640px) {
+            .card-container { height: 380px; }
+            .content { font-size: 24px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header">
+            <h1>Bộ thẻ ghi nhớ</h1>
+            <p>IT Blueprint</p>
+        </div>
+
+        <div class="card-container" id="cardContainer">
+            <div class="card-inner" id="cardInner">
+                <!-- Mặt trước -->
+                <div class="card-face card-front">
+                    <div class="label">Câu hỏi</div>
+                    <div class="content" id="frontText">Đang tải...</div>
+                    <div class="hint">↺ Nhấn để xem đáp án</div>
+                </div>
+                <!-- Mặt sau -->
+                <div class="card-face card-back">
+                    <div class="label">Đáp án</div>
+                    <div class="content" id="backText">Đang tải...</div>
+                    <div class="hint">↺ Nhấn để quay lại</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="btnPrev">← Trước</button>
+            <div class="counter" id="counter">1 / 18</div>
+            <button id="btnNext">Sau →</button>
+        </div>
+
+        <div class="progress-bg">
+            <div class="progress-bar" id="progressBar" style="width: 0%"></div>
+        </div>
+    </div>
+
+    <script>
+        const flashcardsData = [
+            { front: `Mục tiêu chính của việc cải tổ đội ngũ IT là xây dựng một môi trường làm việc như thế nào?`, back: `Minh bạch, hiệu quả và tạo điều kiện phát triển cho mọi thành viên.` },
+            { front: `Ba mục tiêu trọng tâm của lãnh đạo trong giai đoạn cải tổ này là gì?`, back: `Cải tổ phong cách làm việc, nâng cao chất lượng đội ngũ/dự án, và điều phối quản lý dự án tốt hơn.` },
+            { front: `Giá trị nền tảng: Chính trực (Integrity)`, back: `Trung thực với công việc và với nhau; làm đúng, làm thật, dám nhận trách nhiệm.` },
+            { front: `Trong bốn giá trị nền tảng, giá trị nào nhấn mạnh việc "không giữ thông tin cho riêng mình"?`, back: `Chia sẻ (Sharing).` },
+            { front: `Giá trị "Minh bạch" trong văn hóa làm việc mới yêu cầu công khai những yếu tố nào?`, back: `Tiến độ, vấn đề và cách làm.` },
+            { front: `Hạn chế lớn nhất của mô hình tổ chức cũ (đội hành chính) được đề cập trong tài liệu là gì?`, back: `Công việc dồn vào số ít người trong khi nguồn lực khác chưa được phát huy tối đa.` },
+            { front: `Quy trình tiếp nhận và phân loại dự án (Project Qualification Pipeline) được lấy cảm hứng từ mô hình nào?`, back: `Mô hình phễu (pipeline) trong Marketing và Sales.` },
+            { front: `Liệt kê 4 giai đoạn của quy trình tiếp nhận dự án theo thứ tự.`, back: `Awareness -> Interest -> Decision -> Action.` },
+            { front: `Trong quy trình tiếp nhận dự án, giai đoạn "Decision" có nội dung chính là gì?`, back: `Thẩm định nguồn lực và ra quyết định.` },
+            { front: `Vai trò nào tham gia trực tiếp vào khâu đánh giá tại Đội Phân loại Dự án?`, back: `Head of PM.` },
+            { front: `Mục đích của việc thành lập Đội Phân loại Dự án là gì?`, back: `Chuẩn hóa đầu vào, đánh giá ưu tiên và đảm bảo dự án giao đúng đội, đúng năng lực.` },
+            { front: `Lợi ích của việc dự án được "làm sạch" thông tin trước khi giao cho đội dự án là gì?`, back: `Giúp đội dự án khởi động nhanh và đúng hướng hơn.` },
+            { front: `Trong cấu trúc Đội Dự án mới, mọi kết nối với khách hàng đều phải đi qua vai trò nào?`, back: `Comtor.` },
+            { front: `Sắp xếp đúng luồng phối hợp trong Đội Dự án: Comtor -> _____ -> PM/PL -> Tech Lead -> Development Team.`, back: `BA/PO.` },
+            { front: `Một điểm khác biệt then chốt của mô hình mới đối với "team hành chính" là gì?`, back: `Team hành chính không can thiệp trực tiếp vào dự án.` },
+            { front: `Trong các dự án nhỏ, cấu trúc mới cho phép sự linh hoạt nào về nhân sự?`, back: `Một người có thể kiêm nhiệm nhiều vai trò hoặc tham gia nhiều dự án khác nhau.` },
+            { front: `Lộ trình phát triển sự nghiệp mới cho phép các thành viên xuất phát từ Dev/QC/Comtor có thể phấn đấu lên vai trò nào?`, back: `PM, PL hoặc BA của một dự án.` },
+            { front: `Trách nhiệm chính của Comtor trong bảng RACI rút gọn là gì?`, back: `Đầu mối giao tiếp khách hàng; chuyển tải chính xác yêu cầu và phản hồi hai chiều.` },
+            { front: `Quyền hạn của Comtor trong việc điều phối luồng thông tin là gì?`, back: `Nhắc nhở tiến độ trao đổi với khách hàng.` },
+            { front: `Vai trò nào có quyền hạn "Quyết định cách diễn giải yêu cầu nghiệp vụ và xác nhận phạm vi"?`, back: `BA / PO.` },
+            { front: `Trách nhiệm chính của PM / PL tập trung vào những yếu tố nào?`, back: `Quản lý tiến độ, rủi ro, nguồn lực dự án và đề xuất giải pháp.` },
+            { front: `Quyền hạn của PM / PL trong phạm vi dự án bao gồm những gì?`, back: `Phân bổ công việc trong đội và quyết định ưu tiên.` },
+            { front: `Vai trò nào chịu trách nhiệm xây dựng code nền và chuẩn kỹ thuật?`, back: `Tech Lead.` },
+            { front: `Quyền hạn tối cao của Tech Lead trong dự án là gì?`, back: `Quyết định về kiến trúc, tiêu chuẩn code và phê duyệt kỹ thuật.` },
+            { front: `Trách nhiệm của Dev là hiện thực hóa yêu cầu thành sản phẩm theo tiêu chuẩn nào?`, back: `Theo chuẩn đã thống nhất.` },
+            { front: `Quyền hạn của QC trong việc kiểm soát chất lượng là gì?`, back: `Xác nhận chất lượng đạt hoặc không đạt theo tiêu chí đã thống nhất.` },
+            { front: `Mục tiêu của việc phân biệt rõ "Quản lý" và "Vận hành" là gì?`, back: `Giúp mỗi người dành đúng thời gian cho đúng việc, tránh dồn việc vào một đầu mối.` },
+            { front: `Trong tư duy mới, mục tiêu của "Vận hành" (Operations) là để mọi thứ diễn ra _____.`, back: `Trơn tru.` },
+            { front: `Trong tư duy mới, mục tiêu của "Quản lý" (Management) là để mọi thứ trở nên _____.`, back: `Tốt hơn.` },
+            { front: `Hoạt động thực thi công việc hằng ngày theo kế hoạch thuộc về nhóm tư duy nào?`, back: `Vận hành.` },
+            { front: `Hoạt động nhìn xa, phòng ngừa rủi ro và cải tiến quy trình thuộc về nhóm tư duy nào?`, back: `Quản lý.` },
+            { front: `Trong văn hóa học tập, công ty khuyến khích tổ chức định kỳ hoạt động gì để chia sẻ kiến thức?`, back: `Các buổi chia sẻ nội bộ (sharing session).` },
+            { front: `Quy trình giao chỉ tiêu theo kỳ gồm 3 bước: Giao chỉ tiêu -> _____ -> Đánh giá lại.`, back: `Theo dõi.` },
+            { front: `Thời điểm thực hiện việc "Giao chỉ tiêu" trong một kỳ công tác là khi nào?`, back: `Đầu mỗi kỳ.` },
+            { front: `Mục đích của việc đánh giá lại kết quả cuối mỗi kỳ là gì?`, back: `Ghi nhận đóng góp công bằng, rút kinh nghiệm và tạo động lực phấn đấu.` },
+            { front: `Ba nhóm chức năng đặc trưng (Specialized Functions) mới được thành lập bao gồm những nhóm nào?`, back: `R&D; Dịch vụ, Ứng phó & Hỗ trợ (Service); Kiểm soát & Nâng cao Chất lượng (QA).` },
+            { front: `Thành phần nhân sự của nhóm R&D gồm những ai?`, back: `Thành viên chuyên trách và thành viên dự bị từ nguồn lực dư ở các dự án.` },
+            { front: `Nhóm chức năng nào có nhiệm vụ biến "thời gian nhàn rỗi" giữa các dự án thành cơ hội đóng góp giá trị?`, back: `Nhóm Nghiên cứu & Phát triển (R&D).` },
+            { front: `Nhiệm vụ chính của nhóm Dịch vụ, Ứng phó & Hỗ trợ (Service / Rescue) là gì?`, back: `Hỗ trợ các hệ thống/dự án đang vận hành và xử lý tình huống khó.` },
+            { front: `Nhóm nào đóng vai trò là "lực lượng phản ứng nhanh" để giữ sự tin cậy với khách hàng?`, back: `Nhóm Dịch vụ, Ứng phó & Hỗ trợ (Service / Rescue).` },
+            { front: `Trách nhiệm của nhóm QA trong việc chuẩn hóa cách làm giữa QC và Dev là gì?`, back: `Huấn luyện, chuẩn hóa cách làm và thống nhất tài liệu dự án.` },
+            { front: `Nhóm nào chịu trách nhiệm kiểm tra tính tuân thủ quy trình và tiêu chuẩn trong các dự án?`, back: `Nhóm Kiểm soát & Nâng cao Chất lượng (QA).` },
+            { front: `Mối quan hệ giữa nhóm QA và đội dự án là gì?`, back: `QA hoạt động song song để giữ vững và nâng cao chuẩn chất lượng.` },
+            { front: `Lộ trình triển khai giai đoạn 1 gồm mấy bước chính?`, back: `3 bước: Khởi động, Củng cố, Nâng cao.` },
+            { front: `Trọng tâm của giai đoạn "Khởi động" là gì?`, back: `Công bố định hướng, thành lập đội phân loại và ban hành bảng phân công vai trò.` },
+            { front: `Kết quả mong đợi sau giai đoạn "Củng cố" là gì?`, back: `Quy trình vận hành ổn định và tài liệu rõ ràng.` },
+            { front: `Trong giai đoạn "Nâng cao", việc đề bạt nhân sự sẽ dựa trên cơ sở nào?`, back: `Đánh giá năng lực.` },
+            { front: `Thông điệp khép lại nhấn mạnh tinh thần làm việc nào để xây dựng đội ngũ IT tự hào?`, back: `Chia sẻ, minh bạch và chính trực.` }
+        ];
+
+        let currentIndex = 0;
+        let isFlipped = false;
+
+        const elements = {
+            cardContainer: document.getElementById('cardContainer'),
+            cardInner: document.getElementById('cardInner'),
+            frontText: document.getElementById('frontText'),
+            backText: document.getElementById('backText'),
+            counter: document.getElementById('counter'),
+            progressBar: document.getElementById('progressBar'),
+            btnPrev: document.getElementById('btnPrev'),
+            btnNext: document.getElementById('btnNext')
+        };
+
+        function renderCard() {
+            const card = flashcardsData[currentIndex];
+            elements.frontText.textContent = card.front;
+            elements.backText.textContent = card.back;
+            elements.counter.textContent = `${currentIndex + 1} / ${flashcardsData.length}`;
+            elements.progressBar.style.width = `${((currentIndex + 1) / flashcardsData.length) * 100}%`;
+        }
+
+        function flipCard() {
+            isFlipped = !isFlipped;
+            if (isFlipped) {
+                elements.cardInner.classList.add('flipped');
+            } else {
+                elements.cardInner.classList.remove('flipped');
+            }
+        }
+
+        function changeCard(offset) {
+            isFlipped = false;
+            elements.cardInner.classList.remove('flipped');
+            
+            // Đợi CSS transition lật lại thẻ rồi mới đổi nội dung
+            setTimeout(() => {
+                currentIndex = (currentIndex + offset + flashcardsData.length) % flashcardsData.length;
+                renderCard();
+            }, 200);
+        }
+
+        // Event Listeners
+        elements.cardContainer.addEventListener('click', flipCard);
+        elements.btnNext.addEventListener('click', () => changeCard(1));
+        elements.btnPrev.addEventListener('click', () => changeCard(-1));
+
+        // Khởi tạo lần đầu
+        renderCard();
+    </script>
+</body>
+</html>
