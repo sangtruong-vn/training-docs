@@ -318,17 +318,6 @@
             }
         }
 
-        function changeCard2(offset) {
-            isFlipped = false;
-            elements.cardInner.classList.remove('flipped');
-            
-            // Đợi CSS transition lật lại thẻ rồi mới đổi nội dung
-            setTimeout(() => {
-                currentIndex = (currentIndex + offset + flashcardsData.length) % flashcardsData.length;
-                renderCard();
-            }, 200);
-        }
-
         function changeCard(offset) {
             if (isFlipped) {
                 isFlipped = false;
